@@ -43,8 +43,9 @@
     background:color-mix(in srgb,var(--iq) 8%,var(--midnight));box-shadow:0 0 0 4px color-mix(in srgb,var(--iq) 7%,transparent);font-size:clamp(16px,2vw,26px)}
   .item.pill.center{justify-content:center}
   .item.right{justify-content:flex-end;text-align:right}
+  .item.text.small.right{white-space:nowrap}
   .item.center{justify-content:center;text-align:center}
-  .item.tile{padding:0;border-radius:6px;overflow:hidden;filter:saturate(1.1)}
+  .item.tile{padding:0;border-radius:0;overflow:hidden;filter:saturate(1.1)}
   .item.tile::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.08),transparent 40%,rgba(0,0,0,.25))}
   .t1{background:linear-gradient(135deg,#3397b9,#1c262f)}
   .t2{background:linear-gradient(135deg,#d85fb8,#7b5cf0)}
@@ -56,8 +57,10 @@
   .i1{background-image:url(store-1140.webp)}
   .i2{background-image:url(primeira-tela-960.webp)}
   .i3{background-image:url(gondola-960.webp)}
+  .i4{background-image:url(abrigo-960.webp)}
+  .i5{background-image:url(tv-960.webp)}
   .item.logo{padding:22px}
-  .item.logo img{width:min(70%,300px);display:block}
+  .item.logo img{width:calc(100% - 44px);display:block}
   .mono{position:absolute;inset:0;background:
       repeating-linear-gradient(90deg,transparent 0 23px,rgba(255,255,255,.18) 23px 24px),
       repeating-linear-gradient(0deg,transparent 0 23px,rgba(255,255,255,.18) 23px 24px),#2a2630}
@@ -81,40 +84,36 @@
 
   // cenas: pesos das colunas/linhas + itens posicionados em células (c,r,cs,rs)
   const scenes=[
-    {cols:[1,1,1,1.6,1],rows:[1,1.4,1,1],hot:{r:2},items:[
-      {t:'logo',c:0,r:1,cs:2,rs:1,va:'mid'},
-      {t:'tile',cls:'t1',c:3,r:1,cs:1,rs:1},
-      {t:'text',cls:'small',c:3,r:3,cs:2,rs:1,txt:'Inteligência espacial',va:'top'}]},
-    {cols:[1,1.4,.6,1,1],rows:[1,1,1.3,1],hot:{c:1},items:[
-      {t:'tile',cls:'img i1',c:0,r:0,cs:1,rs:1},
-      {t:'pill',iq:'geoiq',ac:'#3397b9',vb:'0 0 147.18 41.754',c:3,r:1,cs:2,rs:1,va:'top'},
-      {t:'text',cls:'',c:3,r:2,cs:2,rs:1,txt:'Onde a demanda existe.'},
-      {t:'text',cls:'small',c:1,r:3,cs:2,rs:1,txt:'Places Graph',va:'top'}]},
-    {cols:[1.5,1,1,1,1],rows:[1,1,1,1.3],hot:{r:3},items:[
-      {t:'text',cls:'',c:0,r:2,cs:2,rs:1,txt:'Quanto ela vale.'},
-      {t:'tile',cls:'img i3',c:3,r:2,cs:1,rs:1},
-      {t:'pill',iq:'reviq',ac:'#4cb050',vb:'0 0 126.51 41.754',c:3,r:0,cs:2,rs:1,va:'top'},
-      {t:'text',cls:'small',c:0,r:3,cs:2,rs:1,txt:'Groundflow',va:'top'}]},
-    {cols:[1,1.6,.5,.6,1],rows:[1,1,1,1],hot:{c:3},items:[
-      {t:'pill',iq:'adsiq',ac:'#ff5528',vb:'0 0 138.5 41.754',c:1,r:0,cs:2,rs:1,va:'top'},
-      {t:'text',cls:'',c:1,r:1,cs:2,rs:1,txt:'Com o quê ativar.'},
-      {t:'tile',cls:'img i2',c:4,r:1,cs:1,rs:2},
-      {t:'text',cls:'small',c:1,r:3,cs:2,rs:1,txt:'Max Attention',va:'top'}]},
-    {cols:[1,1,1.3,1,1],rows:[1,1.4,1,1],hot:{r:1},items:[
-      {t:'tile',cls:'t3 grid',c:2,r:1,cs:1,rs:1},
-      {t:'text',cls:'big',c:3,r:1,cs:2,rs:1,txt:'Pergunte.'},
-      {t:'pill',iq:'askiq',ac:'#ea1e63',vb:'0 0 138.5 41.754',c:0,r:3,cs:2,rs:1,va:'top'}]},
+    {cols:[1,1,1,1,1],rows:[1,1,1.25,1.25],hot:{r:2},items:[
+      {t:'logo',c:0,r:0,cs:2,rs:2,va:'mid'},
+      {t:'text',cls:'small',c:0,r:2,cs:1,rs:1,txt:'Inteligência espacial',va:'top'},
+      {t:'tile',cls:'img i1',c:1,r:2,cs:4,rs:2}]},
+    {cols:[1,1,1,1,1],rows:[1,1,1.25,1.25],hot:{r:2},items:[
+      {t:'pill',iq:'geoiq',ac:'#3397b9',vb:'0 0 147.18 41.754',c:0,r:0,cs:2,rs:1,va:'top'},
+      {t:'text',cls:'',c:0,r:1,cs:3,rs:1,txt:'Onde a demanda existe.'},
+      {t:'text',cls:'small',c:3,r:1,cs:1,rs:1,txt:'Places Graph',al:'right'},
+      {t:'tile',cls:'img i4',c:0,r:2,cs:4,rs:2}]},
+    {cols:[1,1,1,1,1],rows:[1.25,1.25,1,1],hot:{r:2},items:[
+      {t:'tile',cls:'img i2',c:1,r:0,cs:4,rs:2},
+      {t:'pill',iq:'adsiq',ac:'#ff5528',vb:'0 0 138.5 41.754',c:1,r:2,cs:2,rs:1,va:'top'},
+      {t:'text',cls:'',c:1,r:3,cs:3,rs:1,txt:'Com o quê ativar.'},
+      {t:'text',cls:'small',c:4,r:3,cs:1,rs:1,txt:'Max Attention',al:'right'}]},
+    {cols:[1,1,1,1,1],rows:[1,1,1.25,1.25],hot:{r:2},items:[
+      {t:'pill',iq:'reviq',ac:'#4cb050',vb:'0 0 126.51 41.754',c:0,r:0,cs:2,rs:1,va:'top'},
+      {t:'text',cls:'',c:0,r:1,cs:3,rs:1,txt:'Quanto ela vale.'},
+      {t:'text',cls:'small',c:3,r:1,cs:1,rs:1,txt:'Groundflow',al:'right'},
+      {t:'tile',cls:'img i3',c:0,r:2,cs:4,rs:2}]},
+    {cols:[1,1,1,1,1],rows:[1.25,1.25,1,1],hot:{r:2},items:[
+      {t:'tile',cls:'img i5',c:1,r:0,cs:4,rs:2},
+      {t:'pill',iq:'askiq',ac:'#ea1e63',vb:'0 0 138.5 41.754',c:1,r:2,cs:2,rs:1,va:'top'},
+      {t:'text',cls:'',c:1,r:3,cs:3,rs:1,txt:'Pergunte a quem está lá.'},
+      {t:'text',cls:'small',c:4,r:3,cs:1,rs:1,txt:'Pesquisa',al:'right'}]},
     {cols:[1,1,1,1,1],rows:[1,1,1,1],hot:{r:2},items:[
-      {t:'text',cls:'',c:0,r:1,cs:3,rs:1,txt:'Quatro IQs.'},
-      {t:'text',cls:'',c:2,r:2,cs:3,rs:1,txt:'Um circuito fechado.',al:'right'},
-      {t:'tile',cls:'t6',c:4,r:0,cs:1,rs:1}]},
-    {cols:[1,1,1,.7,1.3],rows:[1,1.2,1,1],hot:{c:3},items:[
-      {t:'text',cls:'small',c:0,r:0,cs:2,rs:1,txt:'Do bolso à rua',va:'top'},
-      {t:'text',cls:'',c:2,r:0,cs:2,rs:1,txt:'complexidade',al:'right'},
-      {t:'tile',cls:'t1',c:4,r:1,cs:1,rs:1},
-      {t:'text',cls:'',c:3,r:3,cs:2,rs:1,txt:'em clareza.',al:'right'}]},
+      {t:'tile',cls:'t6',c:0,r:1,cs:2,rs:2},
+      {t:'text',cls:'',c:2,r:1,cs:3,rs:1,txt:'Quatro IQs.'},
+      {t:'text',cls:'',c:2,r:2,cs:3,rs:1,txt:'Um circuito fechado.',va:'top'}]},
     {cols:[1,1,1,1,1],rows:[1,1,1,1],hot:{},items:[
-      {t:'text',cls:'big',c:1,r:1,cs:3,rs:2,txt:'A demanda existe.<br>A gente sabe onde.',al:'center'}]}
+      {t:'text',cls:'big',c:1,r:1,cs:3,rs:2,txt:'A demanda existe.<br>A gente sabe onde.',al:'center',va:'mid'}]}
   ];
 
   // elementos fixos: linhas e nós
@@ -144,7 +143,7 @@
       pending.forEach((it,i)=>{
         const e=items[i];
         const x=cx[it.c]*W, y=ry[it.r]*H, w=(cx[it.c+it.cs]-cx[it.c])*W, h=(ry[it.r+it.rs]-ry[it.r])*H;
-        const pad=it.t==='tile'?0.5:0;
+        const pad=0;
         e.style.left=(x+pad)+'px';e.style.top=(y+pad)+'px';e.style.width=(w-pad*2)+'px';e.style.height=(h-pad*2)+'px';
       });
     }
