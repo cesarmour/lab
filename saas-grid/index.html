@@ -30,13 +30,15 @@
   .line.v{width:1px;top:0}
   .node{position:absolute;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:var(--node);transition:background .6s,transform .6s,box-shadow .6s;will-change:left,top}
   .node.hot{background:var(--node-hot);transform:scale(1.55);box-shadow:0 0 10px rgba(255,255,255,.45)}
-  .item{position:absolute;display:flex;align-items:center;opacity:0;transition:opacity .55s ease;will-change:left,top,width,height;padding:0 16px;pointer-events:none}
+  .item{position:absolute;display:flex;align-items:flex-end;opacity:0;transition:opacity .55s ease;will-change:left,top,width,height;padding:22px;pointer-events:none}
+  .item.top{align-items:flex-start}
+  .item.mid{align-items:center}
   .item.on{opacity:1}
   .item.text{font-size:clamp(14px,2vw,26px);font-weight:500;letter-spacing:-.01em;line-height:1.15}
   .item.text.big{font-size:clamp(20px,3.2vw,44px);font-weight:600;letter-spacing:-.025em}
   .item.text.small{font-size:clamp(11px,1.15vw,14px);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
   .iq-logo{display:inline-block;height:1em;width:auto;overflow:visible;color:var(--offwhite)}
-  .item.pill{padding:0}
+  .item.pill{padding:22px}
   .item.pill .node-pill{display:inline-flex;align-items:center;padding:11px 18px 12px;border-radius:999px;border:1px solid color-mix(in srgb,var(--iq) 70%,transparent);
     background:color-mix(in srgb,var(--iq) 8%,var(--midnight));box-shadow:0 0 0 4px color-mix(in srgb,var(--iq) 7%,transparent);font-size:clamp(16px,2vw,26px)}
   .item.pill.center{justify-content:center}
@@ -54,14 +56,14 @@
   .i1{background-image:url(store-1140.webp)}
   .i2{background-image:url(primeira-tela-960.webp)}
   .i3{background-image:url(gondola-960.webp)}
-  .item.logo{padding:0}
-  .item.logo img{width:min(60%,420px);display:block}
+  .item.logo{padding:22px}
+  .item.logo img{width:min(70%,300px);display:block}
   .mono{position:absolute;inset:0;background:
       repeating-linear-gradient(90deg,transparent 0 23px,rgba(255,255,255,.18) 23px 24px),
       repeating-linear-gradient(0deg,transparent 0 23px,rgba(255,255,255,.18) 23px 24px),#2a2630}
   @media (max-width:640px){
     .stage{width:94vw;aspect-ratio:16/9.6}
-    .item{padding:0 8px}
+    .item,.item.logo,.item.pill{padding:10px}
     .brand{top:14px;left:16px}
   }
 </style>
@@ -80,34 +82,34 @@
   // cenas: pesos das colunas/linhas + itens posicionados em células (c,r,cs,rs)
   const scenes=[
     {cols:[1,1,1,1.6,1],rows:[1,1.4,1,1],hot:{r:2},items:[
-      {t:'logo',c:0,r:1,cs:2,rs:1},
+      {t:'logo',c:0,r:1,cs:2,rs:1,va:'mid'},
       {t:'tile',cls:'t1',c:3,r:1,cs:1,rs:1},
-      {t:'text',cls:'small',c:3,r:3,cs:2,rs:1,txt:'Inteligência espacial'}]},
+      {t:'text',cls:'small',c:3,r:3,cs:2,rs:1,txt:'Inteligência espacial',va:'top'}]},
     {cols:[1,1.4,.6,1,1],rows:[1,1,1.3,1],hot:{c:1},items:[
       {t:'tile',cls:'img i1',c:0,r:0,cs:1,rs:1},
-      {t:'pill',iq:'geoiq',ac:'#3397b9',vb:'0 0 147.18 41.754',c:3,r:1,cs:2,rs:1},
+      {t:'pill',iq:'geoiq',ac:'#3397b9',vb:'0 0 147.18 41.754',c:3,r:1,cs:2,rs:1,va:'top'},
       {t:'text',cls:'',c:3,r:2,cs:2,rs:1,txt:'Onde a demanda existe.'},
-      {t:'text',cls:'small',c:1,r:3,cs:2,rs:1,txt:'Places Graph'}]},
+      {t:'text',cls:'small',c:1,r:3,cs:2,rs:1,txt:'Places Graph',va:'top'}]},
     {cols:[1.5,1,1,1,1],rows:[1,1,1,1.3],hot:{r:3},items:[
       {t:'text',cls:'',c:0,r:2,cs:2,rs:1,txt:'Quanto ela vale.'},
       {t:'tile',cls:'img i3',c:3,r:2,cs:1,rs:1},
-      {t:'pill',iq:'reviq',ac:'#4cb050',vb:'0 0 126.51 41.754',c:3,r:0,cs:2,rs:1},
-      {t:'text',cls:'small',c:0,r:3,cs:2,rs:1,txt:'Groundflow'}]},
+      {t:'pill',iq:'reviq',ac:'#4cb050',vb:'0 0 126.51 41.754',c:3,r:0,cs:2,rs:1,va:'top'},
+      {t:'text',cls:'small',c:0,r:3,cs:2,rs:1,txt:'Groundflow',va:'top'}]},
     {cols:[1,1.6,.5,.6,1],rows:[1,1,1,1],hot:{c:3},items:[
-      {t:'pill',iq:'adsiq',ac:'#ff5528',vb:'0 0 138.5 41.754',c:1,r:0,cs:2,rs:1,al:'center'},
-      {t:'text',cls:'',c:1,r:1,cs:2,rs:1,txt:'Com o quê ativar.',al:'center'},
+      {t:'pill',iq:'adsiq',ac:'#ff5528',vb:'0 0 138.5 41.754',c:1,r:0,cs:2,rs:1,va:'top'},
+      {t:'text',cls:'',c:1,r:1,cs:2,rs:1,txt:'Com o quê ativar.'},
       {t:'tile',cls:'img i2',c:4,r:1,cs:1,rs:2},
-      {t:'text',cls:'small',c:1,r:3,cs:3,rs:1,txt:'Max Attention',al:'center'}]},
+      {t:'text',cls:'small',c:1,r:3,cs:2,rs:1,txt:'Max Attention',va:'top'}]},
     {cols:[1,1,1.3,1,1],rows:[1,1.4,1,1],hot:{r:1},items:[
       {t:'tile',cls:'t3 grid',c:2,r:1,cs:1,rs:1},
       {t:'text',cls:'big',c:3,r:1,cs:2,rs:1,txt:'Pergunte.'},
-      {t:'pill',iq:'askiq',ac:'#ea1e63',vb:'0 0 138.5 41.754',c:0,r:3,cs:2,rs:1}]},
+      {t:'pill',iq:'askiq',ac:'#ea1e63',vb:'0 0 138.5 41.754',c:0,r:3,cs:2,rs:1,va:'top'}]},
     {cols:[1,1,1,1,1],rows:[1,1,1,1],hot:{r:2},items:[
       {t:'text',cls:'',c:0,r:1,cs:3,rs:1,txt:'Quatro IQs.'},
       {t:'text',cls:'',c:2,r:2,cs:3,rs:1,txt:'Um circuito fechado.',al:'right'},
       {t:'tile',cls:'t6',c:4,r:0,cs:1,rs:1}]},
     {cols:[1,1,1,.7,1.3],rows:[1,1.2,1,1],hot:{c:3},items:[
-      {t:'text',cls:'small',c:0,r:0,cs:2,rs:1,txt:'Do bolso à rua'},
+      {t:'text',cls:'small',c:0,r:0,cs:2,rs:1,txt:'Do bolso à rua',va:'top'},
       {t:'text',cls:'',c:2,r:0,cs:2,rs:1,txt:'complexidade',al:'right'},
       {t:'tile',cls:'t1',c:4,r:1,cs:1,rs:1},
       {t:'text',cls:'',c:3,r:3,cs:2,rs:1,txt:'em clareza.',al:'right'}]},
@@ -142,7 +144,7 @@
       pending.forEach((it,i)=>{
         const e=items[i];
         const x=cx[it.c]*W, y=ry[it.r]*H, w=(cx[it.c+it.cs]-cx[it.c])*W, h=(ry[it.r+it.rs]-ry[it.r])*H;
-        const pad=it.t==='tile'?1:0;
+        const pad=it.t==='tile'?0.5:0;
         e.style.left=(x+pad)+'px';e.style.top=(y+pad)+'px';e.style.width=(w-pad*2)+'px';e.style.height=(h-pad*2)+'px';
       });
     }
@@ -153,7 +155,7 @@
       const it=scene.items[i];
       e.classList.remove('on');
       if(!it){e.className='item';e.innerHTML='';return;}
-      e.className='item '+(it.t==='tile'?'tile ':it.t==='logo'?'logo ':it.t==='pill'?'pill ':'text ')+(it.cls||'')+(it.al?' '+it.al:'');
+      e.className='item '+(it.t==='tile'?'tile ':it.t==='logo'?'logo ':it.t==='pill'?'pill ':'text ')+(it.cls||'')+(it.al?' '+it.al:'')+(it.va?' '+it.va:'');
       e.innerHTML=it.t==='pill'?'<span class="node-pill" style="--iq:'+it.ac+'"><svg class="iq-logo" viewBox="'+it.vb+'" style="--iq-accent:'+it.ac+'"><use href="#iq-'+it.iq+'"></use></svg></span>':it.t==='logo'?'<img src="hypr-wordmark-white.svg" alt="HYPR">':it.t==='tile'?(it.cls.includes('grid')?'<div class="mono"></div>':''):it.txt;
     });
     pending=scene.items;
