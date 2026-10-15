@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>HYPR Platform</title>
+<style>
+  :root{
+    --bg:#070608;
+    --line:rgba(255,255,255,.22);
+    --node:rgba(255,255,255,.55);
+    --node-hot:#fff;
+    --text:#f4f2f5;
+    --muted:#8f8a95;
+    --font:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased}
+  body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;overflow:hidden;
+       background:radial-gradient(60% 50% at 50% 50%,#120a14 0%,var(--bg) 70%)}
+  .brand{position:fixed;top:22px;left:24px;font-size:13px;letter-spacing:.18em;font-weight:600;color:var(--muted)}
+  .brand b{color:var(--text)}
+  .hint{position:fixed;bottom:20px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+  .stage{position:relative;width:min(92vw,1180px);aspect-ratio:16/8.4;max-height:78vh}
+  .line{position:absolute;background:var(--line);transform-origin:0 0;will-change:transform,left,top,width,height}
+  .line.h{height:1px;left:0}
+  .line.v{width:1px;top:0}
+  .node{position:absolute;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:var(--node);transition:background .6s,transform .6s,box-shadow .6s;will-change:left,top}
+  .node.hot{background:var(--node-hot);transform:scale(1.55);box-shadow:0 0 10px rgba(255,255,255,.45)}
+  .item{position:absolute;display:flex;align-items:center;opacity:0;transition:opacity .55s ease;will-change:left,top,width,height;padding:0 16px;pointer-events:none}
+  .item.on{opacity:1}
+  .item.text{font-size:clamp(14px,2vw,26px);font-weight:500;letter-spacing:-.01em;line-height:1.15}
+  .item.text.big{font-size:clamp(20px,3.2vw,44px);font-weight:600;letter-spacing:-.025em}
+  .item.text.small{font-size:clamp(11px,1.15vw,14px);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .item.text.iq{font-size:clamp(13px,1.4vw,18px);font-weight:600;letter-spacing:0;color:var(--text)}
+  .item.right{justify-content:flex-end;text-align:right}
+  .item.center{justify-content:center;text-align:center}
+  .item.tile{padding:0;border-radius:6px;overflow:hidden;filter:saturate(1.1)}
+  .item.tile::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.08),transparent 40%,rgba(0,0,0,.25))}
+  .t1{background:linear-gradient(135deg,#ff3b6b,#b4257a)}
+  .t2{background:linear-gradient(135deg,#d85fb8,#7b5cf0)}
+  .t3{background:linear-gradient(135deg,#2a2630,#5a5663)}
+  .t4{background:linear-gradient(135deg,#ff6a3d,#ff3b6b)}
+  .t5{background:radial-gradient(circle at 40% 40%,#ff5c8a,#5b1a3a 70%)}
+  .t6{background:linear-gradient(135deg,#1f3a8a,#2563eb)}
+  .mono{position:absolute;inset:0;background:
+      repeating-linear-gradient(90deg,transparent 0 23px,rgba(255,255,255,.18) 23px 24px),
+      repeating-linear-gradient(0deg,transparent 0 23px,rgba(255,255,255,.18) 23px 24px),#2a2630}
+  @media (max-width:640px){
+    .stage{width:94vw;aspect-ratio:16/9.6}
+    .item{padding:0 8px}
+    .brand{top:14px;left:16px}
+  }
+</style>
+</head>
+<body>
+<div class="brand"><b>HYPR</b> &nbsp;PLATFORM</div>
+<div class="stage" id="stage"></div>
+<div class="hint">Spatial intelligence</div>
+
+<script>
+(function(){
+  const COLS=5, ROWS=4;
+  const stage=document.getElementById('stage');
+
+  // cenas: pesos das colunas/linhas + itens posicionados em células (c,r,cs,rs)
+  const scenes=[
+    {cols:[1,1,1,1.6,1],rows:[1,1.4,1,1],hot:{r:2},items:[
+      {t:'text',cls:'big',c:0,r:1,cs:2,rs:1,txt:'HYPR Platform'},
+      {t:'tile',cls:'t1',c:3,r:1,cs:1,rs:1},
+      {t:'text',cls:'small',c:3,r:3,cs:2,rs:1,txt:'Inteligência espacial'}]},
+    {cols:[1,1.4,.6,1,1],rows:[1,1,1.3,1],hot:{c:1},items:[
+      {t:'tile',cls:'t5',c:0,r:0,cs:1,rs:1},
+      {t:'text',cls:'iq',c:3,r:1,cs:2,rs:1,txt:'geoIQ'},
+      {t:'text',cls:'',c:3,r:2,cs:2,rs:1,txt:'Onde a demanda existe.'},
+      {t:'text',cls:'small',c:1,r:3,cs:2,rs:1,txt:'Places Graph'}]},
+    {cols:[1.5,1,1,1,1],rows:[1,1,1,1.3],hot:{r:3},items:[
+      {t:'text',cls:'',c:0,r:2,cs:2,rs:1,txt:'Quanto ela vale.'},
+      {t:'tile',cls:'t2',c:3,r:2,cs:1,rs:1},
+      {t:'text',cls:'iq',c:3,r:0,cs:2,rs:1,txt:'revIQ'},
+      {t:'text',cls:'small',c:0,r:3,cs:2,rs:1,txt:'Groundflow'}]},
+    {cols:[1,1.6,.5,.6,1],rows:[1,1,1,1],hot:{c:3},items:[
+      {t:'text',cls:'iq',c:1,r:0,cs:2,rs:1,txt:'adsIQ'},
+      {t:'text',cls:'',c:1,r:1,cs:2,rs:1,txt:'Com o quê ativar.',al:'center'},
+      {t:'tile',cls:'t4',c:4,r:1,cs:1,rs:2},
+      {t:'text',cls:'small',c:1,r:3,cs:3,rs:1,txt:'Max Attention',al:'center'}]},
+    {cols:[1,1,1.3,1,1],rows:[1,1.4,1,1],hot:{r:1},items:[
+      {t:'tile',cls:'t3 grid',c:2,r:1,cs:1,rs:1},
+      {t:'text',cls:'big',c:3,r:1,cs:2,rs:1,txt:'Pergunte.'},
+      {t:'text',cls:'iq',c:0,r:3,cs:2,rs:1,txt:'askIQ'}]},
+    {cols:[1,1,1,1,1],rows:[1,1,1,1],hot:{r:2},items:[
+      {t:'text',cls:'',c:0,r:1,cs:3,rs:1,txt:'Quatro IQs.'},
+      {t:'text',cls:'',c:2,r:2,cs:3,rs:1,txt:'Um circuito fechado.',al:'right'},
+      {t:'tile',cls:'t6',c:4,r:0,cs:1,rs:1}]},
+    {cols:[1,1,1,.7,1.3],rows:[1,1.2,1,1],hot:{c:3},items:[
+      {t:'text',cls:'small',c:0,r:0,cs:2,rs:1,txt:'Do bolso à rua'},
+      {t:'text',cls:'',c:2,r:0,cs:2,rs:1,txt:'complexidade',al:'right'},
+      {t:'tile',cls:'t1',c:4,r:1,cs:1,rs:1},
+      {t:'text',cls:'',c:3,r:3,cs:2,rs:1,txt:'em clareza.',al:'right'}]},
+    {cols:[1,1,1,1,1],rows:[1,1,1,1],hot:{},items:[
+      {t:'text',cls:'big',c:1,r:1,cs:3,rs:2,txt:'A demanda existe.<br>A gente sabe onde.',al:'center'}]}
+  ];
+
+  // elementos fixos: linhas e nós
+  const hLines=[],vLines=[],nodes=[];
+  for(let r=0;r<=ROWS;r++){const e=document.createElement('div');e.className='line h';stage.appendChild(e);hLines.push(e);}
+  for(let c=0;c<=COLS;c++){const e=document.createElement('div');e.className='line v';stage.appendChild(e);vLines.push(e);}
+  for(let r=0;r<=ROWS;r++)for(let c=0;c<=COLS;c++){const e=document.createElement('div');e.className='node';stage.appendChild(e);nodes.push(e);}
+
+  // pool de itens (máx 5 por cena)
+  const POOL=5, items=[];
+  for(let i=0;i<POOL;i++){const e=document.createElement('div');e.className='item';stage.appendChild(e);items.push(e);}
+
+  const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  const cum=w=>{const s=w.reduce((a,b)=>a+b,0);const out=[0];let acc=0;for(const x of w){acc+=x/s;out.push(acc);}return out;};
+
+  let cur=cum(scenes[0].cols), curR=cum(scenes[0].rows);
+  let from=cur, fromR=curR, to=cur, toR=curR;
+  let t0=0, DUR=1150, animating=false, idx=0, pending=null;
+
+  function layout(cx,ry){
+    const W=stage.clientWidth, H=stage.clientHeight;
+    hLines.forEach((e,i)=>{e.style.top=(ry[i]*H)+'px';e.style.width=W+'px';});
+    vLines.forEach((e,i)=>{e.style.left=(cx[i]*W)+'px';e.style.height=H+'px';});
+    let k=0;
+    for(let r=0;r<=ROWS;r++)for(let c=0;c<=COLS;c++){const n=nodes[k++];n.style.left=(cx[c]*W)+'px';n.style.top=(ry[r]*H)+'px';}
+    if(pending){
+      pending.forEach((it,i)=>{
+        const e=items[i];
+        const x=cx[it.c]*W, y=ry[it.r]*H, w=(cx[it.c+it.cs]-cx[it.c])*W, h=(ry[it.r+it.rs]-ry[it.r])*H;
+        const pad=it.t==='tile'?1:0;
+        e.style.left=(x+pad)+'px';e.style.top=(y+pad)+'px';e.style.width=(w-pad*2)+'px';e.style.height=(h-pad*2)+'px';
+      });
+    }
+  }
+
+  function applyItems(scene){
+    items.forEach((e,i)=>{
+      const it=scene.items[i];
+      e.classList.remove('on');
+      if(!it){e.className='item';e.innerHTML='';return;}
+      e.className='item '+(it.t==='tile'?'tile ':'text ')+(it.cls||'')+(it.al?' '+it.al:'');
+      e.innerHTML=it.t==='tile'?(it.cls.includes('grid')?'<div class="mono"></div>':''):it.txt;
+    });
+    pending=scene.items;
+    let k=0;
+    for(let r=0;r<=ROWS;r++)for(let c=0;c<=COLS;c++){
+      const n=nodes[k++];
+      const hot=(scene.hot.r!==undefined&&r===scene.hot.r)||(scene.hot.c!==undefined&&c===scene.hot.c);
+      n.classList.toggle('hot',hot);
+    }
+  }
+
+  function go(next){
+    const s=scenes[next];
+    from=cur;fromR=curR;to=cum(s.cols);toR=cum(s.rows);
+    items.forEach(e=>e.classList.remove('on'));
+    setTimeout(()=>{applyItems(s);layout(cur,curR);requestAnimationFrame(()=>items.forEach((e,i)=>{if(s.items[i])e.classList.add('on');}));},420);
+    t0=performance.now();animating=true;
+  }
+
+  function frame(now){
+    if(animating){
+      let p=Math.min(1,(now-t0)/DUR);const e=ease(p);
+      cur=from.map((v,i)=>v+(to[i]-v)*e);
+      curR=fromR.map((v,i)=>v+(toR[i]-v)*e);
+      if(p>=1)animating=false;
+    }
+    layout(cur,curR);
+    requestAnimationFrame(frame);
+  }
+
+  applyItems(scenes[0]);layout(cur,curR);
+  requestAnimationFrame(()=>items.forEach((e,i)=>{if(scenes[0].items[i])e.classList.add('on');}));
+  requestAnimationFrame(frame);
+  setInterval(()=>{idx=(idx+1)%scenes.length;go(idx);},3000);
+  window.addEventListener('resize',()=>layout(cur,curR));
+})();
+</script>
+</body>
+</html>
