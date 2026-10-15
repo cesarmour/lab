@@ -43,9 +43,8 @@
 <div class="meta">4D / R<sup>4</sup> → R<sup>2</sup></div>
 <div class="stage" id="stage">
   <canvas id="c"></canvas>
-  <div class="center"><div class="k">HYPR Platform</div><div class="t" id="t">Own the Journey.</div></div>
-</div>
-<div class="hint">Spatial intelligence</div>
+  </div>
+
 <script>
 (function(){
   const stage=document.getElementById('stage'),cv=document.getElementById('c'),ctx=cv.getContext('2d');
@@ -64,9 +63,8 @@
   function project(p){const q=p.slice();const d4=4.2,w=1/(d4-q[3]);let x=q[0]*w*d4*.62,y=q[1]*w*d4*.62,z=q[2]*w*d4*.62;const d3=9,k=1/(d3-z);return [x*k*d3,y*k*d3,z,w];}
   let W,H,DPR;function resize(){DPR=Math.min(2,devicePixelRatio||1);W=stage.clientWidth;H=stage.clientHeight;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);}
   resize();addEventListener('resize',resize);
-  let active=0;const T=document.getElementById('t');
-  setInterval(()=>{active=(active+1)%5;T.classList.add('off');setTimeout(()=>{T.innerHTML=active<4?IQ[active].txt:'Own the Journey.';T.classList.remove('off');},500);
-    pills.forEach((e,i)=>e.classList.toggle('dim',active<4&&i!==active));},3200);
+  let active=0;
+  setInterval(()=>{active=(active+1)%5;pills.forEach((e,i)=>e.classList.toggle('dim',active<4&&i!==active));},3200);
   function frame(now){
     const t=now/1000;const S=Math.min(W,H)*.33;
     const P=V.map(v=>{const p=v.slice();rot(p,0,3,t*.3);rot(p,1,3,t*.11);rot(p,0,2,.62);rot(p,1,2,.38);const r=project(p);return [W/2+r[0]*S,H/2+r[1]*S,r[2],r[3]];});
