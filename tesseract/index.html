@@ -43,17 +43,17 @@
 <div class="meta">4D / R<sup>4</sup> → R<sup>2</sup></div>
 <div class="stage" id="stage">
   <canvas id="c"></canvas>
-  <div class="center"><div class="k">Circuito fechado</div><div class="t" id="t">Quatro IQs.<br>Um circuito fechado.</div></div>
+  <div class="center"><div class="k">HYPR Platform</div><div class="t" id="t">Own the Journey.</div></div>
 </div>
 <div class="hint">Spatial intelligence</div>
 <script>
 (function(){
   const stage=document.getElementById('stage'),cv=document.getElementById('c'),ctx=cv.getContext('2d');
   const IQ=[
-    {id:'geoiq',ac:'#3397b9',vb:'0 0 147.18 41.754',v:0, txt:'O lugar define<br>onde a mídia entra.'},
-    {id:'adsiq',ac:'#ff5528',vb:'0 0 138.5 41.754', v:5, txt:'A mídia é medida<br>na nota fiscal.'},
-    {id:'reviq',ac:'#4cb050',vb:'0 0 126.51 41.754',v:15,txt:'A venda aponta<br>o que perguntar.'},
-    {id:'askiq',ac:'#ea1e63',vb:'0 0 138.5 41.754', v:10,txt:'A pesquisa<br>recalibra o lugar.'}
+    {id:'geoiq',ac:'#3397b9',vb:'0 0 147.18 41.754',v:0, txt:'Onde.<br>A demanda tem endereço.'},
+    {id:'adsiq',ac:'#ff5528',vb:'0 0 138.5 41.754', v:5, txt:'Com o quê.<br>A mídia certa, no lugar certo.'},
+    {id:'reviq',ac:'#4cb050',vb:'0 0 126.51 41.754',v:15,txt:'Quanto.<br>A venda real, na nota fiscal.'},
+    {id:'askiq',ac:'#ea1e63',vb:'0 0 138.5 41.754', v:10,txt:'Pergunte.<br>A quem está lá.'}
   ];
   const pills=IQ.map(q=>{const e=document.createElement('div');e.className='pill';e.style.setProperty('--iq',q.ac);
     e.innerHTML='<svg class="iq-logo" viewBox="'+q.vb+'" style="--iq-accent:'+q.ac+'"><use href="#iq-'+q.id+'"></use></svg>';stage.appendChild(e);return e;});
@@ -65,7 +65,7 @@
   let W,H,DPR;function resize(){DPR=Math.min(2,devicePixelRatio||1);W=stage.clientWidth;H=stage.clientHeight;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);}
   resize();addEventListener('resize',resize);
   let active=0;const T=document.getElementById('t');
-  setInterval(()=>{active=(active+1)%5;T.classList.add('off');setTimeout(()=>{T.innerHTML=active<4?IQ[active].txt:'Quatro IQs.<br>Um circuito fechado.';T.classList.remove('off');},500);
+  setInterval(()=>{active=(active+1)%5;T.classList.add('off');setTimeout(()=>{T.innerHTML=active<4?IQ[active].txt:'Own the Journey.';T.classList.remove('off');},500);
     pills.forEach((e,i)=>e.classList.toggle('dim',active<4&&i!==active));},3200);
   function frame(now){
     const t=now/1000;const S=Math.min(W,H)*.33;
