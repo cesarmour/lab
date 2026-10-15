@@ -39,6 +39,11 @@
   .item.text.small{font-size:clamp(11px,1.15vw,14px);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
   .iq-logo{display:inline-block;height:1em;width:auto;overflow:visible;color:var(--offwhite)}
   .item.pill{padding:22px}
+  .item.box{padding:22px;flex-direction:column;justify-content:space-between;align-items:flex-start;background:var(--iq);color:#fff}
+  .item.box .iq-logo{color:#fff;font-size:clamp(22px,2.6vw,36px)}
+  .item.box .word{font-size:clamp(14px,1.6vw,22px);font-weight:400;letter-spacing:-.01em;opacity:.92}
+  .item.logobox{padding:22px;background:#2b3a47;color:#fff;align-items:center}
+  .item.logobox img{width:calc(100% - 20px);display:block}
   .item.pill .node-pill{display:inline-flex;align-items:center;padding:11px 18px 12px;border-radius:999px;border:1px solid color-mix(in srgb,var(--iq) 70%,transparent);
     background:color-mix(in srgb,var(--iq) 8%,var(--midnight));box-shadow:0 0 0 4px color-mix(in srgb,var(--iq) 7%,transparent);font-size:clamp(16px,2vw,26px)}
   .item.pill.center{justify-content:center}
@@ -66,7 +71,7 @@
       repeating-linear-gradient(0deg,transparent 0 23px,rgba(255,255,255,.18) 23px 24px),#2a2630}
   @media (max-width:640px){
     .stage{width:94vw;aspect-ratio:16/9.6}
-    .item,.item.logo,.item.pill{padding:10px}
+    .item,.item.logo,.item.pill,.item.box,.item.logobox{padding:10px}
     .brand{top:14px;left:16px}
   }
 </style>
@@ -85,33 +90,32 @@
   // cenas: pesos das colunas/linhas + itens posicionados em células (c,r,cs,rs)
   const scenes=[
     {cols:[1,1,1,1,1],rows:[1,1,1.25,1.25],hot:{r:2},items:[
-      {t:'logo',c:0,r:0,cs:2,rs:2,va:'mid'},
-      {t:'text',cls:'small',c:0,r:2,cs:1,rs:1,txt:'Inteligência espacial',va:'top'},
-      {t:'tile',cls:'img i1',c:1,r:2,cs:4,rs:2}]},
+      {t:'logobox',c:0,r:0,cs:2,rs:2},
+      {t:'text',cls:'small',c:2,r:1,cs:2,rs:1,txt:'Inteligência espacial'},
+      {t:'tile',cls:'img i1',c:0,r:2,cs:4,rs:2}]},
     {cols:[1,1,1,1,1],rows:[1,1,1.25,1.25],hot:{r:2},items:[
-      {t:'pill',iq:'geoiq',ac:'#3397b9',vb:'0 0 147.18 41.754',c:0,r:0,cs:2,rs:1,va:'top'},
-      {t:'text',cls:'',c:0,r:1,cs:3,rs:1,txt:'Onde a demanda existe.'},
-      {t:'text',cls:'small',c:3,r:1,cs:1,rs:1,txt:'Places Graph',al:'right'},
+      {t:'box',iq:'geoiq',ac:'#3397b9',vb:'0 0 147.18 41.754',word:'Onde',c:0,r:0,cs:2,rs:2},
+      {t:'text',cls:'',c:2,r:1,cs:3,rs:1,txt:'Onde a demanda existe.'},
+      {t:'text',cls:'small',c:2,r:0,cs:2,rs:1,txt:'Places Graph',va:'top'},
       {t:'tile',cls:'img i4',c:0,r:2,cs:4,rs:2}]},
     {cols:[1,1,1,1,1],rows:[1.25,1.25,1,1],hot:{r:2},items:[
       {t:'tile',cls:'img i2',c:1,r:0,cs:4,rs:2},
-      {t:'pill',iq:'adsiq',ac:'#ff5528',vb:'0 0 138.5 41.754',c:1,r:2,cs:2,rs:1,va:'top'},
-      {t:'text',cls:'',c:1,r:3,cs:3,rs:1,txt:'Com o quê ativar.'},
-      {t:'text',cls:'small',c:4,r:3,cs:1,rs:1,txt:'Max Attention',al:'right'}]},
+      {t:'box',iq:'adsiq',ac:'#ff5528',vb:'0 0 138.5 41.754',word:'Com o quê',c:1,r:2,cs:2,rs:2},
+      {t:'text',cls:'small',c:3,r:2,cs:2,rs:1,txt:'Max Attention',va:'top'},
+      {t:'text',cls:'',c:3,r:3,cs:2,rs:1,txt:'Com o quê ativar.'}]},
     {cols:[1,1,1,1,1],rows:[1,1,1.25,1.25],hot:{r:2},items:[
-      {t:'pill',iq:'reviq',ac:'#4cb050',vb:'0 0 126.51 41.754',c:0,r:0,cs:2,rs:1,va:'top'},
-      {t:'text',cls:'',c:0,r:1,cs:3,rs:1,txt:'Quanto ela vale.'},
-      {t:'text',cls:'small',c:3,r:1,cs:1,rs:1,txt:'Groundflow',al:'right'},
+      {t:'box',iq:'reviq',ac:'#4cb050',vb:'0 0 126.51 41.754',word:'Quanto',c:0,r:0,cs:2,rs:2},
+      {t:'text',cls:'small',c:2,r:0,cs:2,rs:1,txt:'Groundflow',va:'top'},
+      {t:'text',cls:'',c:2,r:1,cs:3,rs:1,txt:'Quanto ela vale.'},
       {t:'tile',cls:'img i3',c:0,r:2,cs:4,rs:2}]},
     {cols:[1,1,1,1,1],rows:[1.25,1.25,1,1],hot:{r:2},items:[
       {t:'tile',cls:'img i5',c:1,r:0,cs:4,rs:2},
-      {t:'pill',iq:'askiq',ac:'#ea1e63',vb:'0 0 138.5 41.754',c:1,r:2,cs:2,rs:1,va:'top'},
-      {t:'text',cls:'',c:1,r:3,cs:3,rs:1,txt:'Pergunte a quem está lá.'},
-      {t:'text',cls:'small',c:4,r:3,cs:1,rs:1,txt:'Pesquisa',al:'right'}]},
-    {cols:[1,1,1,1,1],rows:[1,1,1,1],hot:{r:2},items:[
-      {t:'tile',cls:'t6',c:0,r:1,cs:2,rs:2},
-      {t:'text',cls:'',c:2,r:1,cs:3,rs:1,txt:'Quatro IQs.'},
-      {t:'text',cls:'',c:2,r:2,cs:3,rs:1,txt:'Um circuito fechado.',va:'top'}]},
+      {t:'box',iq:'askiq',ac:'#ea1e63',vb:'0 0 138.5 41.754',word:'Pergunte',c:1,r:2,cs:2,rs:2},
+      {t:'text',cls:'small',c:3,r:2,cs:2,rs:1,txt:'Pesquisa',va:'top'},
+      {t:'text',cls:'',c:3,r:3,cs:2,rs:1,txt:'Pergunte a quem está lá.'}]},
+    {cols:[1,1,1,1,1],rows:[1.2,1.2,1,1],hot:{r:2},items:[
+      {t:'box',iq:'geoiq',ac:'#3397b9',vb:'0 0 147.18 41.754',word:'Onde',c:0,r:0,cs:1,rs:2},{t:'box',iq:'adsiq',ac:'#ff5528',vb:'0 0 138.5 41.754',word:'Com o quê',c:1,r:0,cs:1,rs:2},{t:'box',iq:'reviq',ac:'#4cb050',vb:'0 0 126.51 41.754',word:'Quanto',c:2,r:0,cs:1,rs:2},{t:'box',iq:'askiq',ac:'#ea1e63',vb:'0 0 138.5 41.754',word:'Pergunte',c:3,r:0,cs:1,rs:2},
+      {t:'text',cls:'',c:0,r:2,cs:4,rs:1,txt:'Quatro IQs. Um circuito fechado.',va:'top'}]},
     {cols:[1,1,1,1,1],rows:[1,1,1,1],hot:{},items:[
       {t:'text',cls:'big',c:1,r:1,cs:3,rs:2,txt:'A demanda existe.<br>A gente sabe onde.',al:'center',va:'mid'}]}
   ];
@@ -123,7 +127,7 @@
   for(let r=0;r<=ROWS;r++)for(let c=0;c<=COLS;c++){const e=document.createElement('div');e.className='node';stage.appendChild(e);nodes.push(e);}
 
   // pool de itens (máx 5 por cena)
-  const POOL=5, items=[];
+  const POOL=6, items=[];
   for(let i=0;i<POOL;i++){const e=document.createElement('div');e.className='item';stage.appendChild(e);items.push(e);}
 
   const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
@@ -154,8 +158,9 @@
       const it=scene.items[i];
       e.classList.remove('on');
       if(!it){e.className='item';e.innerHTML='';return;}
-      e.className='item '+(it.t==='tile'?'tile ':it.t==='logo'?'logo ':it.t==='pill'?'pill ':'text ')+(it.cls||'')+(it.al?' '+it.al:'')+(it.va?' '+it.va:'');
-      e.innerHTML=it.t==='pill'?'<span class="node-pill" style="--iq:'+it.ac+'"><svg class="iq-logo" viewBox="'+it.vb+'" style="--iq-accent:'+it.ac+'"><use href="#iq-'+it.iq+'"></use></svg></span>':it.t==='logo'?'<img src="hypr-wordmark-white.svg" alt="HYPR">':it.t==='tile'?(it.cls.includes('grid')?'<div class="mono"></div>':''):it.txt;
+      e.className='item '+(it.t==='tile'?'tile ':it.t==='logo'?'logo ':it.t==='pill'?'pill ':it.t==='box'?'box ':it.t==='logobox'?'logobox ':'text ')+(it.cls||'')+(it.al?' '+it.al:'')+(it.va?' '+it.va:'');
+      if(it.t==='box')e.style.setProperty('--iq',it.ac);
+      e.innerHTML=it.t==='box'?'<svg class="iq-logo" viewBox="'+it.vb+'" style="--iq-accent:rgba(255,255,255,.72)"><use href="#iq-'+it.iq+'"></use></svg><div class="word">'+it.word+'</div>':it.t==='logobox'?'<img src="hypr-wordmark-white.svg" alt="HYPR">':it.t==='pill'?'<span class="node-pill" style="--iq:'+it.ac+'"><svg class="iq-logo" viewBox="'+it.vb+'" style="--iq-accent:'+it.ac+'"><use href="#iq-'+it.iq+'"></use></svg></span>':it.t==='logo'?'<img src="hypr-wordmark-white.svg" alt="HYPR">':it.t==='tile'?(it.cls.includes('grid')?'<div class="mono"></div>':''):it.txt;
     });
     pending=scene.items;
     let k=0;
