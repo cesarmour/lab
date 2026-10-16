@@ -121,6 +121,7 @@ button.run svg{width:12px;height:12px}
 .ln .m{font-family:var(--mono);font-size:10.5px;color:var(--steel)}
 .ln .who{font-weight:600;color:var(--midnight);white-space:nowrap;font-size:12.5px}
 .ln.orq .who{color:var(--deep)}
+.ln.aud .who{color:var(--deep)}
 .ln .act{color:var(--steel)}
 .ln .ds{font-family:var(--mono);font-size:11px;color:var(--midnight)}
 .ln pre{margin:4px 0 2px;padding:8px 12px;background:var(--off);border:1px solid var(--mist);border-radius:var(--r-sm);font-family:var(--mono);font-size:10.5px;line-height:1.5;color:var(--slate);white-space:pre-wrap;overflow:hidden}
@@ -172,7 +173,7 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
     <div class="grid">
       <div>
         <h1>Por que as vendas de protetor solar caíram <em>18%</em> em junho?</h1>
-        <p class="lede">A mesma pergunta, respondida de dois jeitos. À esquerda, uma pessoa num chat, uma hipótese por vez. À direita, um <b>orquestrador</b> quebra a pergunta em cinco hipóteses e cinco agentes investigam ao mesmo tempo nas bases da HYPR.</p>
+        <p class="lede">A mesma pergunta, respondida de dois jeitos. À esquerda, uma pessoa num chat, uma hipótese por vez. À direita, sete agentes: um <b>orquestrador</b> quebra a pergunta em cinco hipóteses, cinco investigam ao mesmo tempo nas bases da HYPR e um auditor refaz a conta sem ter visto o trabalho.</p>
       </div>
       <div>
         <button class="run" id="run" type="button"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 2.5v11l10-5.5z"/></svg><span>Rodar a simulação</span></button>
@@ -199,7 +200,7 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
 
   <div class="lane agents">
     <div class="lane-head">
-      <div><h2>Cinco agentes</h2><p>Um pedido, cinco investigações em paralelo</p></div>
+      <div><h2>Sete agentes</h2><p>Orquestrador, cinco investigadores, um auditor</p></div>
       <div class="kpi"><div class="v" id="t-ag">0</div><div class="l">tokens consumidos</div></div>
       <div class="kpi" id="k-ag"><div class="v" id="c-ag">0 min</div><div class="l">tempo decorrido</div></div>
     </div>
@@ -214,20 +215,21 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
 <section class="compare" id="compare">
   <h2>Mesma pergunta, <em>dois</em> resultados</h2>
   <table>
-    <thead><tr><th>Medida</th><th>Um chat</th><th>Cinco agentes</th></tr></thead>
+    <thead><tr><th>Medida</th><th>Um chat</th><th>Sete agentes</th></tr></thead>
     <tbody>
       <tr><td>Turnos digitados pela pessoa</td><td id="k1">…</td><td>1</td></tr>
-      <tr><td>Tempo até a resposta</td><td id="k2">…</td><td>13 min</td></tr>
+      <tr><td>Tempo até a resposta</td><td id="k2">…</td><td>15 min</td></tr>
       <tr><td>Tokens consumidos</td><td id="k9">…</td><td id="t-ag-k">…</td></tr>
       <tr><td>Consultas rodadas</td><td id="k3">…</td><td id="q-ag">…</td></tr>
       <tr><td>Hipóteses descartadas com dado</td><td id="k4">…</td><td>4: ruptura, UV nacional, alcance, UF sem canal</td></tr>
       <tr><td>Hipóteses cruzadas entre si</td><td id="k5">…</td><td>Todas, pelo orquestrador</td></tr>
+      <tr><td>Checagem independente</td><td id="k10">…</td><td>Sim: auditor refez 2 consultas e achou uma ressalva (base de comparação)</td></tr>
       <tr><td>Informação perdida no caminho</td><td id="k6">…</td><td>Nenhuma: cada agente devolve só a conclusão</td></tr>
       <tr><td>Causa principal com peso</td><td id="k7">…</td><td>Sim: campanhas e promoção ≈ 10 pts, clima ≈ 8 pts</td></tr>
       <tr><td>Próxima ação definida</td><td id="k8">…</td><td>Sim, com audiência e volume</td></tr>
     </tbody>
   </table>
-  <p class="foot">Os tempos, os turnos e os tokens são simulados. Os nomes e volumes de audiência vêm do catálogo HYPR. Os datasets, as consultas e os números do caso são ilustrativos. Clima vem de fonte externa (INMET); o resto vem das bases HYPR: notas fiscais, lugares, audiências, performance das campanhas na rede e pesquisas.</p>
+  <p class="foot">Os tempos, os turnos e os tokens são simulados. Os nomes e volumes de audiência vêm do catálogo HYPR. Os datasets, as consultas e os números do caso são ilustrativos. Clima vem de fonte externa (INMET); o resto vem das bases HYPR: notas fiscais, lugares, audiências, performance das campanhas na rede e pesquisas. Clima vem de fonte externa (INMET); o resto vem das bases HYPR: notas fiscais, lugares, audiências, performance das campanhas na rede e pesquisas.</p>
 </section>
 </div>
 
@@ -334,11 +336,23 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
     [8.6,'note',null,'Sobreposição: promoção retirada, B na prateleira e campanhas pausadas são o mesmo evento visto de três lados. Agentes 1, 3 e 5 apontam a mesma semana'],
     [9.3,'note',null,'Pedindo ao Agente 2 um teste: onde não houve a B nem corte de mídia, quanto caiu?'],
     [10.4,'note',null,'Agente 2: Nordeste, sem B e com sol, −4%. Clima sozinho em SP, sem o evento, seria ≈ −8%'],
-    [11.0,'note',null,'Reconciliado: clima ≈ 8 pts, evento de mídia + promoção + concorrente ≈ 10 pts'],
-    [11.6,'conn','bid','search_audiences("farmácia")'],
-    [12.2,'res','bid','88 audiências · Visitantes de Farmácias · 21.647.167 pessoas · 9.991 endereços'],
-    [12.8,'find',null,'Resposta pronta'],
-    [13.0,'done',null,'Concluído']]};
+    [11.0,'note',null,'Reconciliado: clima ≈ 8 pts, evento de campanhas + promoção + concorrente ≈ 10 pts. Enviando ao Auditor'],
+    [13.6,'conn','bid','search_audiences("farmácia")'],
+    [14.2,'res','bid','88 audiências · Visitantes de Farmácias · 21.647.167 pessoas · 9.991 endereços'],
+    [14.8,'find',null,'Resposta pronta, auditada'],
+    [15.0,'done',null,'Concluído']]};
+  var aud={id:'aud', n:'Auditor', role:'', l:[
+    [11.2,'hyp',null,'Recebeu só a conclusão e os números, não o raciocínio. Vai refazer os dois pilares por conta própria'],
+    [11.4,'conn','rev','revIQ · transactions.nf_items'],
+    [11.6,'sql','rev','<k>SELECT</k> brand, p.channel,\n  SUM(<k>IF</k>(m=6, qty, 0))/SUM(<k>IF</k>(m=5, qty, 0)) - 1 var\n<k>FROM</k> `transactions.nf_items` n <k>JOIN</k> `places.pois` p <k>USING</k> (store_id)\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>GROUP BY</k> 1, 2'],
+    [12.3,'res','rev','18 linhas · 2.402.511 lidas · 3,0 s · 640 MB'],
+    [12.5,'note',null,'Confere: marca −27% em farmácia, B +41% em farmácia, demais marcas entre −5% e −9%'],
+    [12.6,'conn','geo','geoIQ · places.weather_daily'],
+    [12.8,'sql','geo','<k>SELECT</k> p.region, AVG(w.uv_index) uv, SUM(n.qty) un\n<k>FROM</k> `transactions.nf_items` n <k>JOIN</k> `places.pois` p <k>USING</k> (store_id)\n<k>JOIN</k> `places.weather_daily` w <k>ON</k> w.city = p.city <k>AND</k> w.dt = n.dt\n<k>WHERE</k> n.brand = <s>\'marca\'</s> <k>AND</k> n.dt >= <s>\'2026-05-01\'</s> <k>GROUP BY</k> 1'],
+    [13.2,'res','geo','5 linhas · 2.816.220 lidas · 3,6 s'],
+    [13.3,'dead',null,'Ressalva: os agentes compararam junho com maio. Contra junho/2025 a queda é 17,6%, não 18%. Dentro da margem, mas vai na nota'],
+    [13.4,'find',null,'Conta fecha: 8 + 10 = 18. Controle do Nordeste confirma o clima. Aprovado com uma ressalva'],
+    [13.5,'done',null,'Concluído']]};
 
   var chat=[
     [0,'user','Por que as vendas de protetor solar caíram 18% em junho?',4],
@@ -429,9 +443,20 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
     var g=el('g',{class:'ag',transform:'translate(320,360)'},gN);
     el('circle',{class:'c',r:22},g);
     var ring=el('circle',{class:'prog',r:22,transform:'rotate(-90)','stroke-dasharray':'138.2','stroke-dashoffset':'138.2'},g);
-    el('text',{x:34,y:4,'text-anchor':'start'},g).textContent='Orquestrador';
+    el('text',{x:-34,y:4,'text-anchor':'end'},g).textContent='Orquestrador';
     el('text',{class:'st',y:3,'text-anchor':'middle'},g).textContent='';
     agEl.orq={g:g,prog:ring,st:g.querySelector('.st')};
+    pos.aud={x:470,y:360};
+    links['aud-rev']=el('path',{class:'link',d:'M'+pos.rev.x+' '+(pos.rev.y+17)+' C '+pos.rev.x+' 250, 470 290, 470 338'},gL);
+    links['aud-geo']=el('path',{class:'link',d:'M'+pos.geo.x+' '+(pos.geo.y+17)+' C '+pos.geo.x+' 250, 470 290, 470 338'},gL);
+    links['orq-aud']=el('path',{class:'link',d:'M342 360 L448 360'},gL);
+    var ga=el('g',{class:'ag',transform:'translate(470,360)'},gN);
+    el('circle',{class:'c',r:22},ga);
+    var ringa=el('circle',{class:'prog',r:22,transform:'rotate(-90)','stroke-dasharray':'138.2','stroke-dashoffset':'138.2'},ga);
+    el('text',{x:34,y:4,'text-anchor':'start'},ga).textContent='Auditor';
+    el('text',{class:'role',x:34,y:17,'text-anchor':'start'},ga).textContent='checagem independente';
+    el('text',{class:'st',y:3,'text-anchor':'middle'},ga).textContent='';
+    agEl.aud={g:ga,prog:ringa,st:ga.querySelector('.st')};
     net._gP=gP;
   }
   var pid=0;function ensureId(p){if(!p.id)p.id='lk'+(pid++);return p.id}
@@ -453,7 +478,7 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
   function esc(t){return t.replace(/<k>/g,'<span class="k">').replace(/<\/k>/g,'</span>').replace(/<s>/g,'<span class="s">').replace(/<\/s>/g,'</span>')}
   function logLine(a,line){
     var min=line[0],type=line[1],base=line[2],text=line[3];
-    var d=document.createElement('div');d.className='ln '+type+(a.id==='orq'?' orq':'');
+    var d=document.createElement('div');d.className='ln '+type+(a.id==='orq'?' orq':'')+(a.id==='aud'?' aud':'');
     addTok('ag',COST[type]||80);
     var body='';
     if(type==='hyp')body=text;
@@ -490,7 +515,7 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
     $('ctx').classList.remove('full');$('ctx-bar').style.width='0';$('ctx-pct').textContent='0%';
     ['r-chat','r-ag'].forEach(function(id){var r=$(id);r.className='result empty';r.textContent='resultado'});
     $('compare').classList.remove('show');
-    for(var i=1;i<=9;i++)$('k'+i).textContent='…';$('q-ag').textContent='…';$('t-ag-k').textContent='…';
+    for(var i=1;i<=10;i++)$('k'+i).textContent='…';$('q-ag').textContent='…';$('t-ag-k').textContent='…';
   }
   function showResultChat(){
     var r=$('r-chat');r.className='result show';
@@ -515,14 +540,14 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
     k(5,'Não: cada resposta trata uma hipótese');
     k(6,'Análise de clima saiu do contexto no minuto 40');
     k(7,'Não: "causas combinadas", sem peso');
-    k(8,'Não: "recomendo investigar"');
+    k(8,'Não: "recomendo investigar"');k(10,'Não: quem respondeu foi quem conferiu');
     $('compare').classList.add('show');
   }
 
   function run(){
     reset();
     var btn=$('run');btn.disabled=true;btn.querySelector('span').textContent='Rodando…';
-    var lastChat=61,lastAg=13;
+    var lastChat=61,lastAg=15;
     for(var m=1;m<=lastChat;m++){(function(m){at(m,function(){setClock('chat',m)})})(m)}
     for(var m2=1;m2<=lastAg;m2++){(function(m){at(m,function(){setClock('ag',m,m===lastAg)})})(m2)}
     chat.forEach(function(row){
@@ -537,9 +562,9 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
     at(lastChat+0.6,function(){showResultChat();$('k-chat').classList.add('bad');$('k-chat').querySelector('.l').textContent='sem causa principal'});
     at(lastChat+1,fillCompare);
 
-    agents.concat([orq]).forEach(function(a){
+    agents.concat([orq,aud]).forEach(function(a){
       var n=a.l.length,first=a.l[0][0],last=a.l[n-1][0];
-      at(first,function(){agEl[a.id].g.classList.add('live');agEl[a.id].st.textContent='ativo';addTok('ag',a.id==='orq'?900:1400)});
+      at(first,function(){agEl[a.id].g.classList.add('live');agEl[a.id].st.textContent='ativo';addTok('ag',a.id==='orq'?900:(a.id==='aud'?700:1400))});
       a.l.forEach(function(line,i){
         at(line[0],function(){
           logLine(a,line);
@@ -547,6 +572,8 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
           if(a.id==='orq'&&line[0]===8.0){agents.forEach(function(x){packet(x.id,'orq',false);var l=links[x.id+'-orq'];l.classList.add('on');setTimeout(function(){l.classList.remove('on')},1100)})}
           if(a.id==='orq'&&line[0]===9.3){packet('orq','a2',true)}
           if(a.id==='orq'&&line[0]===10.4){packet('a2','orq',false)}
+          if(a.id==='orq'&&line[0]===11.0){packet('orq','aud',false);var lo=links['orq-aud'];lo.classList.add('on');setTimeout(function(){lo.classList.remove('on')},1100)}
+          if(a.id==='aud'&&line[0]===13.4){packet('aud','orq',true)}
         });
       });
       at(last+0.3,function(){agEl[a.id].g.classList.remove('live');agEl[a.id].g.classList.add('done');agEl[a.id].st.textContent='ok'});
