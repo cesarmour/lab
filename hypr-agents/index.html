@@ -3,145 +3,154 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#1c262f">
+<meta name="theme-color" content="#1C262F">
 <title>Um chat contra cinco agentes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#1c262f; --panel:#141d25; --panel-2:#0f161d; --line:#2b3a47; --line-2:#1f2b36;
-  --text:#e9eef2; --muted:#8b98a5; --dim:#5e6c79;
-  --heat:#f2a93b; --heat-dim:rgba(242,169,59,.14);
-  --ok:#6fd6a4; --warn:#ff8f6b;
-  --a1:#5cc8ff; --a2:#7ee0d2; --a3:#b89cff; --a4:#ffd166; --a5:#ff8fa3; --ac:#6fd6a4;
-  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
-  --lane-h:860px; --result-h:224px;
+  --midnight:#1C262F; --cloud:#FAFAFA; --off:#FCFEFE; --mist:#E5EBF2; --steel:#78909C; --slate:#536872;
+  --cyan:#3397B9; --deep:#246C84; --soft:#C5EAF6;
+  --good:#018376; --good-bg:#E6F3EA; --bad:#B41048; --bad-bg:#FBE4EA;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --r-sm:8px; --r-md:14px; --r-lg:20px;
+  --shadow:0 8px 28px rgba(28,38,47,.06), 0 1px 2px rgba(28,38,47,.04);
+  --lane-h:880px; --result-h:232px;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--text);font-family:Urbanist,system-ui,sans-serif;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
-body{padding:0 16px 80px}
-.wrap{max-width:1320px;margin:0 auto}
+html,body{margin:0;background:var(--cloud);color:var(--midnight);font-family:Urbanist,system-ui,sans-serif;font-size:17px;line-height:1.5;font-weight:400;-webkit-font-smoothing:antialiased}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--steel)}
 
-header{padding:48px 0 24px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end}
-.brand{display:flex;align-items:center;gap:12px;color:var(--muted);font-weight:600;font-size:14px;margin-bottom:24px}
-.brand b{color:var(--text);font-weight:800;letter-spacing:.06em;font-size:15px}
-.brand span{color:var(--dim)}
-h1{font-size:clamp(32px,4.6vw,56px);line-height:1.02;letter-spacing:-.025em;font-weight:800;margin:0;max-width:18ch}
-h1 em{font-style:normal;color:var(--heat)}
-.lede{color:var(--muted);font-size:16px;max-width:56ch;margin:14px 0 0}
-.controls{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
-button.run{appearance:none;border:0;background:var(--text);color:var(--bg);font:inherit;font-weight:700;font-size:16px;padding:14px 22px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:10px}
+/* capa */
+.cover{background:var(--midnight);color:var(--off);padding:0 24px}
+.cover .in{max-width:1320px;margin:0 auto;padding:40px 0 48px}
+.cover .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:44px}
+.cover .tag{border:1px solid rgba(252,254,254,.35);border-radius:999px;padding:6px 14px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--off)}
+.cover .wm{font-weight:600;letter-spacing:.04em;font-size:18px}
+.cover .wm sup{font-size:10px;vertical-align:top;margin-left:1px}
+.cover h1{font-weight:300;font-size:clamp(36px,5vw,60px);line-height:1.08;letter-spacing:-.015em;margin:0;max-width:20ch}
+.cover h1 em{font-style:normal;color:var(--cyan)}
+.cover .grid{display:grid;grid-template-columns:1fr auto;gap:32px;align-items:end}
+.cover .lede{color:rgba(252,254,254,.72);font-size:18px;max-width:58ch;margin:22px 0 0;font-weight:300}
+.cover .lede b{color:var(--off);font-weight:600}
+button.run{appearance:none;border:0;background:var(--off);color:var(--midnight);font:inherit;font-weight:600;font-size:16px;padding:14px 24px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:10px}
 button.run:hover{background:#fff}
-button.run:disabled{opacity:.7;cursor:default}
-button.run:focus-visible{outline:3px solid var(--a1);outline-offset:3px}
-button.run svg{width:14px;height:14px}
-.scale{color:var(--dim);font-size:13px}
+button.run:disabled{opacity:.6;cursor:default}
+button.run:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+button.run svg{width:12px;height:12px}
+.cover .scale{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:rgba(252,254,254,.5);margin-top:12px;text-align:right}
 
-.arena{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.lane{background:var(--panel);border:1px solid var(--line-2);border-radius:14px;height:var(--lane-h);display:flex;flex-direction:column;overflow:hidden}
-.lane-head{display:flex;justify-content:space-between;align-items:baseline;padding:16px 20px 12px;border-bottom:1px solid var(--line-2);flex:none}
-.lane-head h2{margin:0;font-size:18px;font-weight:700}
-.lane-head p{margin:2px 0 0;color:var(--muted);font-size:14px}
-.clock{font-variant-numeric:tabular-nums;font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1;text-align:right}
-.clock small{display:block;font-size:12px;font-weight:600;color:var(--dim);letter-spacing:0;margin-top:4px}
-.meters{display:flex;gap:22px;align-items:flex-start}
-.tok{font-variant-numeric:tabular-nums;font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1;text-align:right;color:var(--text)}
-.tok small{display:block;font-size:12px;font-weight:600;color:var(--dim);margin-top:4px}
-.lane.chat .clock{color:var(--heat)}
-.lane.agents .clock{color:var(--a1)}
-.lane.agents .clock.done{color:var(--ok)}
+.page{max-width:1320px;margin:0 auto;padding:32px 24px 96px}
+.arena{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.lane{background:var(--off);border:1px solid var(--mist);border-radius:var(--r-lg);height:var(--lane-h);display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow)}
+.lane-head{display:grid;grid-template-columns:1fr auto auto;gap:28px;align-items:end;padding:22px 24px 18px;border-bottom:1px solid var(--mist);flex:none}
+.lane-head h2{margin:0;font-size:22px;font-weight:300;letter-spacing:-.01em;line-height:1.15}
+.lane-head p{margin:4px 0 0;color:var(--steel);font-size:14px}
+.kpi{text-align:right}
+.kpi .v{font-weight:300;font-size:34px;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--midnight)}
+.kpi .l{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--steel);margin-top:6px;white-space:nowrap}
+.kpi.done .v{color:var(--good)}
+.kpi.bad .v{color:var(--bad)}
 .body{flex:1;min-height:0;display:flex;flex-direction:column}
 
-.result{flex:none;height:var(--result-h);border-top:1px solid var(--line-2);padding:14px 20px;background:var(--panel-2);overflow:auto;opacity:0}
+.result{flex:none;height:var(--result-h);border-top:1px solid var(--mist);padding:16px 24px;background:var(--cloud);overflow:auto;opacity:0}
 .result.show{animation:in .45s ease forwards}
-.result h3{margin:0 0 8px;font-size:15px;display:flex;align-items:center;gap:10px}
-.result h3 .tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;border:1px solid currentColor}
-.result p{margin:0 0 6px;font-size:14px;color:#cdd6de;line-height:1.4}
+.result .h{display:flex;align-items:baseline;gap:12px;margin-bottom:8px}
+.result .h h3{margin:0;font-size:16px;font-weight:600}
+.result .h span{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--steel)}
+.result p{margin:0 0 6px;font-size:14.5px;line-height:1.45;color:var(--slate)}
 .result p:last-child{margin:0}
-.result b{color:var(--text)}
-.lane.chat .result h3{color:var(--heat)}
-.lane.agents .result h3{color:var(--ok)}
-.result.empty{opacity:1;animation:none;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:14px}
+.result b{color:var(--midnight);font-weight:600}
+.result.empty{opacity:1;animation:none;display:flex;align-items:center;justify-content:center;color:var(--steel);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.result .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;margin-right:6px}
+.pill.good{background:var(--good-bg);color:var(--good)}.pill.bad{background:var(--bad-bg);color:var(--bad)}
 
 /* chat */
-.ctx{padding:10px 20px;border-bottom:1px solid var(--line-2);display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;font-size:13px;color:var(--muted);flex:none}
-.ctx .bar{height:6px;background:var(--panel-2);border-radius:3px;overflow:hidden}
-.ctx .bar i{display:block;height:100%;width:0;background:var(--heat);transition:width .6s ease}
-.ctx .pct{font-variant-numeric:tabular-nums;min-width:4ch;text-align:right}
-.thread{padding:16px 20px;display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;overflow-y:auto;scroll-behavior:smooth}
-.msg{max-width:88%;padding:10px 14px;border-radius:14px;font-size:14.5px;line-height:1.4;opacity:0;transform:translateY(6px);animation:in .35s ease forwards}
-.msg.user{align-self:flex-end;background:var(--heat-dim);border:1px solid rgba(242,169,59,.25);border-bottom-right-radius:4px}
-.msg.bot{align-self:flex-start;background:var(--panel-2);border:1px solid var(--line-2);border-bottom-left-radius:4px;color:#cdd6de}
-.msg .t{display:block;color:var(--dim);font-size:12px;margin-top:5px;font-variant-numeric:tabular-nums}
-.msg.sys{align-self:center;background:transparent;border:1px dashed rgba(242,169,59,.5);color:var(--heat);font-size:13px;padding:8px 12px;max-width:100%}
-.typing{align-self:flex-start;color:var(--dim);font-size:13px;padding:4px 14px;flex:none}
-.typing i{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--dim);margin-right:3px;animation:dot 1s infinite}
+.ctx{padding:12px 24px;border-bottom:1px solid var(--mist);display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;flex:none}
+.ctx .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--steel)}
+.ctx .bar{height:4px;background:var(--mist);border-radius:2px;overflow:hidden}
+.ctx .bar i{display:block;height:100%;width:0;background:var(--steel);transition:width .6s ease,background .4s}
+.ctx.full .bar i{background:var(--bad)}
+.ctx .pct{font-family:var(--mono);font-size:11px;color:var(--steel);min-width:4ch;text-align:right}
+.ctx.full .pct{color:var(--bad)}
+.thread{padding:18px 24px;display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;overflow-y:auto;scroll-behavior:smooth}
+.msg{max-width:86%;padding:11px 15px;border-radius:var(--r-md);font-size:15px;line-height:1.45;opacity:0;transform:translateY(6px);animation:in .35s ease forwards}
+.msg.user{align-self:flex-end;background:var(--mist);color:var(--midnight);border-bottom-right-radius:4px}
+.msg.bot{align-self:flex-start;background:var(--off);border:1px solid var(--mist);color:var(--slate);border-bottom-left-radius:4px}
+.msg .t{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--steel);margin-top:6px}
+.msg.sys{align-self:center;background:var(--bad-bg);color:var(--bad);font-size:13px;padding:7px 14px;border-radius:999px;max-width:100%}
+.typing{align-self:flex-start;padding:4px 15px;flex:none}
+.typing i{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--steel);margin-right:3px;animation:dot 1s infinite}
 .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
 
 /* rede */
-.net{flex:none;padding:6px 12px 0;background:radial-gradient(ellipse at 50% 30%,rgba(92,200,255,.06),transparent 60%)}
+.net{flex:none;padding:8px 14px 0}
 .net svg{width:100%;height:auto;display:block}
-.net text{font-family:Urbanist,system-ui,sans-serif;fill:var(--muted);font-size:11px;font-weight:600}
-.net text.lbl{fill:var(--text);font-size:12px;font-weight:700}
-.net text.sub{fill:var(--dim);font-size:9.5px;font-weight:500;font-family:var(--mono)}
-.net text.role{fill:var(--dim);font-size:10px;font-weight:500}
-.net text.bq{fill:var(--dim);font-size:10px;font-weight:700;letter-spacing:.04em}
-.net .bqbox{fill:none;stroke:var(--line-2);stroke-dasharray:3 3}
-.net .link{stroke:var(--line);stroke-width:1.2;fill:none;transition:stroke .3s,stroke-width .3s,opacity .3s;opacity:.5}
-.net .link.on{stroke-width:2;opacity:1;stroke-dasharray:4 5;animation:flow .6s linear infinite}
-.net .base circle{fill:var(--panel-2);stroke:var(--line);stroke-width:1.5;transition:stroke .3s,fill .3s}
-.net .base.on circle{stroke:#cfe8ff;fill:#1a2a38}
-.net .base .ring{fill:none;stroke:#cfe8ff;stroke-width:1.5;opacity:0;transform-origin:center;transform-box:fill-box}
+.net text{font-family:Urbanist,system-ui,sans-serif;fill:var(--slate);font-size:12px;font-weight:600}
+.net text.sub{font-family:var(--mono);fill:var(--steel);font-size:9px;font-weight:400;letter-spacing:.04em}
+.net text.role{fill:var(--steel);font-size:10.5px;font-weight:400}
+.net text.bq{font-family:var(--mono);fill:var(--steel);font-size:9.5px;letter-spacing:.08em}
+.net .bqbox{fill:var(--cloud);stroke:var(--mist)}
+.net .link{stroke:var(--mist);stroke-width:1.2;fill:none;transition:stroke .3s,stroke-width .3s}
+.net .link.on{stroke:var(--cyan);stroke-width:1.6;stroke-dasharray:3 5;animation:flow .6s linear infinite}
+.net .base circle{fill:var(--off);stroke:var(--mist);stroke-width:1.5;transition:stroke .3s,fill .3s}
+.net .base.on circle{stroke:var(--cyan);fill:var(--soft)}
+.net .base .ring{fill:none;stroke:var(--cyan);stroke-width:1;opacity:0;transform-origin:center;transform-box:fill-box}
 .net .base.on .ring{animation:ring .9s ease-out}
-.net .base .cnt{fill:var(--a1);font-size:10px;font-weight:800}
-.net .ag circle{fill:var(--panel-2);stroke:var(--line);stroke-width:1.5;transition:stroke .3s}
-.net .ag.live circle{stroke:var(--c)}
-.net .ag.done circle{stroke:var(--ok);fill:rgba(111,214,164,.1)}
-.net .ag .st{font-size:9.5px;fill:var(--dim)}
-.net .ag.live .st{fill:var(--c)}
-.net .ag.done .st{fill:var(--ok)}
-.net .ag .prog{stroke:var(--c);stroke-width:3;fill:none;stroke-linecap:round;transition:stroke-dashoffset .5s ease}
-.net .ag.done .prog{stroke:var(--ok)}
-.net .pkt{filter:drop-shadow(0 0 4px currentColor)}
+.net .base .cnt{font-family:var(--mono);fill:var(--deep);font-size:10.5px;font-weight:500}
+.net .ag circle.c{fill:var(--off);stroke:var(--mist);stroke-width:1.5;transition:stroke .3s,fill .3s}
+.net .ag.live circle.c{stroke:var(--soft)}
+.net .ag.done circle.c{stroke:var(--good);fill:var(--good-bg)}
+.net .ag .st{font-family:var(--mono);font-size:9px;fill:var(--steel);letter-spacing:.04em}
+.net .ag.live .st{fill:var(--cyan)}
+.net .ag.done .st{fill:var(--good)}
+.net .ag .prog{stroke:var(--cyan);stroke-width:2.5;fill:none;stroke-linecap:round;transition:stroke-dashoffset .5s ease}
+.net .ag.done .prog{stroke:var(--good)}
+.net .pkt{fill:var(--cyan)}
+.net .pkt.back{fill:var(--deep)}
 
 /* console */
-.console{flex:1;min-height:0;overflow-y:auto;scroll-behavior:smooth;padding:8px 16px 12px;font-size:12.5px;display:flex;flex-direction:column;gap:3px;border-top:1px solid var(--line-2)}
-.ln{display:grid;grid-template-columns:3.6em 5.4em 1fr;gap:8px;align-items:baseline;opacity:0;animation:in .3s ease forwards;color:#b9c4ce}
-.ln .m{color:var(--dim);font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:11px}
-.ln .who{font-weight:700;color:var(--c);white-space:nowrap}
-.ln .act{color:var(--dim)}
-.ln .ds{font-family:var(--mono);font-size:11.5px;color:var(--text)}
-.ln pre{margin:3px 0 2px;padding:7px 10px;background:#0a1117;border:1px solid var(--line-2);border-left:2px solid var(--c);border-radius:6px;font-family:var(--mono);font-size:11px;line-height:1.45;color:#c9d4de;white-space:pre-wrap;overflow:hidden}
-.ln pre .k{color:#8fb7ff}.ln pre .s{color:#ffd166}
-.ln .res{font-family:var(--mono);font-size:11px;color:var(--muted)}
-.ln.hyp{color:var(--muted);font-style:italic}
-.ln.dead{color:var(--warn)}
-.ln.find{color:var(--text)}
-.ln.find .who{text-decoration:underline;text-underline-offset:3px}
+.console{flex:1;min-height:0;overflow-y:auto;scroll-behavior:smooth;padding:10px 20px 14px;font-size:13px;display:flex;flex-direction:column;gap:4px;border-top:1px solid var(--mist);background:var(--cloud)}
+.ln{display:grid;grid-template-columns:3.2em 7em 1fr;gap:10px;align-items:baseline;opacity:0;animation:in .3s ease forwards;color:var(--slate)}
+.ln .m{font-family:var(--mono);font-size:10.5px;color:var(--steel)}
+.ln .who{font-weight:600;color:var(--midnight);white-space:nowrap;font-size:12.5px}
+.ln.orq .who{color:var(--deep)}
+.ln .act{color:var(--steel)}
+.ln .ds{font-family:var(--mono);font-size:11px;color:var(--midnight)}
+.ln pre{margin:4px 0 2px;padding:8px 12px;background:var(--off);border:1px solid var(--mist);border-radius:var(--r-sm);font-family:var(--mono);font-size:10.5px;line-height:1.5;color:var(--slate);white-space:pre-wrap;overflow:hidden}
+.ln pre .k{color:var(--deep)}.ln pre .s{color:var(--cyan)}
+.ln .res{font-family:var(--mono);font-size:10.5px;color:var(--steel)}
+.ln.hyp{color:var(--steel);font-style:italic}
+.ln.dead{color:var(--bad)}
+.ln.find{color:var(--midnight)}
+.ln.find .who{color:var(--good)}
 
 /* comparação */
-.compare{margin-top:24px;background:var(--panel);border:1px solid var(--line-2);border-radius:14px;padding:22px 20px;opacity:.4;transition:opacity .5s}
+.compare{margin-top:24px;background:var(--off);border:1px solid var(--mist);border-radius:var(--r-lg);padding:28px 24px;box-shadow:var(--shadow);opacity:.45;transition:opacity .5s}
 .compare.show{opacity:1}
-.compare h2{margin:0 0 14px;font-size:20px}
+.compare h2{margin:0 0 20px;font-size:26px;font-weight:300;letter-spacing:-.01em}
+.compare h2 em{font-style:normal;color:var(--cyan)}
 table{width:100%;border-collapse:collapse;font-size:15px}
-th,td{text-align:left;padding:10px;border-top:1px solid var(--line-2);vertical-align:top}
-th{color:var(--muted);font-weight:600;font-size:14px}
+th,td{text-align:left;padding:12px 10px;border-top:1px solid var(--mist);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--steel);font-weight:500}
 thead th{border-top:0;padding-top:0}
-td:nth-child(2){color:var(--heat)}
-td:nth-child(3){color:var(--a1)}
-td.n{font-variant-numeric:tabular-nums}
-.foot{margin-top:24px;color:var(--dim);font-size:13px;max-width:72ch}
+td:first-child{color:var(--slate)}
+td:nth-child(2){color:var(--slate)}
+td:nth-child(3){color:var(--midnight)}
+td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:var(--mono);font-size:10.5px;margin-right:6px}
+.foot{margin-top:24px;color:var(--steel);font-size:13px;max-width:72ch}
 
 @keyframes in{to{opacity:1;transform:none}}
 @keyframes dot{0%,80%,100%{opacity:.2}40%{opacity:1}}
-@keyframes flow{to{stroke-dashoffset:-9}}
-@keyframes ring{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(2.2)}}
+@keyframes flow{to{stroke-dashoffset:-8}}
+@keyframes ring{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(2.3)}}
 @media (max-width:980px){
-  header{grid-template-columns:1fr}
-  .controls{align-items:flex-start}
+  .cover .grid{grid-template-columns:1fr}
+  .cover .scale{text-align:left}
   .arena{grid-template-columns:1fr}
-  :root{--lane-h:760px}
+  :root{--lane-h:780px}
+  .lane-head{grid-template-columns:1fr auto auto;gap:16px}
 }
 @media (prefers-reduced-motion:reduce){
   .msg,.ln,.result{animation:none!important;opacity:1!important;transform:none!important}
@@ -151,62 +160,68 @@ td.n{font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
-<div class="wrap">
-<header>
-  <div>
-    <div class="brand"><b>HYPR</b><span>·</span><span>simulação</span></div>
-    <h1>Por que as vendas de protetor solar caíram <em>18%</em> em junho?</h1>
-    <p class="lede">A mesma pergunta, respondida de dois jeitos. À esquerda, uma pessoa num chat, uma hipótese por vez. À direita, um compositor quebra a pergunta em cinco hipóteses e cinco agentes investigam ao mesmo tempo nas bases da HYPR.</p>
+<section class="cover">
+  <div class="in">
+    <div class="top"><span class="tag">Simulação</span><span class="wm">HYPR<sup>°</sup></span></div>
+    <div class="grid">
+      <div>
+        <h1>Por que as vendas de protetor solar caíram <em>18%</em> em junho?</h1>
+        <p class="lede">A mesma pergunta, respondida de dois jeitos. À esquerda, uma pessoa num chat, uma hipótese por vez. À direita, um <b>orquestrador</b> quebra a pergunta em cinco hipóteses e cinco agentes investigam ao mesmo tempo nas bases da HYPR.</p>
+      </div>
+      <div>
+        <button class="run" id="run" type="button"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 2.5v11l10-5.5z"/></svg><span>Rodar a simulação</span></button>
+        <div class="scale">1 min simulado = 0,75 s</div>
+      </div>
+    </div>
   </div>
-  <div class="controls">
-    <button class="run" id="run" type="button"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 2.5v11l10-5.5z"/></svg><span>Rodar a simulação</span></button>
-    <div class="scale">1 minuto simulado = 0,75 s real</div>
-  </div>
-</header>
+</section>
 
+<div class="page">
 <section class="arena">
   <div class="lane chat">
     <div class="lane-head">
-      <div><h2>Um chat</h2><p>Uma pessoa, uma conversa, uma pergunta de cada vez</p></div>
-      <div class="meters"><div class="tok" id="t-chat">0<small>tokens</small></div><div class="clock" id="c-chat">0 min<small>tempo decorrido</small></div></div>
+      <div><h2>Um chat</h2><p>Uma pessoa, uma pergunta de cada vez</p></div>
+      <div class="kpi"><div class="v" id="t-chat">0</div><div class="l">tokens consumidos</div></div>
+      <div class="kpi" id="k-chat"><div class="v" id="c-chat">0 min</div><div class="l">tempo decorrido</div></div>
     </div>
     <div class="body">
-      <div class="ctx"><span>contexto</span><div class="bar"><i id="ctx-bar"></i></div><span class="pct" id="ctx-pct">0%</span></div>
+      <div class="ctx" id="ctx"><span class="lbl">contexto</span><div class="bar"><i id="ctx-bar"></i></div><span class="pct" id="ctx-pct">0%</span></div>
       <div class="thread" id="thread"></div>
     </div>
-    <div class="result empty" id="r-chat">resultado aparece aqui</div>
+    <div class="result empty" id="r-chat">resultado</div>
   </div>
 
   <div class="lane agents">
     <div class="lane-head">
-      <div><h2>Cinco agentes + compositor</h2><p>Um pedido, cinco investigações paralelas, uma resposta</p></div>
-      <div class="meters"><div class="tok" id="t-ag">0<small>tokens</small></div><div class="clock" id="c-ag">0 min<small>tempo decorrido</small></div></div>
+      <div><h2>Cinco agentes</h2><p>Um pedido, cinco investigações em paralelo</p></div>
+      <div class="kpi"><div class="v" id="t-ag">0</div><div class="l">tokens consumidos</div></div>
+      <div class="kpi" id="k-ag"><div class="v" id="c-ag">0 min</div><div class="l">tempo decorrido</div></div>
     </div>
     <div class="body">
-      <div class="net"><svg id="net" viewBox="0 0 640 318" aria-label="Agentes consultando as bases HYPR no BigQuery"></svg></div>
+      <div class="net"><svg id="net" viewBox="0 0 640 332" aria-label="Agentes consultando as bases HYPR no BigQuery"></svg></div>
       <div class="console" id="console"></div>
     </div>
-    <div class="result empty" id="r-ag">resultado aparece aqui</div>
+    <div class="result empty" id="r-ag">resultado</div>
   </div>
 </section>
 
 <section class="compare" id="compare">
-  <h2>Mesma pergunta, dois resultados</h2>
+  <h2>Mesma pergunta, <em>dois</em> resultados</h2>
   <table>
     <thead><tr><th>Medida</th><th>Um chat</th><th>Cinco agentes</th></tr></thead>
     <tbody>
-      <tr><td>Turnos digitados pela pessoa</td><td class="n" id="k1">…</td><td class="n">1</td></tr>
-      <tr><td>Tempo até a resposta</td><td class="n" id="k2">…</td><td class="n">13 min</td></tr>
-      <tr><td>Tokens consumidos</td><td class="n" id="k9">…</td><td class="n" id="t-ag-k">…</td></tr>
-      <tr><td>Consultas rodadas</td><td class="n" id="k3">…</td><td class="n" id="q-ag">…</td></tr>
-      <tr><td>Hipóteses descartadas com dado</td><td id="k4">…</td><td>4 (ruptura, UV nacional, TV, UF sem canal)</td></tr>
-      <tr><td>Hipóteses cruzadas entre si</td><td id="k5">…</td><td>Todas, pelo compositor</td></tr>
+      <tr><td>Turnos digitados pela pessoa</td><td id="k1">…</td><td>1</td></tr>
+      <tr><td>Tempo até a resposta</td><td id="k2">…</td><td>13 min</td></tr>
+      <tr><td>Tokens consumidos</td><td id="k9">…</td><td id="t-ag-k">…</td></tr>
+      <tr><td>Consultas rodadas</td><td id="k3">…</td><td id="q-ag">…</td></tr>
+      <tr><td>Hipóteses descartadas com dado</td><td id="k4">…</td><td>4: ruptura, UV nacional, TV, UF sem canal</td></tr>
+      <tr><td>Hipóteses cruzadas entre si</td><td id="k5">…</td><td>Todas, pelo orquestrador</td></tr>
       <tr><td>Informação perdida no caminho</td><td id="k6">…</td><td>Nenhuma: cada agente devolve só a conclusão</td></tr>
       <tr><td>Causa principal com peso</td><td id="k7">…</td><td>Sim: mídia e promoção ≈ 10 pts, clima ≈ 8 pts</td></tr>
       <tr><td>Próxima ação definida</td><td id="k8">…</td><td>Sim, com audiência e volume</td></tr>
     </tbody>
   </table>
-  <p class="foot">Os tempos e os turnos são simulados. Os nomes e volumes de audiência vêm do catálogo HYPR. Os datasets, as consultas e os números do caso são ilustrativos.</p>
+  <p class="foot">Os tempos, os turnos e os tokens são simulados. Os nomes e volumes de audiência vêm do catálogo HYPR. Os datasets, as consultas e os números do caso são ilustrativos.</p>
 </section>
 </div>
 
@@ -225,10 +240,8 @@ td.n{font-variant-numeric:tabular-nums}
     {id:'cl', n:'INMET',        s:'inmet_daily'}
   ];
 
-  // tipos de linha: hyp (hipótese), conn (conectando), sql (consulta), res (resultado), dead (descartado), note, find, done
-  // [min, tipo, base, texto]
   var agents=[
-    {id:'a1', n:'Agente 1', role:'preço e promoção', c:'var(--a1)', uses:['gf','ds'], l:[
+    {id:'a1', n:'Agente 1', role:'preço e promoção', uses:['gf','ds'], l:[
       [0.3,'hyp',null,'Hipótese: ruptura de estoque ou mudança de preço'],
       [0.6,'conn','gf','hypr-prod.groundflow.nf_items'],
       [0.9,'sql','gf','<k>SELECT</k> COUNT(DISTINCT store_id) lojas, SUM(qty) un\n<k>FROM</k> `hypr-prod.groundflow.nf_items`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> dt <k>BETWEEN</k> <s>\'2026-05-01\'</s> <k>AND</k> <s>\'2026-06-30\'</s>\n<k>GROUP BY</k> EXTRACT(MONTH <k>FROM</k> dt)'],
@@ -242,7 +255,7 @@ td.n{font-variant-numeric:tabular-nums}
       [5.2,'res','ds','24 linhas · 0,4 s'],
       [5.8,'find',null,'Categoria caiu 7%, a marca caiu 18%: 11 pts são da marca. Promoção saiu em 2/jun e a queda começa nessa semana'],
       [6.2,'done',null,'Concluído']]},
-    {id:'a2', n:'Agente 2', role:'clima', c:'var(--a2)', uses:['cl','pg','gf'], l:[
+    {id:'a2', n:'Agente 2', role:'clima', uses:['cl','pg','gf'], l:[
       [0.3,'hyp',null,'Hipótese: inverno derrubou a demanda'],
       [0.6,'conn','cl','hypr-prod.ext.inmet_daily'],
       [0.9,'sql','cl','<k>SELECT</k> EXTRACT(MONTH <k>FROM</k> dt) m, AVG(uv_index) uv\n<k>FROM</k> `hypr-prod.ext.inmet_daily`\n<k>WHERE</k> dt >= <s>\'2026-05-01\'</s> <k>GROUP BY</k> 1'],
@@ -256,7 +269,7 @@ td.n{font-variant-numeric:tabular-nums}
       [5.0,'res','gf','312 linhas · 2.816.220 lidas · 3,8 s · 744 MB'],
       [5.6,'find',null,'SP e litoral: 22 dias sem sol, UV 8 → 4, venda −21%. Natal e Recife: UV normal, venda −3%. Clima explica até 8 pts'],
       [6.0,'done',null,'Concluído']]},
-    {id:'a3', n:'Agente 3', role:'concorrência', c:'var(--a3)', uses:['gf','ma','ds'], l:[
+    {id:'a3', n:'Agente 3', role:'concorrência', uses:['gf','ma','ds'], l:[
       [0.3,'hyp',null,'Hipótese: alguém tomou share'],
       [0.6,'conn','gf','hypr-prod.groundflow.nf_items'],
       [0.9,'sql','gf','<k>SELECT</k> brand, EXTRACT(MONTH <k>FROM</k> dt) m,\n  SUM(qty)/SUM(SUM(qty)) <k>OVER</k> (PARTITION BY EXTRACT(MONTH <k>FROM</k> dt)) share\n<k>FROM</k> `hypr-prod.groundflow.nf_items`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> dt >= <s>\'2026-03-01\'</s>\n<k>GROUP BY</k> 1, 2'],
@@ -265,7 +278,7 @@ td.n{font-variant-numeric:tabular-nums}
       [2.9,'sql','gf','<k>SELECT</k> channel, brand, AVG(discount) desc_medio\n<k>FROM</k> `hypr-prod.groundflow.nf_items`\n<k>WHERE</k> brand <k>IN</k> (<s>\'marca\'</s>, <s>\'B\'</s>) <k>AND</k> dt >= <s>\'2026-06-01\'</s>\n<k>GROUP BY</k> 1, 2'],
       [3.8,'res','gf','6 linhas · 1.198.004 lidas · 1,9 s'],
       [4.2,'note',null,'B com 25% off em farmácia; zero em supermercado'],
-      [4.6,'conn','ds','hypr-prod.demandshift.demand'],
+      [4.6,'conn','ds','hypr-prod.demandshift.launches'],
       [4.9,'sql','ds','<k>SELECT</k> brand, launch_dt, line\n<k>FROM</k> `hypr-prod.demandshift.launches`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> launch_dt >= <s>\'2026-05-01\'</s>'],
       [5.4,'res','ds','1 linha · 0,2 s'],
       [5.8,'conn','ma','hypr-prod.max_attention.media'],
@@ -273,7 +286,7 @@ td.n{font-variant-numeric:tabular-nums}
       [6.8,'res','ma','3 linhas · 0,5 s'],
       [7.3,'find',null,'B lançou linha em 1/jun com 25% off em farmácia e dobrou mídia em maio. Ganhou 6 pts, todos no canal farmácia'],
       [7.7,'done',null,'Concluído']]},
-    {id:'a4', n:'Agente 4', role:'canal e região', c:'var(--a4)', uses:['gf','pg'], l:[
+    {id:'a4', n:'Agente 4', role:'canal e região', uses:['gf','pg'], l:[
       [0.3,'hyp',null,'Hipótese: a queda é regional'],
       [0.6,'conn','pg','hypr-prod.places_graph.pois'],
       [0.9,'conn','gf','hypr-prod.groundflow.nf_items'],
@@ -285,7 +298,7 @@ td.n{font-variant-numeric:tabular-nums}
       [5.0,'note',null,'Farmácia: −27% (58% do volume). Supermercado: −6%. Perfumaria: −3%'],
       [5.6,'find',null,'Farmácia no Sul e Sudeste: −31%. Farmácia no Nordeste: −5%. Supermercado cai pouco em todo lugar'],
       [6.0,'done',null,'Concluído']]},
-    {id:'a5', n:'Agente 5', role:'mídia', c:'var(--a5)', uses:['ma','au'], l:[
+    {id:'a5', n:'Agente 5', role:'mídia', uses:['ma','au'], l:[
       [0.3,'hyp',null,'Hipótese: a marca ficou invisível'],
       [0.6,'conn','ma','hypr-prod.max_attention.media'],
       [0.9,'sql','ma','<k>SELECT</k> month, channel, SUM(spend) spend\n<k>FROM</k> `hypr-prod.max_attention.media`\n<k>WHERE</k> brand = <s>\'marca\'</s> <k>AND</k> month >= <s>\'2026-03\'</s>\n<k>GROUP BY</k> 1, 2'],
@@ -294,13 +307,13 @@ td.n{font-variant-numeric:tabular-nums}
       [2.7,'sql','ma','<k>SELECT</k> month, SUM(spend) digital,\n  AVG(attention_share) att\n<k>FROM</k> `hypr-prod.max_attention.media`\n<k>WHERE</k> brand = <s>\'marca\'</s> <k>AND</k> channel <k>IN</k> (<s>\'digital\'</s>, <s>\'ooh\'</s>)\n<k>GROUP BY</k> 1'],
       [3.6,'res','ma','4 linhas · 0,5 s'],
       [4.0,'note',null,'Digital e OOH −40% em maio. Share de atenção 18% → 9% em junho'],
-      [4.4,'conn','au','hypr-prod.audiences.catalog'],
+      [4.4,'conn','au','hypr-prod.audiences.exposure'],
       [4.7,'sql','au','<k>SELECT</k> audience_name, audience_volume\n<k>FROM</k> `hypr-prod.audiences.exposure`\n<k>WHERE</k> brand = <s>\'B\'</s> <k>AND</k> month = <s>\'2026-06\'</s>'],
       [5.3,'res','au','1 linha · 0,3 s'],
       [5.9,'find',null,'6,1 mi de pessoas expostas à B em junho sem nenhum impacto da marca. A perda de atenção precede a queda em 3 semanas'],
       [6.3,'done',null,'Concluído']]}
   ];
-  var comp={id:'comp', n:'Compositor', role:'', c:'var(--ac)', l:[
+  var orq={id:'orq', n:'Orquestrador', role:'', l:[
     [0.0,'note',null,'Pergunta recebida. Quebrando em 5 hipóteses: preço, clima, concorrência, canal/região, mídia'],
     [0.15,'note',null,'5 agentes disparados em paralelo, cada um com acesso às bases que precisa'],
     [8.0,'note',null,'Recebeu 5 conclusões. Somando: clima 8 + promoção 11 + concorrente 6 + mídia 9 = 34 pts. Não fecha com 18'],
@@ -337,90 +350,90 @@ td.n{font-variant-numeric:tabular-nums}
   var thread=$('thread'),cons=$('console'),net=$('net');
   var timers=[];
   function at(min,fn){if(reduced){fn();return;}timers.push(setTimeout(fn,min*MIN))}
-  function setClock(el,m,done){el.innerHTML=m+' min<small>'+(done?'resposta pronta':'tempo decorrido')+'</small>';el.classList.toggle('done',!!done)}
+  function setClock(id,m,done){$('c-'+id).textContent=m+' min';var k=$('k-'+id);k.classList.toggle('done',!!done);k.querySelector('.l').textContent=done?'resposta pronta':'tempo decorrido'}
 
-  // ---------- rede ----------
+  var queries=0,tokChat=0,tokAg=0,WIN=32000;
+  var COST={hyp:120,conn:40,sql:320,res:90,dead:110,note:130,find:170,done:20};
+  function fmtTok(n){return n>=1000?(n/1000).toFixed(1).replace('.',',')+' mil':String(n)}
+  function addTok(side,n){if(side==='chat'){tokChat+=n;$('t-chat').textContent=fmtTok(tokChat)}else{tokAg+=n;$('t-ag').textContent=fmtTok(tokAg)}}
+
+  // rede
   var pos={},links={},agEl={},baseEl={},baseCnt={};
   function el(tag,attrs,parent){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);(parent||net).appendChild(e);return e}
   function buildNet(){
     net.innerHTML='';pos={};links={};agEl={};baseEl={};baseCnt={};
     var gL=el('g'),gN=el('g'),gP=el('g');
-    el('rect',{class:'bqbox',x:6,y:4,width:628,height:96,rx:10},gN);
-    el('text',{class:'bq',x:16,y:93},gN).textContent='BIGQUERY · hypr-prod';
+    el('rect',{class:'bqbox',x:6,y:4,width:628,height:98,rx:14},gN);
+    el('text',{class:'bq',x:18,y:94},gN).textContent='BIGQUERY · HYPR-PROD';
     bases.forEach(function(b,i){
       var x=56+i*105.6,y=62;pos[b.id]={x:x,y:y};
       var g=el('g',{class:'base',transform:'translate('+x+','+y+')'},gN);
       el('circle',{class:'ring',r:15},g);
       el('circle',{r:15},g);
       el('text',{class:'cnt',y:4,'text-anchor':'middle',id:'cnt-'+b.id},g);
-      el('text',{class:'lbl',y:-32,'text-anchor':'middle'},g).textContent=b.n;
-      el('text',{class:'sub',y:-21,'text-anchor':'middle'},g).textContent=b.s;
+      el('text',{y:-31,'text-anchor':'middle'},g).textContent=b.n;
+      el('text',{class:'sub',y:-19,'text-anchor':'middle'},g).textContent=b.s;
       baseEl[b.id]=g;baseCnt[b.id]=0;
     });
     agents.forEach(function(a,i){
       var x=80+i*120,y=198;pos[a.id]={x:x,y:y};
       a.uses.forEach(function(b){
-        var p=pos[b];var d='M'+p.x+' '+(p.y+15)+' C '+p.x+' '+(y-70)+', '+x+' '+(p.y+70)+', '+x+' '+(y-22);
-        links[a.id+'-'+b]=el('path',{class:'link',d:d},gL);
+        var p=pos[b];
+        links[a.id+'-'+b]=el('path',{class:'link',d:'M'+p.x+' '+(p.y+15)+' C '+p.x+' '+(y-70)+', '+x+' '+(p.y+70)+', '+x+' '+(y-22)},gL);
       });
-      links[a.id+'-comp']=el('path',{class:'link',d:'M'+x+' '+(y+22)+' C '+x+' '+(y+56)+', 320 '+(y+56)+', 320 '+(y+90)},gL);
-      var g=el('g',{class:'ag',style:'--c:'+a.c,transform:'translate('+x+','+y+')'},gN);
-      el('circle',{r:22},g);
+      links[a.id+'-orq']=el('path',{class:'link',d:'M'+x+' '+(y+22)+' C '+x+' '+(y+56)+', 320 '+(y+56)+', 320 '+(y+90)},gL);
+      var g=el('g',{class:'ag',transform:'translate('+x+','+y+')'},gN);
+      el('circle',{class:'c',r:22},g);
       var ring=el('circle',{class:'prog',r:22,transform:'rotate(-90)','stroke-dasharray':'138.2','stroke-dashoffset':'138.2'},g);
-      el('text',{class:'lbl',y:-30,'text-anchor':'middle'},g).textContent=a.n;
-      el('text',{class:'role',y:36,'text-anchor':'middle'},g).textContent=a.role;
-      el('text',{class:'st',y:4,'text-anchor':'middle'},g).textContent='…';
+      el('text',{y:-30,'text-anchor':'middle'},g).textContent=a.n;
+      el('text',{class:'role',y:37,'text-anchor':'middle'},g).textContent=a.role;
+      el('text',{class:'st',y:3,'text-anchor':'middle'},g).textContent='';
       agEl[a.id]={g:g,prog:ring,st:g.querySelector('.st')};
     });
-    pos.comp={x:320,y:300};
-    links['comp-au']=el('path',{class:'link',d:'M'+pos.au.x+' '+(pos.au.y+15)+' C '+pos.au.x+' 210, 320 230, 320 278'},gL);
-    var g=el('g',{class:'ag',style:'--c:'+comp.c,transform:'translate(320,300)'},gN);
-    el('circle',{r:22},g);
+    pos.orq={x:320,y:300};
+    links['orq-au']=el('path',{class:'link',d:'M'+pos.au.x+' '+(pos.au.y+15)+' C '+pos.au.x+' 210, 320 230, 320 278'},gL);
+    var g=el('g',{class:'ag',transform:'translate(320,300)'},gN);
+    el('circle',{class:'c',r:22},g);
     var ring=el('circle',{class:'prog',r:22,transform:'rotate(-90)','stroke-dasharray':'138.2','stroke-dashoffset':'138.2'},g);
-    el('text',{class:'lbl',x:34,y:4,'text-anchor':'start'},g).textContent='Compositor';
-    el('text',{class:'st',y:4,'text-anchor':'middle'},g).textContent='…';
-    agEl.comp={g:g,prog:ring,st:g.querySelector('.st')};
+    el('text',{x:34,y:4,'text-anchor':'start'},g).textContent='Orquestrador';
+    el('text',{class:'st',y:3,'text-anchor':'middle'},g).textContent='';
+    agEl.orq={g:g,prog:ring,st:g.querySelector('.st')};
     net._gP=gP;
   }
   var pid=0;function ensureId(p){if(!p.id)p.id='lk'+(pid++);return p.id}
-  function packet(from,to,color){
+  function packet(from,to,back){
     if(reduced)return;
     var path=links[from+'-'+to],rev=false;
     if(!path){path=links[to+'-'+from];rev=true}
     if(!path)return;
-    var c=el('circle',{class:'pkt',r:3.2,fill:color,style:'color:'+color},net._gP);
+    var c=el('circle',{class:'pkt'+(back?' back':''),r:3},net._gP);
     var am=el('animateMotion',{dur:'0.7s',fill:'freeze',keyPoints:rev?'0;1':'1;0',keyTimes:'0;1',calcMode:'linear'},c);
     el('mpath',{href:'#'+ensureId(path)},am);
     am.beginElement&&am.beginElement();
     setTimeout(function(){c.remove()},800);
   }
-  function light(agId,baseId,color){
-    var l=links[agId+'-'+baseId];if(l){l.classList.add('on');l.style.stroke=color;setTimeout(function(){l.classList.remove('on');l.style.stroke=''},1100)}
-  }
+  function light(agId,baseId){var l=links[agId+'-'+baseId];if(l){l.classList.add('on');setTimeout(function(){l.classList.remove('on')},1100)}}
   function pulse(baseId){var b=baseEl[baseId];if(!b)return;b.classList.remove('on');void b.getBBox();b.classList.add('on');setTimeout(function(){b.classList.remove('on')},900)}
   function setProg(id,frac){agEl[id].prog.setAttribute('stroke-dashoffset',String(138.2*(1-frac)))}
 
-  var queries=0,tokChat=0,tokAg=0,WIN=32000;
-  var COST={hyp:120,conn:40,sql:320,res:90,dead:110,note:130,find:170,done:20};
-  function fmtTok(n){return n>=1000?(n/1000).toFixed(1).replace('.',',')+' mil':String(n)}
-  function addTok(side,n){if(side==='chat'){tokChat+=n;$('t-chat').textContent=fmtTok(tokChat)}else{tokAg+=n;$('t-ag').textContent=fmtTok(tokAg)}}
+  function esc(t){return t.replace(/<k>/g,'<span class="k">').replace(/<\/k>/g,'</span>').replace(/<s>/g,'<span class="s">').replace(/<\/s>/g,'</span>')}
   function logLine(a,line){
     var min=line[0],type=line[1],base=line[2],text=line[3];
-    var d=document.createElement('div');d.className='ln '+type;d.style.setProperty('--c',a.c);
+    var d=document.createElement('div');d.className='ln '+type+(a.id==='orq'?' orq':'');
     addTok('ag',COST[type]||80);
     var body='';
     if(type==='hyp')body=text;
     else if(type==='conn')body='<span class="act">conectando</span> <span class="ds">'+text+'</span>';
-    else if(type==='sql'){body='<pre>'+text.replace(/<k>/g,'<span class="k">').replace(/<\/k>/g,'</span>').replace(/<s>/g,'<span class="s">').replace(/<\/s>/g,'</span>')+'</pre>';queries++;$('q-ag').textContent=queries}
+    else if(type==='sql'){body='<pre>'+esc(text)+'</pre>';queries++;$('q-ag').textContent=queries}
     else if(type==='res')body='<span class="res">↳ '+text+'</span>';
     else if(type==='dead')body='✕ '+text;
     else body=text;
     d.innerHTML='<span class="m">'+min.toFixed(1).replace('.',',')+'</span><span class="who">'+a.n+'</span><div>'+body+'</div>';
     cons.appendChild(d);cons.scrollTop=cons.scrollHeight;
     if(base){
-      if(type==='conn'){light(a.id,base,a.c);pulse(base)}
-      if(type==='sql'){light(a.id,base,a.c);packet(a.id,base,a.c)}
-      if(type==='res'){pulse(base);packet(base,a.id,a.c);baseCnt[base]++;$('cnt-'+base).textContent=baseCnt[base]}
+      if(type==='conn'){light(a.id,base);pulse(base)}
+      if(type==='sql'){light(a.id,base);packet(a.id,base,false)}
+      if(type==='res'){pulse(base);packet(base,a.id,true);baseCnt[base]++;$('cnt-'+base).textContent=baseCnt[base]}
     }
   }
 
@@ -436,32 +449,34 @@ td.n{font-variant-numeric:tabular-nums}
   }
 
   function reset(){
-    timers.forEach(clearTimeout);timers=[];queries=0;tokChat=0;tokAg=0;$('t-chat').textContent='0';$('t-ag').textContent='0';
+    timers.forEach(clearTimeout);timers=[];queries=0;tokChat=0;tokAg=0;
+    $('t-chat').textContent='0';$('t-ag').textContent='0';
     thread.innerHTML='';cons.innerHTML='';buildNet();
-    setClock($('c-chat'),0);setClock($('c-ag'),0);
-    $('ctx-bar').style.width='0';$('ctx-pct').textContent='0%';
-    ['r-chat','r-ag'].forEach(function(id){var r=$(id);r.className='result empty';r.textContent='resultado aparece aqui'});
+    setClock('chat',0);setClock('ag',0);$('k-chat').classList.remove('bad');
+    $('ctx').classList.remove('full');$('ctx-bar').style.width='0';$('ctx-pct').textContent='0%';
+    ['r-chat','r-ag'].forEach(function(id){var r=$(id);r.className='result empty';r.textContent='resultado'});
     $('compare').classList.remove('show');
     for(var i=1;i<=9;i++)$('k'+i).textContent='…';$('q-ag').textContent='…';$('t-ag-k').textContent='…';
   }
   function showResultChat(){
     var r=$('r-chat');r.className='result show';
-    r.innerHTML='<h3>Resumo do chat <span class="tag">61 min · 9 turnos · '+fmtTok(tokChat)+' tokens</span></h3>'+
+    r.innerHTML='<div class="h"><h3>Resumo do chat</h3><span>61 min · 9 turnos · '+fmtTok(tokChat)+' tokens</span></div>'+
       '<p>A queda de 18% em junho tem <b>causas combinadas</b>: clima, retirada de promoção, concorrente em farmácia e corte de mídia.</p>'+
-      '<p><b>Causa principal:</b> não identificada. "Recomendo investigar qual pesou mais."</p>'+
-      '<p><b>Ação:</b> nenhuma definida. A análise de clima se perdeu no caminho e a de mídia não foi cruzada com as outras.</p>';
+      '<p><span class="pill bad">causa principal</span>não identificada. "Recomendo investigar qual pesou mais."</p>'+
+      '<p><span class="pill bad">ação</span>nenhuma. A análise de clima se perdeu no caminho e a de mídia não foi cruzada com as outras.</p>';
   }
   function showResultAg(){
     var r=$('r-ag');r.className='result show';
-    r.innerHTML='<h3>Resposta do compositor <span class="tag">13 min · 1 pedido · '+queries+' consultas · '+fmtTok(tokAg)+' tokens</span></h3>'+
-      '<p><b>Causa principal (≈10 pts):</b> um único evento visto de três lados. A marca cortou 40% da mídia em maio e retirou promoção de farmácia em 2/jun; na mesma semana a marca B entrou na mesma prateleira com 25% off e o dobro de mídia. Share de atenção 18% → 9%.</p>'+
-      '<p><b>Causa secundária (≈8 pts):</b> clima. 22 dias sem sol em SP e litoral, UV 8 → 4. Sazonal: no Nordeste, com sol e sem a B, a queda foi de 4%.</p>'+
+    r.innerHTML='<div class="h"><h3>Resposta do orquestrador</h3><span>13 min · 1 pedido · '+queries+' consultas · '+fmtTok(tokAg)+' tokens</span></div>'+
+      '<p><span class="pill good">causa principal ≈ 10 pts</span>um único evento visto de três lados. A marca cortou 40% da mídia em maio e retirou promoção de farmácia em 2/jun; na mesma semana a marca B entrou na mesma prateleira com 25% off e o dobro de mídia. Share de atenção 18% → 9%.</p>'+
+      '<p><span class="pill good">causa secundária ≈ 8 pts</span>clima. 22 dias sem sol em SP e litoral, UV 8 → 4. Sazonal: no Nordeste, com sol e sem a B, a queda foi de 4%.</p>'+
       '<p><b>Descartado com dado:</b> ruptura de estoque, TV, UV nacional.</p>'+
-      '<p><b>Ação:</b> retomar promoção e mídia em farmácia no Sul e Sudeste antes de outubro, na audiência <b>Visitantes de Farmácias</b> (21,6 mi de pessoas, 9.991 endereços) com recorte geográfico.</p>';
+      '<p><span class="pill good">ação</span>retomar promoção e mídia em farmácia no Sul e Sudeste antes de outubro, na audiência <b>Visitantes de Farmácias</b> (21,6 mi de pessoas, 9.991 endereços) com recorte geográfico.</p>';
   }
   function fillCompare(){
     var k=function(i,v){$('k'+i).textContent=v};
-    k(1,'9');k(2,'61 min');k(9,fmtTok(tokChat)+' (contexto reenviado a cada turno)');$('t-ag-k').textContent=fmtTok(tokAg)+' (cada agente paga só o seu trecho)';k(3,'5, sob demanda da pessoa');
+    k(1,'9');k(2,'61 min');k(9,fmtTok(tokChat)+', contexto reenviado a cada turno');$('t-ag-k').textContent=fmtTok(tokAg)+', cada agente paga só o seu trecho';
+    k(3,'5, sob demanda da pessoa');
     k(4,'Nenhuma: só as que a pessoa pediu');
     k(5,'Não: cada resposta trata uma hipótese');
     k(6,'Análise de clima saiu do contexto no minuto 40');
@@ -474,29 +489,30 @@ td.n{font-variant-numeric:tabular-nums}
     reset();
     var btn=$('run');btn.disabled=true;btn.querySelector('span').textContent='Rodando…';
     var lastChat=61,lastAg=13;
-    for(var m=1;m<=lastChat;m++){(function(m){at(m,function(){setClock($('c-chat'),m)})})(m)}
-    for(var m2=1;m2<=lastAg;m2++){(function(m){at(m,function(){setClock($('c-ag'),m,m===lastAg)})})(m2)}
+    for(var m=1;m<=lastChat;m++){(function(m){at(m,function(){setClock('chat',m)})})(m)}
+    for(var m2=1;m2<=lastAg;m2++){(function(m){at(m,function(){setClock('ag',m,m===lastAg)})})(m2)}
     chat.forEach(function(row){
       at(row[0],function(){
         showTyping(false);addMsg(row[1],row[2],row[0]);
         if(row[1]==='bot')addTok('chat',Math.round(WIN*row[3]/100)+220);
         $('ctx-bar').style.width=row[3]+'%';$('ctx-pct').textContent=row[3]+'%';
+        if(row[3]>=100||row[1]==='sys')$('ctx').classList.add('full');
         if(row[1]==='user')at(0.6,function(){showTyping(true)});
       });
     });
-    at(lastChat+0.6,showResultChat);
+    at(lastChat+0.6,function(){showResultChat();$('k-chat').classList.add('bad');$('k-chat').querySelector('.l').textContent='sem causa principal'});
     at(lastChat+1,fillCompare);
 
-    agents.concat([comp]).forEach(function(a){
+    agents.concat([orq]).forEach(function(a){
       var n=a.l.length,first=a.l[0][0],last=a.l[n-1][0];
-      at(first,function(){agEl[a.id].g.classList.add('live');agEl[a.id].st.textContent='rodando';addTok('ag',a.id==='comp'?900:1400)});
+      at(first,function(){agEl[a.id].g.classList.add('live');agEl[a.id].st.textContent='ativo';addTok('ag',a.id==='orq'?900:1400)});
       a.l.forEach(function(line,i){
         at(line[0],function(){
           logLine(a,line);
           setProg(a.id,(i+1)/n);
-          if(a.id==='comp'&&line[0]===8.0){agents.forEach(function(x){packet(x.id,'comp',x.c);var l=links[x.id+'-comp'];l.classList.add('on');l.style.stroke=x.c;setTimeout(function(){l.classList.remove('on');l.style.stroke=''},1100)})}
-          if(a.id==='comp'&&line[0]===9.3){packet('comp','a2',comp.c)}
-          if(a.id==='comp'&&line[0]===10.4){packet('a2','comp','var(--a2)')}
+          if(a.id==='orq'&&line[0]===8.0){agents.forEach(function(x){packet(x.id,'orq',false);var l=links[x.id+'-orq'];l.classList.add('on');setTimeout(function(){l.classList.remove('on')},1100)})}
+          if(a.id==='orq'&&line[0]===9.3){packet('orq','a2',true)}
+          if(a.id==='orq'&&line[0]===10.4){packet('a2','orq',false)}
         });
       });
       at(last+0.3,function(){agEl[a.id].g.classList.remove('live');agEl[a.id].g.classList.add('done');agEl[a.id].st.textContent='ok'});
