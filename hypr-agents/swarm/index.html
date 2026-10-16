@@ -41,6 +41,12 @@ section:first-child{border-top:0;padding-top:0}
 .sec p:last-child{margin:0}
 .sec b{color:var(--midnight);font-weight:600}
 
+.why{display:grid;gap:10px;margin-top:6px}
+.why .row{display:grid;grid-template-columns:180px 1fr 1.4fr;gap:18px;background:var(--off);border:1px solid var(--mist);border-radius:14px;padding:16px 20px;font-size:15.5px;color:var(--slate);line-height:1.45}
+.why .row b{color:var(--midnight);font-weight:600}
+.why .row.head{background:transparent;border:0;padding:0 20px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--steel)}
+.why .row span:nth-child(3){color:var(--midnight)}
+@media (max-width:860px){.why .row{grid-template-columns:1fr}.why .row.head{display:none}}
 .plays{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
 .play{background:var(--off);border:1px solid var(--mist);border-radius:20px;padding:22px 24px;box-shadow:var(--shadow)}
 .play .n{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--steel);margin-bottom:10px}
@@ -86,6 +92,24 @@ section:first-child{border-top:0;padding-top:0}
     <div>
       <p>Um workspace onde a marca abre um caso em uma frase e recebe um laudo auditado em minutos.</p>
       <p>Cada caso roda um playbook: um <b>orquestrador</b> quebra a pergunta em hipóteses, <b>investigadores</b> trabalham em paralelo sobre os pipelines da HYPR (places, transactions, audiences, performance), um <b>auditor</b> independente refaz a conta sem ter visto o raciocínio, e a resposta sai com uma <b>ação executável</b> no bidIQ.</p>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>Por que <em>vários</em> agentes</h2>
+    <div>
+      <p>Um chat faz tudo numa janela só: cada pergunta nova empurra a anterior para fora, quem responde é quem confere, e nada do que foi feito fica registrado de um jeito que se possa repetir. O Swarm separa os papéis e guarda tudo.</p>
+      <div class="why">
+        <div class="row head"><span>vantagem</span><span>num chat</span><span>no Swarm</span></div>
+        <div class="row"><b>Memória que não se perde</b><span>O contexto enche, a análise do minuto 10 some no minuto 40 e a pessoa pergunta de novo.</span><span>Cada investigador trabalha no próprio contexto e devolve só a conclusão. O orquestrador nunca enche. O caso inteiro fica gravado: hipóteses, consultas, achados, laudo.</span></div>
+        <div class="row"><b>Paralelismo</b><span>Uma hipótese por vez, na ordem em que a pessoa lembra de perguntar.</span><span>Cinco hipóteses ao mesmo tempo. O orquestrador cruza os achados e percebe quando três agentes viram o mesmo evento por lados diferentes.</span></div>
+        <div class="row"><b>Checagem independente</b><span>O mesmo modelo relê o próprio trabalho e concorda consigo mesmo.</span><span>O auditor recebe só as conclusões e os dados, refaz as consultas por conta própria, confere a conta e devolve com ressalva quando não fecha.</span></div>
+        <div class="row"><b>Versionamento</b><span>O prompt vive na cabeça de quem digitou. Não há como saber o que foi perguntado no caso do mês passado.</span><span>Playbooks são arquivos versionados no repositório. Cada caso registra a versão do playbook, as tabelas e as consultas usadas. Um caso de hoje roda igual daqui a seis meses, e dá para comparar quando o playbook muda.</span></div>
+        <div class="row"><b>Rastreabilidade</b><span>"Causas combinadas", sem dizer de onde veio cada número.</span><span>Todo número do laudo aponta para a consulta que o gerou, com linhas lidas, tempo e bytes. O cliente pode abrir qualquer afirmação.</span></div>
+        <div class="row"><b>Acesso governado</b><span>Um chat com acesso ao banco vê tudo ou nada.</span><span>Cada agente tem só as tabelas da sua função, com cota de bytes e limite de consultas. Custo por caso previsível e visível.</span></div>
+        <div class="row"><b>Roda sem operador</b><span>Alguém precisa estar ali para fazer a pergunta seguinte.</span><span>Casos recorrentes rodam agendados: toda segunda o playbook de campanha roda sozinho e o laudo chega pronto, comparado com a semana anterior.</span></div>
+        <div class="row"><b>Aprende com os casos</b><span>Cada conversa começa do zero.</span><span>Achados e ressalvas dos auditores viram melhorias no playbook, revisadas e versionadas. O sistema melhora a si mesmo, com histórico de cada mudança.</span></div>
+      </div>
     </div>
   </section>
 
