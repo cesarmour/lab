@@ -62,7 +62,7 @@ button.run svg{width:12px;height:12px}
 .result p:last-child{margin:0}
 .result b{color:var(--midnight);font-weight:600}
 .result.empty{opacity:1;animation:none;display:flex;align-items:center;justify-content:center;color:var(--steel);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
-.result .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;margin-right:6px}
+.result .pill{display:inline-block;margin-right:8px;padding:2px 10px;border-radius:999px;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;margin-right:6px}
 .pill.good{background:var(--good-bg);color:var(--good)}.pill.bad{background:var(--bad-bg);color:var(--bad)}
 
 /* chat */
@@ -220,14 +220,14 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
       <tr><td>Tempo até a resposta</td><td id="k2">…</td><td>13 min</td></tr>
       <tr><td>Tokens consumidos</td><td id="k9">…</td><td id="t-ag-k">…</td></tr>
       <tr><td>Consultas rodadas</td><td id="k3">…</td><td id="q-ag">…</td></tr>
-      <tr><td>Hipóteses descartadas com dado</td><td id="k4">…</td><td>4: ruptura, UV nacional, TV, UF sem canal</td></tr>
+      <tr><td>Hipóteses descartadas com dado</td><td id="k4">…</td><td>4: ruptura, UV nacional, alcance, UF sem canal</td></tr>
       <tr><td>Hipóteses cruzadas entre si</td><td id="k5">…</td><td>Todas, pelo orquestrador</td></tr>
       <tr><td>Informação perdida no caminho</td><td id="k6">…</td><td>Nenhuma: cada agente devolve só a conclusão</td></tr>
-      <tr><td>Causa principal com peso</td><td id="k7">…</td><td>Sim: mídia e promoção ≈ 10 pts, clima ≈ 8 pts</td></tr>
+      <tr><td>Causa principal com peso</td><td id="k7">…</td><td>Sim: campanhas e promoção ≈ 10 pts, clima ≈ 8 pts</td></tr>
       <tr><td>Próxima ação definida</td><td id="k8">…</td><td>Sim, com audiência e volume</td></tr>
     </tbody>
   </table>
-  <p class="foot">Os tempos, os turnos e os tokens são simulados. Os nomes e volumes de audiência vêm do catálogo HYPR. Os datasets, as consultas e os números do caso são ilustrativos.</p>
+  <p class="foot">Os tempos, os turnos e os tokens são simulados. Os nomes e volumes de audiência vêm do catálogo HYPR. Os datasets, as consultas e os números do caso são ilustrativos. Clima vem de fonte externa (INMET); o resto vem das bases HYPR: notas fiscais, lugares, audiências, performance das campanhas na rede e pesquisas.</p>
 </section>
 </div>
 
@@ -247,7 +247,7 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
     {id:'geo', n:'geoIQ', s:'onde?',     feeds:['p_pl','p_tr']},
     {id:'rev', n:'revIQ', s:'quanto?',   feeds:['p_tr','p_pf']},
     {id:'bid', n:'bidIQ', s:'quem?',     feeds:['p_au','p_pl']},
-    {id:'ad',  n:'adIQ',  s:'com o quê?',feeds:['p_pf','p_au']},
+    {id:'ad',  n:'adsIQ',  s:'com o quê?',feeds:['p_pf','p_au']},
     {id:'ask', n:'askIQ', s:'por quê?',  feeds:['p_au','p_pf']}
   ];
 
@@ -255,25 +255,25 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
     {id:'a1', n:'Agente 1', role:'preço e promoção', uses:['rev'], l:[
       [0.3,'hyp',null,'Hipótese: ruptura de estoque ou mudança de preço'],
       [0.6,'conn','rev','revIQ · transactions.nf_items'],
-      [0.9,'sql','rev','<k>SELECT</k> COUNT(DISTINCT store_id) lojas, SUM(qty) un\n<k>FROM</k> `revIQ · transactions.nf_items`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> dt <k>BETWEEN</k> <s>\'2026-05-01\'</s> <k>AND</k> <s>\'2026-06-30\'</s>\n<k>GROUP BY</k> EXTRACT(MONTH <k>FROM</k> dt)'],
+      [0.9,'sql','rev','<k>SELECT</k> COUNT(DISTINCT store_id) lojas, SUM(qty) un\n<k>FROM</k> `transactions.nf_items`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> dt <k>BETWEEN</k> <s>\'2026-05-01\'</s> <k>AND</k> <s>\'2026-06-30\'</s>\n<k>GROUP BY</k> EXTRACT(MONTH <k>FROM</k> dt)'],
       [1.8,'res','rev','2 linhas · 1.204.318 lidas · 2,1 s · 388 MB'],
       [2.2,'dead',null,'Lojas vendendo: 9.812 em maio, 9.790 em junho. Não é ruptura.'],
-      [2.6,'sql','rev','<k>SELECT</k> DATE_TRUNC(dt, WEEK) wk,\n  AVG(unit_price) preco, COUNTIF(discount > 0)/COUNT(*) promo\n<k>FROM</k> `revIQ · transactions.nf_items`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> dt >= <s>\'2026-04-01\'</s>\n<k>GROUP BY</k> 1 <k>ORDER BY</k> 1'],
+      [2.6,'sql','rev','<k>SELECT</k> DATE_TRUNC(dt, WEEK) wk,\n  AVG(unit_price) preco, COUNTIF(discount > 0)/COUNT(*) promo\n<k>FROM</k> `transactions.nf_items`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> dt >= <s>\'2026-04-01\'</s>\n<k>GROUP BY</k> 1 <k>ORDER BY</k> 1'],
       [3.6,'res','rev','13 linhas · 1.611.902 lidas · 2,4 s · 512 MB'],
       [4.0,'note',null,'Preço médio +9% a partir da semana de 1/jun; promo cai de 31% para 12%'],
       [4.4,'conn','rev','revIQ · transactions.demand_idx'],
-      [4.7,'sql','rev','<k>SELECT</k> month, demand_idx\n<k>FROM</k> `revIQ · transactions.demand_idx`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> uf <k>IS NULL</k>'],
+      [4.7,'sql','rev','<k>SELECT</k> month, demand_idx\n<k>FROM</k> `transactions.demand_idx`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> uf <k>IS NULL</k>'],
       [5.2,'res','rev','24 linhas · 0,4 s'],
       [5.8,'find',null,'Categoria caiu 7%, a marca caiu 18%: 11 pts são da marca. Promoção saiu em 2/jun e a queda começa nessa semana'],
       [6.2,'done',null,'Concluído']]},
     {id:'a2', n:'Agente 2', role:'clima', uses:['geo','rev'], l:[
       [0.3,'hyp',null,'Hipótese: inverno derrubou a demanda'],
       [0.6,'conn','geo','geoIQ · places.weather_daily'],
-      [0.9,'sql','geo','<k>SELECT</k> EXTRACT(MONTH <k>FROM</k> dt) m, AVG(uv_index) uv\n<k>FROM</k> `geoIQ · places.weather_daily`\n<k>WHERE</k> dt >= <s>\'2026-05-01\'</s> <k>GROUP BY</k> 1'],
+      [0.9,'sql','geo','<k>SELECT</k> EXTRACT(MONTH <k>FROM</k> dt) m, AVG(uv_index) uv\n<k>FROM</k> `places.weather_daily`\n<k>WHERE</k> dt >= <s>\'2026-05-01\'</s> <k>GROUP BY</k> 1'],
       [1.6,'res','geo','2 linhas · 0,3 s'],
       [2.0,'dead',null,'UV médio nacional: 7,1 → 6,4. Pouco para explicar 18%. Precisa abrir por cidade'],
       [2.4,'conn','geo','geoIQ · places.pois'],
-      [2.7,'sql','geo','<k>SELECT</k> p.store_id, p.city, p.uf\n<k>FROM</k> `geoIQ · places.pois` p\n<k>WHERE</k> p.sells_category = <s>\'protetor_solar\'</s>'],
+      [2.7,'sql','geo','<k>SELECT</k> p.store_id, p.city, p.uf\n<k>FROM</k> `places.pois` p\n<k>WHERE</k> p.sells_category = <s>\'protetor_solar\'</s>'],
       [3.3,'res','geo','9.991 linhas · 0,6 s'],
       [3.6,'conn','rev','revIQ · transactions.nf_items'],
       [3.9,'sql','rev','<k>SELECT</k> w.city, AVG(w.uv_index) uv, SUM(n.qty) un\n<k>FROM</k> nf_items n <k>JOIN</k> pois p <k>USING</k> (store_id)\n<k>JOIN</k> weather_daily w <k>ON</k> w.city = p.city <k>AND</k> w.dt = n.dt\n<k>WHERE</k> n.dt >= <s>\'2026-05-01\'</s> <k>GROUP BY</k> 1'],
@@ -283,19 +283,19 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
     {id:'a3', n:'Agente 3', role:'concorrência', uses:['rev','ad'], l:[
       [0.3,'hyp',null,'Hipótese: alguém tomou share'],
       [0.6,'conn','rev','revIQ · transactions.nf_items'],
-      [0.9,'sql','rev','<k>SELECT</k> brand, EXTRACT(MONTH <k>FROM</k> dt) m,\n  SUM(qty)/SUM(SUM(qty)) <k>OVER</k> (PARTITION BY EXTRACT(MONTH <k>FROM</k> dt)) share\n<k>FROM</k> `revIQ · transactions.nf_items`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> dt >= <s>\'2026-03-01\'</s>\n<k>GROUP BY</k> 1, 2'],
+      [0.9,'sql','rev','<k>SELECT</k> brand, EXTRACT(MONTH <k>FROM</k> dt) m,\n  SUM(qty)/SUM(SUM(qty)) <k>OVER</k> (PARTITION BY EXTRACT(MONTH <k>FROM</k> dt)) share\n<k>FROM</k> `transactions.nf_items`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> dt >= <s>\'2026-03-01\'</s>\n<k>GROUP BY</k> 1, 2'],
       [2.0,'res','rev','24 linhas · 2.402.511 lidas · 3,1 s · 640 MB'],
       [2.5,'note',null,'4 marcas estáveis. Marca B: 11% → 17% em junho. Onde?'],
-      [2.9,'sql','rev','<k>SELECT</k> channel, brand, AVG(discount) desc_medio\n<k>FROM</k> `revIQ · transactions.nf_items`\n<k>WHERE</k> brand <k>IN</k> (<s>\'marca\'</s>, <s>\'B\'</s>) <k>AND</k> dt >= <s>\'2026-06-01\'</s>\n<k>GROUP BY</k> 1, 2'],
+      [2.9,'sql','rev','<k>SELECT</k> channel, brand, AVG(discount) desc_medio\n<k>FROM</k> `transactions.nf_items`\n<k>WHERE</k> brand <k>IN</k> (<s>\'marca\'</s>, <s>\'B\'</s>) <k>AND</k> dt >= <s>\'2026-06-01\'</s>\n<k>GROUP BY</k> 1, 2'],
       [3.8,'res','rev','6 linhas · 1.198.004 lidas · 1,9 s'],
       [4.2,'note',null,'B com 25% off em farmácia; zero em supermercado'],
       [4.6,'conn','rev','revIQ · transactions.launches'],
-      [4.9,'sql','rev','<k>SELECT</k> brand, launch_dt, line\n<k>FROM</k> `revIQ · transactions.launches`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> launch_dt >= <s>\'2026-05-01\'</s>'],
+      [4.9,'sql','rev','<k>SELECT</k> brand, launch_dt, line\n<k>FROM</k> `transactions.launches`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> launch_dt >= <s>\'2026-05-01\'</s>'],
       [5.4,'res','rev','1 linha · 0,2 s'],
-      [5.8,'conn','ad','adIQ · performance.media'],
-      [6.1,'sql','ad','<k>SELECT</k> brand, month, SUM(spend) spend\n<k>FROM</k> `adIQ · performance.media`\n<k>WHERE</k> brand = <s>\'B\'</s> <k>AND</k> month >= <s>\'2026-04\'</s> <k>GROUP BY</k> 1, 2'],
-      [6.8,'res','ad','3 linhas · 0,5 s'],
-      [7.3,'find',null,'B lançou linha em 1/jun com 25% off em farmácia e dobrou mídia em maio. Ganhou 6 pts, todos no canal farmácia'],
+      [5.8,'conn','geo','geoIQ · places.pois'],
+      [6.1,'sql','geo','<k>SELECT</k> EXTRACT(MONTH <k>FROM</k> n.dt) m, COUNT(DISTINCT n.store_id) lojas_b\n<k>FROM</k> `transactions.nf_items` n <k>JOIN</k> `places.pois` p <k>USING</k> (store_id)\n<k>WHERE</k> n.brand = <s>\'B\'</s> <k>AND</k> p.channel = <s>\'farmacia\'</s> <k>GROUP BY</k> 1'],
+      [6.8,'res','geo','2 linhas · 1.198.004 lidas · 1,8 s'],
+      [7.3,'find',null,'B lançou linha em 1/jun com 25% off e passou de 3.100 para 5.400 farmácias com venda. Ganhou 6 pts, todos no canal farmácia'],
       [7.7,'done',null,'Concluído']]},
     {id:'a4', n:'Agente 4', role:'canal e região', uses:['rev','geo'], l:[
       [0.3,'hyp',null,'Hipótese: a queda é regional'],
@@ -311,27 +311,27 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
       [6.0,'done',null,'Concluído']]},
     {id:'a5', n:'Agente 5', role:'mídia', uses:['ad','bid','ask'], l:[
       [0.3,'hyp',null,'Hipótese: a marca ficou invisível'],
-      [0.6,'conn','ad','adIQ · performance.media'],
-      [0.9,'sql','ad','<k>SELECT</k> month, channel, SUM(spend) spend\n<k>FROM</k> `adIQ · performance.media`\n<k>WHERE</k> brand = <s>\'marca\'</s> <k>AND</k> month >= <s>\'2026-03\'</s>\n<k>GROUP BY</k> 1, 2'],
+      [0.6,'conn','ad','adsIQ · performance.media'],
+      [0.9,'sql','ad','<k>SELECT</k> month, channel, SUM(spend) spend\n<k>FROM</k> `performance.media`\n<k>WHERE</k> brand = <s>\'marca\'</s> <k>AND</k> month >= <s>\'2026-03\'</s>\n<k>GROUP BY</k> 1, 2'],
       [1.8,'res','ad','16 linhas · 0,6 s'],
-      [2.3,'dead',null,'TV estável nos 4 meses. Não é TV'],
-      [2.7,'sql','ad','<k>SELECT</k> month, SUM(spend) digital,\n  AVG(attention_share) att\n<k>FROM</k> `adIQ · performance.media`\n<k>WHERE</k> brand = <s>\'marca\'</s> <k>AND</k> channel <k>IN</k> (<s>\'digital\'</s>, <s>\'ooh\'</s>)\n<k>GROUP BY</k> 1'],
+      [2.3,'dead',null,'Entrega das campanhas da marca na rede estável até abril. Não é alcance'],
+      [2.7,'sql','ad','<k>SELECT</k> month, SUM(spend) digital,\n  AVG(attention_share) att\n<k>FROM</k> `performance.media`\n<k>WHERE</k> brand = <s>\'marca\'</s> <k>AND</k> channel <k>IN</k> (<s>\'digital\'</s>, <s>\'ooh\'</s>)\n<k>GROUP BY</k> 1'],
       [3.6,'res','ad','4 linhas · 0,5 s'],
-      [4.0,'note',null,'Digital e OOH −40% em maio. Share de atenção 18% → 9% em junho'],
+      [4.0,'note',null,'Campanhas da marca na rede pausadas em maio (−40% de entrega). Share de atenção medido cai de 18% para 9% em junho'],
       [4.4,'conn','bid','bidIQ · audiences.exposure'],
-      [4.7,'sql','bid','<k>SELECT</k> audience_name, audience_volume\n<k>FROM</k> `bidIQ · audiences.exposure`\n<k>WHERE</k> brand = <s>\'B\'</s> <k>AND</k> month = <s>\'2026-06\'</s>'],
+      [4.7,'sql','bid','<k>SELECT</k> audience_name, audience_volume\n<k>FROM</k> `audiences.exposure`\n<k>WHERE</k> brand = <s>\'B\'</s> <k>AND</k> month = <s>\'2026-06\'</s>'],
       [5.3,'res','bid','1 linha · 0,3 s'],
       [5.6,'conn','ask','askIQ · surveys.brand_recall'],
       [5.8,'sql','ask','<k>SELECT</k> wave, recall_pct\n<k>FROM</k> `surveys.brand_recall`\n<k>WHERE</k> brand = <s>\'marca\'</s> <k>AND</k> wave >= <s>\'2026-04\'</s>'],
       [6.3,'res','ask','3 linhas · 0,2 s'],
-      [6.8,'find',null,'Recall espontâneo 41% → 27% entre abril e junho. 6,1 mi expostas à B sem impacto da marca. A perda de atenção precede a queda em 3 semanas'],
+      [6.8,'find',null,'Recall espontâneo 41% → 27% entre abril e junho (askIQ). 6,1 mi de pessoas da audiência da marca sem nenhum impacto em junho. A perda de atenção precede a queda em 3 semanas'],
       [7.1,'done',null,'Concluído']]}
   ];
   var orq={id:'orq', n:'Orquestrador', role:'', l:[
     [0.0,'note',null,'Pergunta recebida. Quebrando em 5 hipóteses: preço, clima, concorrência, canal/região, mídia'],
     [0.15,'note',null,'5 agentes disparados em paralelo, cada um com acesso às bases que precisa'],
     [8.0,'note',null,'Recebeu 5 conclusões. Somando: clima 8 + promoção 11 + concorrente 6 + mídia 9 = 34 pts. Não fecha com 18'],
-    [8.6,'note',null,'Sobreposição: promoção, concorrente e mídia são o mesmo evento visto de três lados. Agentes 1, 3 e 5 apontam a mesma semana'],
+    [8.6,'note',null,'Sobreposição: promoção retirada, B na prateleira e campanhas pausadas são o mesmo evento visto de três lados. Agentes 1, 3 e 5 apontam a mesma semana'],
     [9.3,'note',null,'Pedindo ao Agente 2 um teste: onde não houve a B nem corte de mídia, quanto caiu?'],
     [10.4,'note',null,'Agente 2: Nordeste, sem B e com sol, −4%. Clima sozinho em SP, sem o evento, seria ≈ −8%'],
     [11.0,'note',null,'Reconciliado: clima ≈ 8 pts, evento de mídia + promoção + concorrente ≈ 10 pts'],
@@ -502,10 +502,10 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
   function showResultAg(){
     var r=$('r-ag');r.className='result show';
     r.innerHTML='<div class="h"><h3>Resposta do orquestrador</h3><span>13 min · 1 pedido · '+queries+' consultas · '+fmtTok(tokAg)+' tokens</span></div>'+
-      '<p><span class="pill good">causa principal ≈ 10 pts</span>um único evento visto de três lados. A marca cortou 40% da mídia em maio e retirou promoção de farmácia em 2/jun; na mesma semana a marca B entrou na mesma prateleira com 25% off e o dobro de mídia. Share de atenção 18% → 9%.</p>'+
-      '<p><span class="pill good">causa secundária ≈ 8 pts</span>clima. 22 dias sem sol em SP e litoral, UV 8 → 4. Sazonal: no Nordeste, com sol e sem a B, a queda foi de 4%.</p>'+
-      '<p><b>Descartado com dado:</b> ruptura de estoque, TV, UV nacional.</p>'+
-      '<p><span class="pill good">ação</span>retomar promoção e mídia em farmácia no Sul e Sudeste antes de outubro, na audiência <b>Visitantes de Farmácias</b> (21,6 mi de pessoas, 9.991 endereços) com recorte geográfico.</p>';
+      '<p><span class="pill good">causa principal ≈ 10 pts</span>um único evento visto de três lados. A marca pausou as campanhas na rede em maio e retirou promoção de farmácia em 2/jun (notas fiscais); na mesma semana a marca B entrou na mesma prateleira com 25% off e chegou a 5.400 farmácias. Share de atenção medido 18% → 9%, recall 41% → 27%.</p>'+
+      '<p><span class="pill good">causa secundária ≈ 8 pts</span>clima (fonte externa, INMET). 22 dias sem sol em SP e litoral, UV 8 → 4. Sazonal: no Nordeste, com sol e sem a B, a queda foi de 4%.</p>'+
+      '<p><b>Descartado com dado:</b> ruptura de estoque, alcance das campanhas, UV nacional.</p>'+
+      '<p><span class="pill good">ação</span>retomar promoção e campanhas em farmácia no Sul e Sudeste antes de outubro, na audiência <b>Visitantes de Farmácias</b> (21,6 mi de pessoas, 9.991 endereços) com recorte geográfico.</p>';
   }
   function fillCompare(){
     var k=function(i,v){$('k'+i).textContent=v};
