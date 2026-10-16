@@ -16,7 +16,7 @@
   --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
   --r-sm:8px; --r-md:14px; --r-lg:20px;
   --shadow:0 8px 28px rgba(28,38,47,.06), 0 1px 2px rgba(28,38,47,.04);
-  --lane-h:880px; --result-h:232px;
+  --lane-h:960px; --result-h:232px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--cloud);color:var(--midnight);font-family:Urbanist,system-ui,sans-serif;font-size:17px;line-height:1.5;font-weight:400;-webkit-font-smoothing:antialiased}
@@ -92,6 +92,12 @@ button.run svg{width:12px;height:12px}
 .net text.role{fill:var(--steel);font-size:10.5px;font-weight:400}
 .net text.bq{font-family:var(--mono);fill:var(--steel);font-size:9.5px;letter-spacing:.08em}
 .net .bqbox{fill:var(--cloud);stroke:var(--mist)}
+.net .pipe rect{fill:var(--midnight)}
+.net text.pn{font-family:var(--mono);fill:var(--off);font-size:10px;font-weight:500;letter-spacing:.04em}
+.net text.ps{fill:var(--steel);font-size:9.5px;font-weight:400}
+.net text.iq{fill:var(--midnight);font-size:12px;font-weight:600}
+.net .feed{stroke:var(--mist);stroke-width:1;fill:none}
+.net .drop{fill:var(--cyan);opacity:.8}
 .net .link{stroke:var(--mist);stroke-width:1.2;fill:none;transition:stroke .3s,stroke-width .3s}
 .net .link.on{stroke:var(--cyan);stroke-width:1.6;stroke-dasharray:3 5;animation:flow .6s linear infinite}
 .net .base circle{fill:var(--off);stroke:var(--mist);stroke-width:1.5;transition:stroke .3s,fill .3s}
@@ -153,6 +159,7 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
   .lane-head{grid-template-columns:1fr auto auto;gap:16px}
 }
 @media (prefers-reduced-motion:reduce){
+  .net .drop{display:none}
   .msg,.ln,.result{animation:none!important;opacity:1!important;transform:none!important}
   .net .link.on,.net .base.on .ring{animation:none}
   .ctx .bar i,.thread,.console{transition:none;scroll-behavior:auto}
@@ -198,7 +205,7 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
       <div class="kpi" id="k-ag"><div class="v" id="c-ag">0 min</div><div class="l">tempo decorrido</div></div>
     </div>
     <div class="body">
-      <div class="net"><svg id="net" viewBox="0 0 640 332" aria-label="Agentes consultando as bases HYPR no BigQuery"></svg></div>
+      <div class="net"><svg id="net" viewBox="0 0 640 392" aria-label="Agentes consultando as bases HYPR no BigQuery"></svg></div>
       <div class="console" id="console"></div>
     </div>
     <div class="result empty" id="r-ag">resultado</div>
@@ -231,87 +238,95 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
   var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   var NS='http://www.w3.org/2000/svg';
 
+  var pipes=[
+    {id:'p_pl', n:'places',       s:'Places Graph'},
+    {id:'p_tr', n:'transactions', s:'Groundflow'},
+    {id:'p_au', n:'audiences',    s:'Audiences Graph'},
+    {id:'p_pf', n:'performance',  s:'Max Attention'}
+  ];
   var bases=[
-    {id:'gf', n:'Groundflow',   s:'nf_items'},
-    {id:'pg', n:'Places Graph', s:'pois'},
-    {id:'ma', n:'Max Attention',s:'media'},
-    {id:'ds', n:'Demandshift',  s:'demand'},
-    {id:'au', n:'Audiências',   s:'catalog'},
-    {id:'cl', n:'INMET',        s:'inmet_daily'}
+    {id:'geo', n:'geoIQ', s:'onde?',     feeds:['p_pl','p_tr']},
+    {id:'rev', n:'revIQ', s:'quanto?',   feeds:['p_tr','p_pf']},
+    {id:'bid', n:'bidIQ', s:'quem?',     feeds:['p_au','p_pl']},
+    {id:'ad',  n:'adIQ',  s:'com o quê?',feeds:['p_pf','p_au']},
+    {id:'ask', n:'askIQ', s:'por quê?',  feeds:['p_au','p_pf']}
   ];
 
   var agents=[
-    {id:'a1', n:'Agente 1', role:'preço e promoção', uses:['gf','ds'], l:[
+    {id:'a1', n:'Agente 1', role:'preço e promoção', uses:['rev'], l:[
       [0.3,'hyp',null,'Hipótese: ruptura de estoque ou mudança de preço'],
-      [0.6,'conn','gf','hypr-prod.groundflow.nf_items'],
-      [0.9,'sql','gf','<k>SELECT</k> COUNT(DISTINCT store_id) lojas, SUM(qty) un\n<k>FROM</k> `hypr-prod.groundflow.nf_items`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> dt <k>BETWEEN</k> <s>\'2026-05-01\'</s> <k>AND</k> <s>\'2026-06-30\'</s>\n<k>GROUP BY</k> EXTRACT(MONTH <k>FROM</k> dt)'],
-      [1.8,'res','gf','2 linhas · 1.204.318 lidas · 2,1 s · 388 MB'],
+      [0.6,'conn','rev','revIQ · transactions.nf_items'],
+      [0.9,'sql','rev','<k>SELECT</k> COUNT(DISTINCT store_id) lojas, SUM(qty) un\n<k>FROM</k> `revIQ · transactions.nf_items`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> dt <k>BETWEEN</k> <s>\'2026-05-01\'</s> <k>AND</k> <s>\'2026-06-30\'</s>\n<k>GROUP BY</k> EXTRACT(MONTH <k>FROM</k> dt)'],
+      [1.8,'res','rev','2 linhas · 1.204.318 lidas · 2,1 s · 388 MB'],
       [2.2,'dead',null,'Lojas vendendo: 9.812 em maio, 9.790 em junho. Não é ruptura.'],
-      [2.6,'sql','gf','<k>SELECT</k> DATE_TRUNC(dt, WEEK) wk,\n  AVG(unit_price) preco, COUNTIF(discount > 0)/COUNT(*) promo\n<k>FROM</k> `hypr-prod.groundflow.nf_items`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> dt >= <s>\'2026-04-01\'</s>\n<k>GROUP BY</k> 1 <k>ORDER BY</k> 1'],
-      [3.6,'res','gf','13 linhas · 1.611.902 lidas · 2,4 s · 512 MB'],
+      [2.6,'sql','rev','<k>SELECT</k> DATE_TRUNC(dt, WEEK) wk,\n  AVG(unit_price) preco, COUNTIF(discount > 0)/COUNT(*) promo\n<k>FROM</k> `revIQ · transactions.nf_items`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> dt >= <s>\'2026-04-01\'</s>\n<k>GROUP BY</k> 1 <k>ORDER BY</k> 1'],
+      [3.6,'res','rev','13 linhas · 1.611.902 lidas · 2,4 s · 512 MB'],
       [4.0,'note',null,'Preço médio +9% a partir da semana de 1/jun; promo cai de 31% para 12%'],
-      [4.4,'conn','ds','hypr-prod.demandshift.demand'],
-      [4.7,'sql','ds','<k>SELECT</k> month, demand_idx\n<k>FROM</k> `hypr-prod.demandshift.demand`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> uf <k>IS NULL</k>'],
-      [5.2,'res','ds','24 linhas · 0,4 s'],
+      [4.4,'conn','rev','revIQ · transactions.demand_idx'],
+      [4.7,'sql','rev','<k>SELECT</k> month, demand_idx\n<k>FROM</k> `revIQ · transactions.demand_idx`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> uf <k>IS NULL</k>'],
+      [5.2,'res','rev','24 linhas · 0,4 s'],
       [5.8,'find',null,'Categoria caiu 7%, a marca caiu 18%: 11 pts são da marca. Promoção saiu em 2/jun e a queda começa nessa semana'],
       [6.2,'done',null,'Concluído']]},
-    {id:'a2', n:'Agente 2', role:'clima', uses:['cl','pg','gf'], l:[
+    {id:'a2', n:'Agente 2', role:'clima', uses:['geo','rev'], l:[
       [0.3,'hyp',null,'Hipótese: inverno derrubou a demanda'],
-      [0.6,'conn','cl','hypr-prod.ext.inmet_daily'],
-      [0.9,'sql','cl','<k>SELECT</k> EXTRACT(MONTH <k>FROM</k> dt) m, AVG(uv_index) uv\n<k>FROM</k> `hypr-prod.ext.inmet_daily`\n<k>WHERE</k> dt >= <s>\'2026-05-01\'</s> <k>GROUP BY</k> 1'],
-      [1.6,'res','cl','2 linhas · 0,3 s'],
+      [0.6,'conn','geo','geoIQ · places.weather_daily'],
+      [0.9,'sql','geo','<k>SELECT</k> EXTRACT(MONTH <k>FROM</k> dt) m, AVG(uv_index) uv\n<k>FROM</k> `geoIQ · places.weather_daily`\n<k>WHERE</k> dt >= <s>\'2026-05-01\'</s> <k>GROUP BY</k> 1'],
+      [1.6,'res','geo','2 linhas · 0,3 s'],
       [2.0,'dead',null,'UV médio nacional: 7,1 → 6,4. Pouco para explicar 18%. Precisa abrir por cidade'],
-      [2.4,'conn','pg','hypr-prod.places_graph.pois'],
-      [2.7,'sql','pg','<k>SELECT</k> p.store_id, p.city, p.uf\n<k>FROM</k> `hypr-prod.places_graph.pois` p\n<k>WHERE</k> p.sells_category = <s>\'protetor_solar\'</s>'],
-      [3.3,'res','pg','9.991 linhas · 0,6 s'],
-      [3.6,'conn','gf','hypr-prod.groundflow.nf_items'],
-      [3.9,'sql','gf','<k>SELECT</k> w.city, AVG(w.uv_index) uv, SUM(n.qty) un\n<k>FROM</k> nf_items n <k>JOIN</k> pois p <k>USING</k> (store_id)\n<k>JOIN</k> inmet_daily w <k>ON</k> w.city = p.city <k>AND</k> w.dt = n.dt\n<k>WHERE</k> n.dt >= <s>\'2026-05-01\'</s> <k>GROUP BY</k> 1'],
-      [5.0,'res','gf','312 linhas · 2.816.220 lidas · 3,8 s · 744 MB'],
+      [2.4,'conn','geo','geoIQ · places.pois'],
+      [2.7,'sql','geo','<k>SELECT</k> p.store_id, p.city, p.uf\n<k>FROM</k> `geoIQ · places.pois` p\n<k>WHERE</k> p.sells_category = <s>\'protetor_solar\'</s>'],
+      [3.3,'res','geo','9.991 linhas · 0,6 s'],
+      [3.6,'conn','rev','revIQ · transactions.nf_items'],
+      [3.9,'sql','rev','<k>SELECT</k> w.city, AVG(w.uv_index) uv, SUM(n.qty) un\n<k>FROM</k> nf_items n <k>JOIN</k> pois p <k>USING</k> (store_id)\n<k>JOIN</k> weather_daily w <k>ON</k> w.city = p.city <k>AND</k> w.dt = n.dt\n<k>WHERE</k> n.dt >= <s>\'2026-05-01\'</s> <k>GROUP BY</k> 1'],
+      [5.0,'res','rev','312 linhas · 2.816.220 lidas · 3,8 s · 744 MB'],
       [5.6,'find',null,'SP e litoral: 22 dias sem sol, UV 8 → 4, venda −21%. Natal e Recife: UV normal, venda −3%. Clima explica até 8 pts'],
       [6.0,'done',null,'Concluído']]},
-    {id:'a3', n:'Agente 3', role:'concorrência', uses:['gf','ma','ds'], l:[
+    {id:'a3', n:'Agente 3', role:'concorrência', uses:['rev','ad'], l:[
       [0.3,'hyp',null,'Hipótese: alguém tomou share'],
-      [0.6,'conn','gf','hypr-prod.groundflow.nf_items'],
-      [0.9,'sql','gf','<k>SELECT</k> brand, EXTRACT(MONTH <k>FROM</k> dt) m,\n  SUM(qty)/SUM(SUM(qty)) <k>OVER</k> (PARTITION BY EXTRACT(MONTH <k>FROM</k> dt)) share\n<k>FROM</k> `hypr-prod.groundflow.nf_items`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> dt >= <s>\'2026-03-01\'</s>\n<k>GROUP BY</k> 1, 2'],
-      [2.0,'res','gf','24 linhas · 2.402.511 lidas · 3,1 s · 640 MB'],
+      [0.6,'conn','rev','revIQ · transactions.nf_items'],
+      [0.9,'sql','rev','<k>SELECT</k> brand, EXTRACT(MONTH <k>FROM</k> dt) m,\n  SUM(qty)/SUM(SUM(qty)) <k>OVER</k> (PARTITION BY EXTRACT(MONTH <k>FROM</k> dt)) share\n<k>FROM</k> `revIQ · transactions.nf_items`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> dt >= <s>\'2026-03-01\'</s>\n<k>GROUP BY</k> 1, 2'],
+      [2.0,'res','rev','24 linhas · 2.402.511 lidas · 3,1 s · 640 MB'],
       [2.5,'note',null,'4 marcas estáveis. Marca B: 11% → 17% em junho. Onde?'],
-      [2.9,'sql','gf','<k>SELECT</k> channel, brand, AVG(discount) desc_medio\n<k>FROM</k> `hypr-prod.groundflow.nf_items`\n<k>WHERE</k> brand <k>IN</k> (<s>\'marca\'</s>, <s>\'B\'</s>) <k>AND</k> dt >= <s>\'2026-06-01\'</s>\n<k>GROUP BY</k> 1, 2'],
-      [3.8,'res','gf','6 linhas · 1.198.004 lidas · 1,9 s'],
+      [2.9,'sql','rev','<k>SELECT</k> channel, brand, AVG(discount) desc_medio\n<k>FROM</k> `revIQ · transactions.nf_items`\n<k>WHERE</k> brand <k>IN</k> (<s>\'marca\'</s>, <s>\'B\'</s>) <k>AND</k> dt >= <s>\'2026-06-01\'</s>\n<k>GROUP BY</k> 1, 2'],
+      [3.8,'res','rev','6 linhas · 1.198.004 lidas · 1,9 s'],
       [4.2,'note',null,'B com 25% off em farmácia; zero em supermercado'],
-      [4.6,'conn','ds','hypr-prod.demandshift.launches'],
-      [4.9,'sql','ds','<k>SELECT</k> brand, launch_dt, line\n<k>FROM</k> `hypr-prod.demandshift.launches`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> launch_dt >= <s>\'2026-05-01\'</s>'],
-      [5.4,'res','ds','1 linha · 0,2 s'],
-      [5.8,'conn','ma','hypr-prod.max_attention.media'],
-      [6.1,'sql','ma','<k>SELECT</k> brand, month, SUM(spend) spend\n<k>FROM</k> `hypr-prod.max_attention.media`\n<k>WHERE</k> brand = <s>\'B\'</s> <k>AND</k> month >= <s>\'2026-04\'</s> <k>GROUP BY</k> 1, 2'],
-      [6.8,'res','ma','3 linhas · 0,5 s'],
+      [4.6,'conn','rev','revIQ · transactions.launches'],
+      [4.9,'sql','rev','<k>SELECT</k> brand, launch_dt, line\n<k>FROM</k> `revIQ · transactions.launches`\n<k>WHERE</k> category = <s>\'protetor_solar\'</s> <k>AND</k> launch_dt >= <s>\'2026-05-01\'</s>'],
+      [5.4,'res','rev','1 linha · 0,2 s'],
+      [5.8,'conn','ad','adIQ · performance.media'],
+      [6.1,'sql','ad','<k>SELECT</k> brand, month, SUM(spend) spend\n<k>FROM</k> `adIQ · performance.media`\n<k>WHERE</k> brand = <s>\'B\'</s> <k>AND</k> month >= <s>\'2026-04\'</s> <k>GROUP BY</k> 1, 2'],
+      [6.8,'res','ad','3 linhas · 0,5 s'],
       [7.3,'find',null,'B lançou linha em 1/jun com 25% off em farmácia e dobrou mídia em maio. Ganhou 6 pts, todos no canal farmácia'],
       [7.7,'done',null,'Concluído']]},
-    {id:'a4', n:'Agente 4', role:'canal e região', uses:['gf','pg'], l:[
+    {id:'a4', n:'Agente 4', role:'canal e região', uses:['rev','geo'], l:[
       [0.3,'hyp',null,'Hipótese: a queda é regional'],
-      [0.6,'conn','pg','hypr-prod.places_graph.pois'],
-      [0.9,'conn','gf','hypr-prod.groundflow.nf_items'],
-      [1.2,'sql','gf','<k>SELECT</k> p.uf, SUM(<k>IF</k>(m=6, qty, 0))/SUM(<k>IF</k>(m=5, qty, 0)) - 1 var\n<k>FROM</k> nf_items n <k>JOIN</k> pois p <k>USING</k> (store_id)\n<k>WHERE</k> brand = <s>\'marca\'</s> <k>GROUP BY</k> 1 <k>ORDER BY</k> 2'],
-      [2.3,'res','gf','27 linhas · 1.611.902 lidas · 2,6 s · 512 MB'],
+      [0.6,'conn','geo','geoIQ · places.pois'],
+      [0.9,'conn','rev','revIQ · transactions.nf_items'],
+      [1.2,'sql','rev','<k>SELECT</k> p.uf, SUM(<k>IF</k>(m=6, qty, 0))/SUM(<k>IF</k>(m=5, qty, 0)) - 1 var\n<k>FROM</k> nf_items n <k>JOIN</k> pois p <k>USING</k> (store_id)\n<k>WHERE</k> brand = <s>\'marca\'</s> <k>GROUP BY</k> 1 <k>ORDER BY</k> 2'],
+      [2.3,'res','rev','27 linhas · 1.611.902 lidas · 2,6 s · 512 MB'],
       [2.8,'dead',null,'SP −26%, RS −23%, BA −9%, PE −4%. Parece clima, mas Sul e Sudeste também é onde tem mais farmácia. Abrir por canal'],
-      [3.2,'sql','gf','<k>SELECT</k> p.region, n.channel,\n  SUM(<k>IF</k>(m=6, qty, 0))/SUM(<k>IF</k>(m=5, qty, 0)) - 1 var, SUM(qty) un\n<k>FROM</k> nf_items n <k>JOIN</k> pois p <k>USING</k> (store_id)\n<k>WHERE</k> brand = <s>\'marca\'</s> <k>GROUP BY</k> 1, 2'],
-      [4.4,'res','gf','15 linhas · 1.611.902 lidas · 2,5 s'],
+      [3.2,'sql','rev','<k>SELECT</k> p.region, n.channel,\n  SUM(<k>IF</k>(m=6, qty, 0))/SUM(<k>IF</k>(m=5, qty, 0)) - 1 var, SUM(qty) un\n<k>FROM</k> nf_items n <k>JOIN</k> pois p <k>USING</k> (store_id)\n<k>WHERE</k> brand = <s>\'marca\'</s> <k>GROUP BY</k> 1, 2'],
+      [4.4,'res','rev','15 linhas · 1.611.902 lidas · 2,5 s'],
       [5.0,'note',null,'Farmácia: −27% (58% do volume). Supermercado: −6%. Perfumaria: −3%'],
       [5.6,'find',null,'Farmácia no Sul e Sudeste: −31%. Farmácia no Nordeste: −5%. Supermercado cai pouco em todo lugar'],
       [6.0,'done',null,'Concluído']]},
-    {id:'a5', n:'Agente 5', role:'mídia', uses:['ma','au'], l:[
+    {id:'a5', n:'Agente 5', role:'mídia', uses:['ad','bid','ask'], l:[
       [0.3,'hyp',null,'Hipótese: a marca ficou invisível'],
-      [0.6,'conn','ma','hypr-prod.max_attention.media'],
-      [0.9,'sql','ma','<k>SELECT</k> month, channel, SUM(spend) spend\n<k>FROM</k> `hypr-prod.max_attention.media`\n<k>WHERE</k> brand = <s>\'marca\'</s> <k>AND</k> month >= <s>\'2026-03\'</s>\n<k>GROUP BY</k> 1, 2'],
-      [1.8,'res','ma','16 linhas · 0,6 s'],
+      [0.6,'conn','ad','adIQ · performance.media'],
+      [0.9,'sql','ad','<k>SELECT</k> month, channel, SUM(spend) spend\n<k>FROM</k> `adIQ · performance.media`\n<k>WHERE</k> brand = <s>\'marca\'</s> <k>AND</k> month >= <s>\'2026-03\'</s>\n<k>GROUP BY</k> 1, 2'],
+      [1.8,'res','ad','16 linhas · 0,6 s'],
       [2.3,'dead',null,'TV estável nos 4 meses. Não é TV'],
-      [2.7,'sql','ma','<k>SELECT</k> month, SUM(spend) digital,\n  AVG(attention_share) att\n<k>FROM</k> `hypr-prod.max_attention.media`\n<k>WHERE</k> brand = <s>\'marca\'</s> <k>AND</k> channel <k>IN</k> (<s>\'digital\'</s>, <s>\'ooh\'</s>)\n<k>GROUP BY</k> 1'],
-      [3.6,'res','ma','4 linhas · 0,5 s'],
+      [2.7,'sql','ad','<k>SELECT</k> month, SUM(spend) digital,\n  AVG(attention_share) att\n<k>FROM</k> `adIQ · performance.media`\n<k>WHERE</k> brand = <s>\'marca\'</s> <k>AND</k> channel <k>IN</k> (<s>\'digital\'</s>, <s>\'ooh\'</s>)\n<k>GROUP BY</k> 1'],
+      [3.6,'res','ad','4 linhas · 0,5 s'],
       [4.0,'note',null,'Digital e OOH −40% em maio. Share de atenção 18% → 9% em junho'],
-      [4.4,'conn','au','hypr-prod.audiences.exposure'],
-      [4.7,'sql','au','<k>SELECT</k> audience_name, audience_volume\n<k>FROM</k> `hypr-prod.audiences.exposure`\n<k>WHERE</k> brand = <s>\'B\'</s> <k>AND</k> month = <s>\'2026-06\'</s>'],
-      [5.3,'res','au','1 linha · 0,3 s'],
-      [5.9,'find',null,'6,1 mi de pessoas expostas à B em junho sem nenhum impacto da marca. A perda de atenção precede a queda em 3 semanas'],
-      [6.3,'done',null,'Concluído']]}
+      [4.4,'conn','bid','bidIQ · audiences.exposure'],
+      [4.7,'sql','bid','<k>SELECT</k> audience_name, audience_volume\n<k>FROM</k> `bidIQ · audiences.exposure`\n<k>WHERE</k> brand = <s>\'B\'</s> <k>AND</k> month = <s>\'2026-06\'</s>'],
+      [5.3,'res','bid','1 linha · 0,3 s'],
+      [5.6,'conn','ask','askIQ · surveys.brand_recall'],
+      [5.8,'sql','ask','<k>SELECT</k> wave, recall_pct\n<k>FROM</k> `surveys.brand_recall`\n<k>WHERE</k> brand = <s>\'marca\'</s> <k>AND</k> wave >= <s>\'2026-04\'</s>'],
+      [6.3,'res','ask','3 linhas · 0,2 s'],
+      [6.8,'find',null,'Recall espontâneo 41% → 27% entre abril e junho. 6,1 mi expostas à B sem impacto da marca. A perda de atenção precede a queda em 3 semanas'],
+      [7.1,'done',null,'Concluído']]}
   ];
   var orq={id:'orq', n:'Orquestrador', role:'', l:[
     [0.0,'note',null,'Pergunta recebida. Quebrando em 5 hipóteses: preço, clima, concorrência, canal/região, mídia'],
@@ -321,8 +336,8 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
     [9.3,'note',null,'Pedindo ao Agente 2 um teste: onde não houve a B nem corte de mídia, quanto caiu?'],
     [10.4,'note',null,'Agente 2: Nordeste, sem B e com sol, −4%. Clima sozinho em SP, sem o evento, seria ≈ −8%'],
     [11.0,'note',null,'Reconciliado: clima ≈ 8 pts, evento de mídia + promoção + concorrente ≈ 10 pts'],
-    [11.6,'conn','au','search_audiences("farmácia")'],
-    [12.2,'res','au','88 audiências · Visitantes de Farmácias · 21.647.167 pessoas · 9.991 endereços'],
+    [11.6,'conn','bid','search_audiences("farmácia")'],
+    [12.2,'res','bid','88 audiências · Visitantes de Farmácias · 21.647.167 pessoas · 9.991 endereços'],
     [12.8,'find',null,'Resposta pronta'],
     [13.0,'done',null,'Concluído']]};
 
@@ -362,26 +377,46 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
   function el(tag,attrs,parent){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);(parent||net).appendChild(e);return e}
   function buildNet(){
     net.innerHTML='';pos={};links={};agEl={};baseEl={};baseCnt={};
-    var gL=el('g'),gN=el('g'),gP=el('g');
-    el('rect',{class:'bqbox',x:6,y:4,width:628,height:98,rx:14},gN);
-    el('text',{class:'bq',x:18,y:94},gN).textContent='BIGQUERY · HYPR-PROD';
+    var gL=el('g'),gF=el('g'),gN=el('g'),gP=el('g');
+    // pipelines
+    el('text',{class:'bq',x:18,y:14},gN).textContent='DATA PIPELINES';
+    pipes.forEach(function(p,i){
+      var x=112+i*138,y=46;pos[p.id]={x:x,y:y};
+      var g=el('g',{class:'pipe',transform:'translate('+x+','+y+')'},gN);
+      el('rect',{x:-50,y:-12,width:100,height:24,rx:12},g);
+      el('text',{class:'pn',y:4,'text-anchor':'middle'},g).textContent=p.n;
+      el('text',{class:'ps',y:-19,'text-anchor':'middle'},g).textContent=p.s;
+    });
+    // IQ apps
+    el('text',{class:'bq',x:18,y:92},gN).textContent='APLICAÇÕES IQ';
+    el('rect',{class:'bqbox',x:6,y:98,width:628,height:70,rx:14},gN);
     bases.forEach(function(b,i){
-      var x=56+i*105.6,y=62;pos[b.id]={x:x,y:y};
+      var x=80+i*120,y=133;pos[b.id]={x:x,y:y};
+      b.feeds.forEach(function(pid,j){
+        var q=pos[pid];
+        var d='M'+q.x+' '+(q.y+12)+' C '+q.x+' '+(q.y+50)+', '+x+' '+(y-60)+', '+x+' '+(y-17);
+        var f=el('path',{class:'feed',d:d,id:'feed-'+b.id+'-'+pid},gF);
+        // partícula contínua
+        var c=el('circle',{class:'drop',r:2.2},gF);
+        var am=el('animateMotion',{dur:(2.6+((i*7+j*3)%5)*0.35)+'s',repeatCount:'indefinite',begin:(-(i*0.9+j*1.3))+'s'},c);
+        el('mpath',{href:'#feed-'+b.id+'-'+pid},am);
+      });
       var g=el('g',{class:'base',transform:'translate('+x+','+y+')'},gN);
-      el('circle',{class:'ring',r:15},g);
-      el('circle',{r:15},g);
+      el('circle',{class:'ring',r:17},g);
+      el('circle',{r:17},g);
       el('text',{class:'cnt',y:4,'text-anchor':'middle',id:'cnt-'+b.id},g);
-      el('text',{y:-31,'text-anchor':'middle'},g).textContent=b.n;
-      el('text',{class:'sub',y:-19,'text-anchor':'middle'},g).textContent=b.s;
+      el('text',{class:'iq',x:24,y:-2,'text-anchor':'start'},g).textContent=b.n;
+      el('text',{class:'sub',x:24,y:10,'text-anchor':'start'},g).textContent=b.s;
       baseEl[b.id]=g;baseCnt[b.id]=0;
     });
+    // agentes
     agents.forEach(function(a,i){
-      var x=80+i*120,y=198;pos[a.id]={x:x,y:y};
+      var x=80+i*120,y=262;pos[a.id]={x:x,y:y};
       a.uses.forEach(function(b){
         var p=pos[b];
-        links[a.id+'-'+b]=el('path',{class:'link',d:'M'+p.x+' '+(p.y+15)+' C '+p.x+' '+(y-70)+', '+x+' '+(p.y+70)+', '+x+' '+(y-22)},gL);
+        links[a.id+'-'+b]=el('path',{class:'link',d:'M'+p.x+' '+(p.y+17)+' C '+p.x+' '+(y-60)+', '+x+' '+(p.y+60)+', '+x+' '+(y-22)},gL);
       });
-      links[a.id+'-orq']=el('path',{class:'link',d:'M'+x+' '+(y+22)+' C '+x+' '+(y+56)+', 320 '+(y+56)+', 320 '+(y+90)},gL);
+      links[a.id+'-orq']=el('path',{class:'link',d:'M'+x+' '+(y+22)+' C '+x+' '+(y+52)+', 320 '+(y+52)+', 320 '+(y+86)},gL);
       var g=el('g',{class:'ag',transform:'translate('+x+','+y+')'},gN);
       el('circle',{class:'c',r:22},g);
       var ring=el('circle',{class:'prog',r:22,transform:'rotate(-90)','stroke-dasharray':'138.2','stroke-dashoffset':'138.2'},g);
@@ -390,9 +425,9 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
       el('text',{class:'st',y:3,'text-anchor':'middle'},g).textContent='';
       agEl[a.id]={g:g,prog:ring,st:g.querySelector('.st')};
     });
-    pos.orq={x:320,y:300};
-    links['orq-au']=el('path',{class:'link',d:'M'+pos.au.x+' '+(pos.au.y+15)+' C '+pos.au.x+' 210, 320 230, 320 278'},gL);
-    var g=el('g',{class:'ag',transform:'translate(320,300)'},gN);
+    pos.orq={x:320,y:360};
+    links['orq-bid']=el('path',{class:'link',d:'M'+pos.bid.x+' '+(pos.bid.y+17)+' C '+pos.bid.x+' 260, 320 300, 320 338'},gL);
+    var g=el('g',{class:'ag',transform:'translate(320,360)'},gN);
     el('circle',{class:'c',r:22},g);
     var ring=el('circle',{class:'prog',r:22,transform:'rotate(-90)','stroke-dasharray':'138.2','stroke-dashoffset':'138.2'},g);
     el('text',{x:34,y:4,'text-anchor':'start'},g).textContent='Orquestrador';
