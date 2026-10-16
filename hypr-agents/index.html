@@ -12,107 +12,127 @@
 :root{
   --bg:#1c262f; --panel:#141d25; --panel-2:#0f161d; --line:#2b3a47; --line-2:#1f2b36;
   --text:#e9eef2; --muted:#8b98a5; --dim:#5e6c79;
-  --signal:#5cc8ff; --signal-dim:rgba(92,200,255,.14);
   --heat:#f2a93b; --heat-dim:rgba(242,169,59,.14);
   --ok:#6fd6a4;
-  --r:10px;
+  --a1:#5cc8ff; --a2:#7ee0d2; --a3:#b89cff; --a4:#ffd166; --a5:#ff8fa3; --ac:#6fd6a4;
+  --r:10px; --lane-h:780px; --result-h:236px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:Urbanist,system-ui,sans-serif;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
 body{padding:0 16px 80px}
-a{color:inherit}
-.wrap{max-width:1280px;margin:0 auto}
+.wrap{max-width:1320px;margin:0 auto}
 
-header{padding:56px 0 28px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end}
-.brand{display:flex;align-items:center;gap:12px;color:var(--muted);font-weight:600;font-size:14px;margin-bottom:28px}
+header{padding:48px 0 24px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end}
+.brand{display:flex;align-items:center;gap:12px;color:var(--muted);font-weight:600;font-size:14px;margin-bottom:24px}
 .brand b{color:var(--text);font-weight:800;letter-spacing:.06em;font-size:15px}
 .brand span{color:var(--dim)}
-h1{font-size:clamp(34px,5.2vw,64px);line-height:1.02;letter-spacing:-.025em;font-weight:800;margin:0;max-width:16ch}
+h1{font-size:clamp(32px,4.6vw,56px);line-height:1.02;letter-spacing:-.025em;font-weight:800;margin:0;max-width:18ch}
 h1 em{font-style:normal;color:var(--heat)}
-.lede{color:var(--muted);font-size:17px;max-width:52ch;margin:18px 0 0}
-
+.lede{color:var(--muted);font-size:16px;max-width:56ch;margin:14px 0 0}
 .controls{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
 button.run{appearance:none;border:0;background:var(--text);color:var(--bg);font:inherit;font-weight:700;font-size:16px;padding:14px 22px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:10px}
 button.run:hover{background:#fff}
-button.run:focus-visible{outline:3px solid var(--signal);outline-offset:3px}
+button.run:disabled{opacity:.7;cursor:default}
+button.run:focus-visible{outline:3px solid var(--a1);outline-offset:3px}
 button.run svg{width:14px;height:14px}
 .scale{color:var(--dim);font-size:13px}
 
-.arena{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px}
-.lane{background:var(--panel);border:1px solid var(--line-2);border-radius:14px;min-height:640px;display:flex;flex-direction:column;overflow:hidden}
-.lane-head{display:flex;justify-content:space-between;align-items:baseline;padding:18px 20px 14px;border-bottom:1px solid var(--line-2)}
+.arena{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.lane{background:var(--panel);border:1px solid var(--line-2);border-radius:14px;height:var(--lane-h);display:flex;flex-direction:column;overflow:hidden}
+.lane-head{display:flex;justify-content:space-between;align-items:baseline;padding:16px 20px 12px;border-bottom:1px solid var(--line-2);flex:none}
 .lane-head h2{margin:0;font-size:18px;font-weight:700}
 .lane-head p{margin:2px 0 0;color:var(--muted);font-size:14px}
-.clock{font-variant-numeric:tabular-nums;font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1}
+.clock{font-variant-numeric:tabular-nums;font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1;text-align:right}
 .clock small{display:block;font-size:12px;font-weight:600;color:var(--dim);letter-spacing:0;margin-top:4px}
 .lane.chat .clock{color:var(--heat)}
-.lane.agents .clock{color:var(--signal)}
+.lane.agents .clock{color:var(--a1)}
 .lane.agents .clock.done{color:var(--ok)}
+.body{flex:1;min-height:0;display:flex;flex-direction:column}
 
-/* chat lane */
-.ctx{padding:12px 20px;border-bottom:1px solid var(--line-2);display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;font-size:13px;color:var(--muted)}
+/* resultado: mesma posição nos dois lados */
+.result{flex:none;height:var(--result-h);border-top:1px solid var(--line-2);padding:14px 20px;background:var(--panel-2);overflow:auto;opacity:0}
+.result.show{animation:in .45s ease forwards}
+.result h3{margin:0 0 8px;font-size:15px;display:flex;align-items:center;gap:10px}
+.result h3 .tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;border:1px solid currentColor}
+.result p{margin:0 0 6px;font-size:14px;color:#cdd6de;line-height:1.4}
+.result p:last-child{margin:0}
+.result b{color:var(--text)}
+.lane.chat .result h3{color:var(--heat)}
+.lane.agents .result h3{color:var(--ok)}
+.result.empty{opacity:1;animation:none;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:14px}
+
+/* chat */
+.ctx{padding:10px 20px;border-bottom:1px solid var(--line-2);display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;font-size:13px;color:var(--muted);flex:none}
 .ctx .bar{height:6px;background:var(--panel-2);border-radius:3px;overflow:hidden}
 .ctx .bar i{display:block;height:100%;width:0;background:var(--heat);transition:width .6s ease}
 .ctx .pct{font-variant-numeric:tabular-nums;min-width:4ch;text-align:right}
-.thread{padding:16px 20px;display:flex;flex-direction:column;gap:12px;flex:1;overflow:auto}
-.msg{max-width:88%;padding:11px 14px;border-radius:14px;font-size:15px;line-height:1.4;opacity:0;transform:translateY(6px);animation:in .35s ease forwards}
+.thread{padding:16px 20px;display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;overflow-y:auto;scroll-behavior:smooth}
+.msg{max-width:88%;padding:10px 14px;border-radius:14px;font-size:14.5px;line-height:1.4;opacity:0;transform:translateY(6px);animation:in .35s ease forwards}
 .msg.user{align-self:flex-end;background:var(--heat-dim);border:1px solid rgba(242,169,59,.25);border-bottom-right-radius:4px}
 .msg.bot{align-self:flex-start;background:var(--panel-2);border:1px solid var(--line-2);border-bottom-left-radius:4px;color:#cdd6de}
-.msg .t{display:block;color:var(--dim);font-size:12px;margin-top:6px;font-variant-numeric:tabular-nums}
+.msg .t{display:block;color:var(--dim);font-size:12px;margin-top:5px;font-variant-numeric:tabular-nums}
 .msg.sys{align-self:center;background:transparent;border:1px dashed rgba(242,169,59,.5);color:var(--heat);font-size:13px;padding:8px 12px;max-width:100%}
-.typing{align-self:flex-start;color:var(--dim);font-size:13px;padding:4px 14px}
+.typing{align-self:flex-start;color:var(--dim);font-size:13px;padding:4px 14px;flex:none}
 .typing i{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--dim);margin-right:3px;animation:dot 1s infinite}
 .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
 
-/* agents lane */
-.grid{padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.agent{background:var(--panel-2);border:1px solid var(--line-2);border-radius:var(--r);padding:12px 14px;min-height:150px;display:flex;flex-direction:column;opacity:.35;transition:opacity .4s}
-.agent.live{opacity:1;border-color:rgba(92,200,255,.35)}
-.agent.done{opacity:1;border-color:rgba(111,214,164,.35)}
-.agent h3{margin:0;font-size:14px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px}
-.agent h3 .st{font-size:11px;font-weight:600;color:var(--dim);padding:2px 7px;border:1px solid var(--line-2);border-radius:999px;white-space:nowrap}
-.agent.live h3 .st{color:var(--signal);border-color:rgba(92,200,255,.35)}
-.agent.done h3 .st{color:var(--ok);border-color:rgba(111,214,164,.35)}
-.agent .src{color:var(--dim);font-size:12px;margin:2px 0 8px}
-.log{margin:0;padding:0;list-style:none;font-size:13px;color:#b9c4ce;display:flex;flex-direction:column;gap:4px}
-.log li{opacity:0;animation:in .3s ease forwards;display:grid;grid-template-columns:3.2em 1fr;gap:6px}
-.log li span{color:var(--dim);font-variant-numeric:tabular-nums}
-.log li.h{color:var(--text);font-weight:600}
-.agent.comp{grid-column:1/-1;min-height:0}
-.agent.comp .log li.h{color:var(--ok)}
-.verdict{margin:0 20px 20px;background:rgba(111,214,164,.08);border:1px solid rgba(111,214,164,.35);border-radius:var(--r);padding:16px;opacity:0;transform:translateY(6px)}
-.verdict.show{animation:in .45s ease forwards}
-.verdict h3{margin:0 0 8px;font-size:16px;color:var(--ok)}
-.verdict p{margin:0 0 8px;font-size:15px;color:#cdd6de}
-.verdict p:last-child{margin:0}
-.verdict b{color:var(--text)}
+/* rede de agentes */
+.net{flex:none;padding:10px 12px 0;background:radial-gradient(ellipse at 50% 30%,rgba(92,200,255,.06),transparent 60%)}
+.net svg{width:100%;height:auto;display:block}
+.net text{font-family:Urbanist,system-ui,sans-serif;fill:var(--muted);font-size:11px;font-weight:600}
+.net text.lbl{fill:var(--text);font-size:12px;font-weight:700}
+.net text.sub{fill:var(--dim);font-size:10px;font-weight:500}
+.net .link{stroke:var(--line);stroke-width:1.2;fill:none;transition:stroke .3s,stroke-width .3s,opacity .3s;opacity:.55}
+.net .link.on{stroke-width:2;opacity:1;stroke-dasharray:4 5;animation:flow .6s linear infinite}
+.net .base circle{fill:var(--panel-2);stroke:var(--line);stroke-width:1.5;transition:stroke .3s,fill .3s}
+.net .base.on circle{stroke:#cfe8ff;fill:#1a2a38}
+.net .base .ring{fill:none;stroke:#cfe8ff;stroke-width:1.5;opacity:0;transform-origin:center;transform-box:fill-box}
+.net .base.on .ring{animation:ring .9s ease-out}
+.net .base .cnt{fill:var(--a1);font-size:10px;font-weight:800}
+.net .ag circle{fill:var(--panel-2);stroke:var(--line);stroke-width:1.5;transition:stroke .3s}
+.net .ag.live circle{stroke:var(--c)}
+.net .ag.done circle{stroke:var(--ok);fill:rgba(111,214,164,.1)}
+.net .ag .st{font-size:9.5px;fill:var(--dim)}
+.net .ag.live .st{fill:var(--c)}
+.net .ag.done .st{fill:var(--ok)}
+.net .ag .prog{stroke:var(--c);stroke-width:3;fill:none;stroke-linecap:round;transition:stroke-dashoffset .5s ease}
+.net .ag.done .prog{stroke:var(--ok)}
+.net .pkt{r:3.2;filter:drop-shadow(0 0 4px currentColor)}
+.console{flex:1;min-height:0;overflow-y:auto;scroll-behavior:smooth;padding:8px 20px 12px;font-size:13px;display:flex;flex-direction:column;gap:3px;border-top:1px solid var(--line-2)}
+.console .ln{display:grid;grid-template-columns:3.4em auto 1fr;gap:8px;align-items:baseline;opacity:0;animation:in .3s ease forwards;color:#b9c4ce}
+.console .ln span.m{color:var(--dim);font-variant-numeric:tabular-nums}
+.console .ln span.who{font-weight:700;color:var(--c);white-space:nowrap}
+.console .ln span.src{color:var(--text);font-weight:600}
+.console .ln.h{color:var(--text)}
+.console .ln.h span.who{text-decoration:underline;text-underline-offset:3px}
 
-/* comparison */
-.compare{margin-top:28px;background:var(--panel);border:1px solid var(--line-2);border-radius:14px;padding:22px 20px;opacity:.4;transition:opacity .5s}
+/* comparação */
+.compare{margin-top:24px;background:var(--panel);border:1px solid var(--line-2);border-radius:14px;padding:22px 20px;opacity:.4;transition:opacity .5s}
 .compare.show{opacity:1}
 .compare h2{margin:0 0 14px;font-size:20px}
 table{width:100%;border-collapse:collapse;font-size:15px}
-th,td{text-align:left;padding:11px 10px;border-top:1px solid var(--line-2)}
+th,td{text-align:left;padding:10px;border-top:1px solid var(--line-2);vertical-align:top}
 th{color:var(--muted);font-weight:600;font-size:14px}
 thead th{border-top:0;padding-top:0}
 td:nth-child(2){color:var(--heat)}
-td:nth-child(3){color:var(--signal)}
+td:nth-child(3){color:var(--a1)}
 td.n{font-variant-numeric:tabular-nums}
-.foot{margin-top:28px;color:var(--dim);font-size:13px;max-width:70ch}
+.foot{margin-top:24px;color:var(--dim);font-size:13px;max-width:72ch}
 
 @keyframes in{to{opacity:1;transform:none}}
 @keyframes dot{0%,80%,100%{opacity:.2}40%{opacity:1}}
-@media (max-width:900px){
+@keyframes flow{to{stroke-dashoffset:-9}}
+@keyframes ring{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(2.2)}}
+@media (max-width:980px){
   header{grid-template-columns:1fr}
   .controls{align-items:flex-start}
   .arena{grid-template-columns:1fr}
-  .lane{min-height:0}
-  .thread{max-height:560px}
+  :root{--lane-h:700px}
 }
-@media (max-width:520px){.grid{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
-  .msg,.log li,.verdict{animation:none!important;opacity:1!important;transform:none!important}
-  .ctx .bar i{transition:none}
+  .msg,.console .ln,.result{animation:none!important;opacity:1!important;transform:none!important}
+  .net .link.on,.net .base.on .ring{animation:none}
+  .ctx .bar i,.thread,.console{transition:none;scroll-behavior:auto}
 }
 </style>
 </head>
@@ -122,7 +142,7 @@ td.n{font-variant-numeric:tabular-nums}
   <div>
     <div class="brand"><b>HYPR</b><span>·</span><span>simulação</span></div>
     <h1>Por que as vendas de protetor solar caíram <em>18%</em> em junho?</h1>
-    <p class="lede">A mesma pergunta, respondida de dois jeitos. À esquerda, uma pessoa num chat, uma hipótese por vez. À direita, cinco agentes investigando ao mesmo tempo e um compositor que fecha a resposta.</p>
+    <p class="lede">A mesma pergunta, respondida de dois jeitos. À esquerda, uma pessoa num chat, uma hipótese por vez. À direita, cinco agentes conectados às bases da HYPR, investigando ao mesmo tempo, e um compositor que fecha a resposta.</p>
   </div>
   <div class="controls">
     <button class="run" id="run" type="button"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 2.5v11l10-5.5z"/></svg><span>Rodar a simulação</span></button>
@@ -136,8 +156,11 @@ td.n{font-variant-numeric:tabular-nums}
       <div><h2>Um chat</h2><p>Uma pessoa, uma conversa, uma pergunta de cada vez</p></div>
       <div class="clock" id="c-chat">0 min<small>tempo decorrido</small></div>
     </div>
-    <div class="ctx"><span>contexto</span><div class="bar"><i id="ctx-bar"></i></div><span class="pct" id="ctx-pct">0%</span></div>
-    <div class="thread" id="thread"></div>
+    <div class="body">
+      <div class="ctx"><span>contexto</span><div class="bar"><i id="ctx-bar"></i></div><span class="pct" id="ctx-pct">0%</span></div>
+      <div class="thread" id="thread"></div>
+    </div>
+    <div class="result empty" id="r-chat">resultado aparece aqui</div>
   </div>
 
   <div class="lane agents">
@@ -145,13 +168,11 @@ td.n{font-variant-numeric:tabular-nums}
       <div><h2>Cinco agentes + compositor</h2><p>Um pedido, cinco investigações paralelas, uma resposta</p></div>
       <div class="clock" id="c-ag">0 min<small>tempo decorrido</small></div>
     </div>
-    <div class="grid" id="grid"></div>
-    <div class="verdict" id="verdict">
-      <h3>Resposta do compositor</h3>
-      <p><b>Causa principal:</b> a marca retirou promoções de farmácia no Sudeste no mesmo mês em que o concorrente entrou com 25% de desconto na mesma prateleira. Esse movimento explica cerca de 10 dos 18 pontos de queda.</p>
-      <p><b>Causa secundária:</b> clima. Junho teve 22 dias sem sol em SP e no litoral paulista, UV médio caiu de 8 para 4. Explica os outros 8 pontos, e é sazonal: no Nordeste, onde fez sol, a queda foi de 4%.</p>
-      <p><b>Ação:</b> retomar promoção em farmácia no Sul e Sudeste antes de outubro, ativando a audiência <b>Visitantes de Farmácias</b> (21,6 milhões de pessoas, 9.991 endereços) com recorte geográfico.</p>
+    <div class="body">
+      <div class="net"><svg id="net" viewBox="0 0 640 340" aria-label="Agentes conectando às bases HYPR"></svg></div>
+      <div class="console" id="console"></div>
     </div>
+    <div class="result empty" id="r-ag">resultado aparece aqui</div>
   </div>
 </section>
 
@@ -162,128 +183,181 @@ td.n{font-variant-numeric:tabular-nums}
     <tbody>
       <tr><td>Turnos digitados pela pessoa</td><td class="n" id="k1">…</td><td class="n">1</td></tr>
       <tr><td>Tempo até a resposta</td><td class="n" id="k2">…</td><td class="n">11 min</td></tr>
-      <tr><td>Hipóteses investigadas</td><td class="n" id="k3">…</td><td class="n">5, em paralelo</td></tr>
-      <tr><td>Hipóteses cruzadas entre si</td><td id="k4">…</td><td>Todas, pelo compositor</td></tr>
-      <tr><td>Informação perdida no caminho</td><td id="k5">…</td><td>Nenhuma: cada agente devolve só a conclusão</td></tr>
-      <tr><td>Causa principal identificada</td><td id="k6">…</td><td>Sim, com peso de cada fator</td></tr>
-      <tr><td>Próxima ação definida</td><td id="k7">…</td><td>Sim, com audiência e volume</td></tr>
+      <tr><td>Bases consultadas</td><td id="k3">…</td><td>Groundflow, Places Graph, Max Attention, Demandshift, Audiências, clima</td></tr>
+      <tr><td>Hipóteses investigadas</td><td class="n" id="k4">…</td><td class="n">5, em paralelo</td></tr>
+      <tr><td>Hipóteses cruzadas entre si</td><td id="k5">…</td><td>Todas, pelo compositor</td></tr>
+      <tr><td>Informação perdida no caminho</td><td id="k6">…</td><td>Nenhuma: cada agente devolve só a conclusão</td></tr>
+      <tr><td>Causa principal com peso</td><td id="k7">…</td><td>Sim: mídia e promoção ≈ 10 pts, clima ≈ 8 pts</td></tr>
+      <tr><td>Próxima ação definida</td><td id="k8">…</td><td>Sim, com audiência e volume</td></tr>
     </tbody>
   </table>
-  <p class="foot">Os tempos e os turnos são simulados. Os nomes e volumes de audiência vêm do catálogo HYPR. Os números do caso (preço, clima, share, canal, região) são ilustrativos.</p>
+  <p class="foot">Os tempos e os turnos são simulados. Os nomes e volumes de audiência vêm do catálogo HYPR. Os números do caso (preço, clima, share, canal, mídia) são ilustrativos.</p>
 </section>
 </div>
 
 <script>
 (function(){
-  var MIN = 750; // ms por minuto simulado
+  var MIN = 750;
   var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NS='http://www.w3.org/2000/svg';
 
-  // ---------- roteiro do chat ----------
-  // [minuto, quem, texto, contexto%]
-  var chat = [
+  // ---------- bases ----------
+  var bases=[
+    {id:'gf', n:'Groundflow', s:'transações'},
+    {id:'pg', n:'Places Graph', s:'lugares'},
+    {id:'ma', n:'Max Attention', s:'mídia'},
+    {id:'ds', n:'Demandshift', s:'demanda'},
+    {id:'au', n:'Audiências', s:'catálogo'},
+    {id:'cl', n:'INMET', s:'clima, externo'}
+  ];
+  // ---------- agentes ----------
+  var agents=[
+    {id:'preco', n:'Preço', c:'var(--a1)', uses:['gf','ds'], l:[
+      [0,'gf','Lendo 1,2 mi de notas com protetor solar, mai–jun'],
+      [2,'gf','Preço médio: +9% em junho'],
+      [3,'gf','Transações com desconto: 31% → 12%'],
+      [4,'ds','Demanda da categoria: −7%, menor que a queda da marca'],
+      [5,'gf','Promoção retirada em 2/jun; queda começa na mesma semana',1],
+      [6,null,'Concluído']]},
+    {id:'clima', n:'Clima', c:'var(--a2)', uses:['cl','pg','gf'], l:[
+      [0,'cl','Baixando UV e nebulosidade diária por cidade'],
+      [1,'pg','Mapeando cada loja para sua cidade'],
+      [3,'gf','Venda diária por loja cruzada com UV do dia'],
+      [4,'cl','SP e litoral: 22 dias sem sol; UV médio 8 → 4'],
+      [5,'gf','Clima explica até 8 pts; jun/25 caiu 7%',1],
+      [5,null,'Concluído']]},
+    {id:'conc', n:'Concorrência', c:'var(--a3)', uses:['gf','ma','ds'], l:[
+      [0,'gf','Share mensal das 6 marcas, por canal'],
+      [2,'ds','Marca B: linha nova em 1/jun'],
+      [3,'gf','Marca B: 25% off em farmácia, +6 pts de share'],
+      [5,'ma','Marca B dobrou mídia em maio'],
+      [6,'gf','Ganho da B = perda da marca, na mesma prateleira',1],
+      [7,null,'Concluído']]},
+    {id:'canal', n:'Canal e região', c:'var(--a4)', uses:['gf','pg'], l:[
+      [0,'gf','Separando farmácia, supermercado, perfumaria'],
+      [2,'gf','Farmácia: −27% (58% do volume); super: −6%'],
+      [3,'pg','Agregando lojas por UF e região'],
+      [4,'gf','Sul e Sudeste: −24%; Nordeste: −4%'],
+      [5,'pg','Onde fez sol e não houve B, não caiu',1],
+      [6,null,'Concluído']]},
+    {id:'midia', n:'Mídia', c:'var(--a5)', uses:['ma','au'], l:[
+      [0,'ma','Investimento e atenção por marca, mar–jun'],
+      [2,'ma','Marca cortou 40% da mídia em maio'],
+      [3,'ma','Share de atenção: 18% → 9% em junho'],
+      [4,'au','Audiência exposta à B: 6,1 mi, sem resposta da marca'],
+      [5,'ma','Perda de atenção precede a queda em 3 semanas',1],
+      [6,null,'Concluído']]}
+  ];
+  var comp={id:'comp', n:'Compositor', c:'var(--ac)', l:[
+    [7,null,'Recebeu 5 conclusões, 320 palavras no total'],
+    [8,null,'Clima ≈ 8 pts; promoção + mídia + concorrente ≈ 10 pts'],
+    [9,null,'Teste: Nordeste isola o clima e confirma a conta'],
+    [10,'au','Audiência para a ação: Visitantes de Farmácias, 21,6 mi',1],
+    [11,null,'Resposta pronta',1]]};
+
+  // ---------- chat ----------
+  var chat=[
     [0,'user','Por que as vendas de protetor solar caíram 18% em junho?',4],
-    [3,'bot','Pode ser sazonalidade: junho é inverno e a demanda cai. Também pode ser preço, concorrência ou ruptura. Você tem os dados de venda por canal?',9],
+    [3,'bot','Pode ser sazonalidade: junho é inverno. Também pode ser preço, concorrência, mídia ou ruptura. Você tem os dados por canal?',9],
     [5,'user','Tenho. Vê primeiro se foi o clima.',12],
-    [10,'bot','Junho de 2026 teve 22 dias nublados ou chuvosos em São Paulo e no litoral; o índice UV médio caiu de 8 para 4. O clima explica parte da queda, mas em junho de 2025 a queda foi de 7%, então 18% é mais do que o esperado.',22],
+    [10,'bot','Junho teve 22 dias nublados ou chuvosos em SP e litoral; UV médio caiu de 8 para 4. Explica parte, mas em junho de 2025 a queda foi de 7%, então 18% é mais do que o esperado.',22],
     [13,'user','Ok. Então olha preço e promoção.',25],
-    [19,'bot','Nas notas fiscais, o preço médio subiu 9% e a participação de vendas com desconto caiu de 31% para 12% das transações. Houve retirada de promoção em junho.',36],
+    [19,'bot','Nas notas fiscais, o preço médio subiu 9% e as vendas com desconto caíram de 31% para 12% das transações. Houve retirada de promoção.',36],
     [22,'user','E concorrente? Alguém fez promoção?',39],
-    [28,'bot','A marca B lançou uma linha nova com 25% de desconto em farmácias e ganhou 6 pontos de share no canal. O desconto coincidiu com a sua saída de promoção.',51],
+    [28,'bot','A marca B lançou uma linha nova com 25% de desconto em farmácias e ganhou 6 pontos de share no canal.',51],
     [31,'user','Isso foi em qual canal mesmo? Farmácia ou supermercado?',54],
-    [37,'bot','Farmácia. A queda em farmácia foi de 27% e em supermercado de 6%. Farmácia representa 58% do seu volume.',66],
+    [37,'bot','Farmácia. A queda em farmácia foi de 27% e em supermercado de 6%. Farmácia é 58% do seu volume.',66],
     [40,'sys','Contexto cheio. A análise de clima do minuto 10 saiu da janela.',72],
     [41,'user','Espera, quanto era a parte do clima nisso tudo? Você falou antes.',76],
-    [46,'bot','Não tenho mais esse detalhe nesta conversa. Pelo que sei, junho costuma cair por clima. Quer que eu refaça a análise de clima?',88],
-    [48,'user','Não, esquece. E por região, caiu igual?',91],
-    [54,'bot','Sul e Sudeste caíram 24%; Nordeste caiu 4%. Isso sugere clima, mas também é onde o concorrente tem farmácia forte, então não consigo separar as duas causas sem cruzar com o que vimos antes.',100],
+    [46,'bot','Não tenho mais esse detalhe nesta conversa. Pelo que sei, junho costuma cair por clima. Quer que eu refaça?',88],
+    [48,'user','Não, esquece. E mídia, a gente cortou alguma coisa?',91],
+    [54,'bot','Sim, 40% em maio, e o share de atenção caiu de 18% para 9%. Pode ter pesado, mas não consigo cruzar com o que vimos antes sem repetir a análise.',100],
     [56,'user','Ok, me manda um resumo com a causa principal.',100],
-    [61,'bot','Resumo: a queda de 18% em junho tem causas combinadas: clima, retirada de promoção, concorrente em farmácia e concentração no Sudeste. Recomendo investigar qual pesou mais.',100]
+    [61,'bot','Resumo: a queda de 18% tem causas combinadas: clima, retirada de promoção, concorrente em farmácia e corte de mídia. Recomendo investigar qual pesou mais.',100]
   ];
 
-  // ---------- roteiro dos agentes ----------
-  // cada agente: nome, fonte, linhas [minuto, texto, destaque?]
-  var agents = [
-    {n:'Preço e promoção', s:'Groundflow, notas fiscais', l:[
-      [0,'Lendo 1,2 mi de notas com protetor solar, mai–jun'],
-      [2,'Preço médio: +9% em junho'],
-      [4,'Transações com desconto: 31% → 12%'],
-      [5,'Promoção foi retirada no dia 2/jun',1],
-      [6,'Concluído']]},
-    {n:'Clima', s:'INMET + índice UV', l:[
-      [0,'Cruzando venda diária com UV por cidade'],
-      [2,'SP e litoral: 22 dias sem sol em junho'],
-      [3,'UV médio 8 → 4'],
-      [5,'Clima explica até 8 pts de queda; jun/25 caiu 7%',1],
-      [5,'Concluído']]},
-    {n:'Concorrência', s:'Groundflow, share por marca', l:[
-      [0,'Share mensal das 6 marcas, por canal'],
-      [2,'Marca B: linha nova em 1/jun, 25% off em farmácia'],
-      [4,'Marca B: +6 pts de share em farmácia'],
-      [6,'Ganho da B = perda da marca, mesmo canal',1],
-      [7,'Concluído']]},
-    {n:'Canal', s:'Groundflow, por tipo de loja', l:[
-      [0,'Separando farmácia, supermercado e perfumaria'],
-      [2,'Farmácia: −27% (58% do volume)'],
-      [3,'Supermercado: −6%; perfumaria: −3%'],
-      [5,'A queda é um problema de farmácia',1],
-      [5,'Concluído']]},
-    {n:'Região', s:'Places Graph', l:[
-      [0,'Queda por UF, cruzando com UV e share'],
-      [2,'Sul e Sudeste: −24%'],
-      [3,'Nordeste: −4%, UV normal, B sem desconto lá'],
-      [5,'Onde fez sol e não houve B, não caiu',1],
-      [6,'Concluído']]},
-    {n:'Compositor', s:'lê os 5 relatórios e fecha', comp:true, l:[
-      [7,'Recebeu 5 conclusões, 300 palavras no total'],
-      [8,'Clima ≈ 8 pts; promoção + concorrente ≈ 10 pts'],
-      [9,'Teste: Nordeste isola o clima e confirma a conta'],
-      [10,'Audiência para a ação: Visitantes de Farmácias, 21,6 mi',1],
-      [11,'Resposta pronta',1]]}
-  ];
+  var $=function(id){return document.getElementById(id)};
+  var thread=$('thread'),cons=$('console'),net=$('net');
+  var timers=[];
 
-  var thread = document.getElementById('thread');
-  var grid = document.getElementById('grid');
-  var cChat = document.getElementById('c-chat');
-  var cAg = document.getElementById('c-ag');
-  var ctxBar = document.getElementById('ctx-bar');
-  var ctxPct = document.getElementById('ctx-pct');
-  var verdict = document.getElementById('verdict');
-  var compare = document.getElementById('compare');
-  var btn = document.getElementById('run');
-  var timers = [];
-
+  function at(min,fn){ if(reduced){fn();return;} timers.push(setTimeout(fn,min*MIN)); }
   function fmt(m){return m+' min'}
   function setClock(el,m,done){el.innerHTML=fmt(m)+'<small>'+(done?'resposta pronta':'tempo decorrido')+'</small>';el.classList.toggle('done',!!done)}
 
-  function buildGrid(){
-    grid.innerHTML='';
-    agents.forEach(function(a,i){
-      var d=document.createElement('div');
-      d.className='agent'+(a.comp?' comp':'');
-      d.id='ag'+i;
-      d.innerHTML='<h3>'+a.n+'<span class="st">aguardando</span></h3><div class="src">'+a.s+'</div><ul class="log"></ul>';
-      grid.appendChild(d);
+  // ---------- desenha a rede ----------
+  var pos={},links={},agEl={},baseEl={},baseCnt={};
+  function el(tag,attrs,parent){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);(parent||net).appendChild(e);return e}
+  function buildNet(){
+    net.innerHTML='';pos={};links={};agEl={};baseEl={};baseCnt={};
+    var gL=el('g',{id:'links'}),gN=el('g',{id:'nodes'}),gP=el('g',{id:'pkts'});
+    bases.forEach(function(b,i){
+      var x=56+i*105.6,y=56;pos[b.id]={x:x,y:y};
+      var g=el('g',{class:'base',transform:'translate('+x+','+y+')'},gN);
+      el('circle',{class:'ring',r:16},g);
+      el('circle',{r:16},g);
+      el('text',{class:'cnt',y:4,'text-anchor':'middle',id:'cnt-'+b.id},g).textContent='';
+      el('text',{class:'lbl',y:-33,'text-anchor':'middle'},g).textContent=b.n;
+      el('text',{class:'sub',y:-21,'text-anchor':'middle'},g).textContent=b.s;
+      baseEl[b.id]=g;baseCnt[b.id]=0;
     });
+    agents.forEach(function(a,i){
+      var x=80+i*120,y=190;pos[a.id]={x:x,y:y};
+      a.uses.forEach(function(b){
+        var p=pos[b];var d='M'+p.x+' '+(p.y+16)+' C '+p.x+' '+(y-70)+', '+x+' '+(p.y+70)+', '+x+' '+(y-22);
+        var path=el('path',{class:'link',d:d},gL);links[a.id+'-'+b]=path;
+      });
+      var d2='M'+x+' '+(y+22)+' C '+x+' '+(y+60)+', 320 '+(y+60)+', 320 '+(y+96);
+      links[a.id+'-comp']=el('path',{class:'link',d:d2},gL);
+      var g=el('g',{class:'ag',style:'--c:'+a.c,transform:'translate('+x+','+y+')'},gN);
+      el('circle',{r:22},g);
+      var ring=el('circle',{class:'prog',r:22,transform:'rotate(-90)','stroke-dasharray':'138.2','stroke-dashoffset':'138.2'},g);
+      el('text',{class:'lbl',y:-30,'text-anchor':'middle'},g).textContent=a.n;
+      el('text',{class:'st',y:4,'text-anchor':'middle'},g).textContent='…';
+      agEl[a.id]={g:g,prog:ring,st:g.querySelector('.st')};
+    });
+    pos.comp={x:320,y:308};
+    var g=el('g',{class:'ag',style:'--c:'+comp.c,transform:'translate(320,308)'},gN);
+    el('circle',{r:22},g);
+    var ring=el('circle',{class:'prog',r:22,transform:'rotate(-90)','stroke-dasharray':'138.2','stroke-dashoffset':'138.2'},g);
+    el('text',{class:'lbl',x:34,y:4,'text-anchor':'start'},g).textContent='Compositor';
+    el('text',{class:'st',y:4,'text-anchor':'middle'},g).textContent='…';
+    agEl.comp={g:g,prog:ring,st:g.querySelector('.st')};
+    var pA=pos.au;links['comp-au']=el('path',{class:'link',d:'M'+pA.x+' '+(pA.y+16)+' C '+pA.x+' 200, 320 230, 320 286'},gL);
+    net._gP=gP;
   }
 
-  function reset(){
-    timers.forEach(clearTimeout);timers=[];
-    thread.innerHTML='';buildGrid();
-    setClock(cChat,0);setClock(cAg,0);
-    ctxBar.style.width='0';ctxPct.textContent='0%';
-    verdict.classList.remove('show');
-    compare.classList.remove('show');
-    ['k1','k2','k3','k4','k5','k6','k7'].forEach(function(k){document.getElementById(k).textContent='…'});
+  function packet(from,to,color){
+    if(reduced)return;
+    var key=from+'-'+to,path=links[key];var rev=false;
+    if(!path){path=links[to+'-'+from];rev=true;}
+    if(!path)return;
+    var c=el('circle',{class:'pkt',r:3.2,fill:color,style:'color:'+color},net._gP);
+    var am=el('animateMotion',{dur:'0.7s',fill:'freeze',keyPoints:rev?'0;1':'1;0',keyTimes:'0;1',calcMode:'linear'},c);
+    el('mpath',{href:'#'+ensureId(path)},am);
+    am.beginElement&&am.beginElement();
+    setTimeout(function(){c.remove()},800);
   }
+  var pid=0;function ensureId(p){if(!p.id)p.id='lk'+(pid++);return p.id}
+  function flash(agId,baseId,color){
+    var l=links[agId+'-'+baseId];if(l){l.classList.add('on');l.style.stroke=color;setTimeout(function(){l.classList.remove('on');l.style.stroke=''},1100)}
+    var b=baseEl[baseId];if(b){b.classList.remove('on');void b.getBBox();b.classList.add('on');setTimeout(function(){b.classList.remove('on')},900)}
+    baseCnt[baseId]++;$('cnt-'+baseId).textContent=baseCnt[baseId];
+    packet(baseId,agId,color);
+  }
+  function setProg(id,frac){agEl[id].prog.setAttribute('stroke-dashoffset',String(138.2*(1-frac)))}
 
-  function at(min,fn){ if(reduced){fn();return;} timers.push(setTimeout(fn,min*MIN)); }
+  function logLine(min,who,color,src,text,h){
+    var d=document.createElement('div');d.className='ln'+(h?' h':'');d.style.setProperty('--c',color);
+    d.innerHTML='<span class="m">'+min+' min</span><span class="who">'+who+'</span><div>'+(src?'<span class="src">'+src+'</span> · ':'')+text+'</div>';
+    cons.appendChild(d);cons.scrollTop=cons.scrollHeight;
+  }
+  var baseName={};bases.forEach(function(b){baseName[b.id]=b.n});
 
+  // ---------- chat helpers ----------
   function addMsg(who,text,min){
-    var d=document.createElement('div');
-    d.className='msg '+who;
+    var d=document.createElement('div');d.className='msg '+who;
     d.innerHTML=text+(who==='sys'?'':'<span class="t">min '+min+'</span>');
-    thread.appendChild(d);
-    thread.scrollTop=thread.scrollHeight;
+    thread.appendChild(d);thread.scrollTop=thread.scrollHeight;
   }
   function showTyping(on){
     var t=thread.querySelector('.typing');
@@ -291,62 +365,77 @@ td.n{font-variant-numeric:tabular-nums}
     if(!on&&t)t.remove();
   }
 
+  function reset(){
+    timers.forEach(clearTimeout);timers=[];
+    thread.innerHTML='';cons.innerHTML='';buildNet();
+    setClock($('c-chat'),0);setClock($('c-ag'),0);
+    $('ctx-bar').style.width='0';$('ctx-pct').textContent='0%';
+    ['r-chat','r-ag'].forEach(function(id){var r=$(id);r.className='result empty';r.textContent='resultado aparece aqui'});
+    $('compare').classList.remove('show');
+    for(var i=1;i<=8;i++)$('k'+i).textContent='…';
+  }
+
+  function showResultChat(){
+    var r=$('r-chat');r.className='result show';
+    r.innerHTML='<h3>Resumo do chat <span class="tag">61 min · 9 turnos</span></h3>'+
+      '<p>A queda de 18% em junho tem <b>causas combinadas</b>: clima, retirada de promoção, concorrente em farmácia e corte de mídia.</p>'+
+      '<p><b>Causa principal:</b> não identificada. "Recomendo investigar qual pesou mais."</p>'+
+      '<p><b>Ação:</b> nenhuma definida. A análise de clima se perdeu no meio do caminho e a de mídia não foi cruzada com as outras.</p>';
+  }
+  function showResultAg(){
+    var r=$('r-ag');r.className='result show';
+    r.innerHTML='<h3>Resposta do compositor <span class="tag">11 min · 1 pedido</span></h3>'+
+      '<p><b>Causa principal (≈10 pts):</b> a marca cortou 40% da mídia em maio e retirou promoção de farmácia em junho, no mês em que a marca B entrou na mesma prateleira com 25% off e o dobro de mídia. Share de atenção caiu de 18% para 9%.</p>'+
+      '<p><b>Causa secundária (≈8 pts):</b> clima. 22 dias sem sol em SP e litoral, UV 8 → 4. Sazonal: no Nordeste, com sol e sem a B, a queda foi de 4%.</p>'+
+      '<p><b>Ação:</b> retomar promoção e mídia em farmácia no Sul e Sudeste antes de outubro, na audiência <b>Visitantes de Farmácias</b> (21,6 mi de pessoas, 9.991 endereços) com recorte geográfico.</p>';
+  }
   function fillCompare(){
-    var k=function(id,v){document.getElementById(id).textContent=v};
-    k('k1','9');k('k2','61 min');k('k3','5, uma por vez');
-    k('k4','Não: cada resposta trata uma hipótese');
-    k('k5','Análise de clima saiu do contexto no minuto 40');
-    k('k6','Não: "causas combinadas", sem peso');
-    k('k7','Não: "recomendo investigar"');
-    compare.classList.add('show');
+    var k=function(i,v){$('k'+i).textContent=v};
+    k(1,'9');k(2,'61 min');k(3,'As mesmas, uma por vez, sob demanda da pessoa');k(4,'5, uma por vez');
+    k(5,'Não: cada resposta trata uma hipótese');
+    k(6,'Análise de clima saiu do contexto no minuto 40');
+    k(7,'Não: "causas combinadas", sem peso');
+    k(8,'Não: "recomendo investigar"');
+    $('compare').classList.add('show');
   }
 
   function run(){
     reset();
-    btn.disabled=true;btn.querySelector('span').textContent='Rodando…';
-    var lastChat=chat[chat.length-1][0];
-    var lastAg=11;
+    var btn=$('run');btn.disabled=true;btn.querySelector('span').textContent='Rodando…';
+    var lastChat=chat[chat.length-1][0],lastAg=11;
+    for(var m=1;m<=lastChat;m++){(function(m){at(m,function(){setClock($('c-chat'),m)})})(m)}
+    for(var m2=1;m2<=lastAg;m2++){(function(m){at(m,function(){setClock($('c-ag'),m,m===lastAg)})})(m2)}
 
-    // relógios
-    for(var m=1;m<=lastChat;m++){(function(m){at(m,function(){setClock(cChat,m);});})(m);}
-    for(var m2=1;m2<=lastAg;m2++){(function(m){at(m,function(){setClock(cAg,m,m===lastAg);});})(m2);}
-
-    // chat
-    chat.forEach(function(row,i){
-      var min=row[0],who=row[1],text=row[2],ctx=row[3];
-      at(min,function(){
-        showTyping(false);
-        addMsg(who,text,min);
-        ctxBar.style.width=ctx+'%';ctxPct.textContent=ctx+'%';
-        if(who==='user'){ at(0.6,function(){showTyping(true);}); }
+    chat.forEach(function(row){
+      at(row[0],function(){
+        showTyping(false);addMsg(row[1],row[2],row[0]);
+        $('ctx-bar').style.width=row[3]+'%';$('ctx-pct').textContent=row[3]+'%';
+        if(row[1]==='user')at(0.6,function(){showTyping(true)});
       });
     });
+    at(lastChat+0.6,showResultChat);
     at(lastChat+1,fillCompare);
 
-    // agentes
-    agents.forEach(function(a,i){
-      var el=function(){return document.getElementById('ag'+i)};
-      var ul=function(){return el().querySelector('.log')};
-      var st=function(){return el().querySelector('.st')};
-      var first=a.l[0][0], last=a.l[a.l.length-1][0];
-      at(first,function(){el().classList.add('live');st().textContent='rodando';});
-      a.l.forEach(function(line){
-        at(line[0]+0.3,function(){
-          var li=document.createElement('li');
-          if(line[2])li.className='h';
-          li.innerHTML='<span>'+line[0]+' min</span><div>'+line[1]+'</div>';
-          ul().appendChild(li);
+    var all=agents.concat([comp]);
+    all.forEach(function(a){
+      var n=a.l.length,last=a.l[n-1][0],first=a.l[0][0];
+      at(first,function(){agEl[a.id].g.classList.add('live');agEl[a.id].st.textContent='rodando'});
+      a.l.forEach(function(line,i){
+        at(line[0]+0.25,function(){
+          if(line[1])flash(a.id,line[1],a.c);
+          if(a.id==='comp'&&i===0){agents.forEach(function(x){packet(x.id,'comp',x.c);var l=links[x.id+'-comp'];l.classList.add('on');l.style.stroke=x.c;setTimeout(function(){l.classList.remove('on');l.style.stroke=''},1100)})}
+          logLine(line[0],a.n,a.c,line[1]?baseName[line[1]]:'',line[2],line[3]);
+          setProg(a.id,(i+1)/n);
         });
       });
-      at(last+0.5,function(){el().classList.remove('live');el().classList.add('done');st().textContent='concluído';});
+      at(last+0.5,function(){agEl[a.id].g.classList.remove('live');agEl[a.id].g.classList.add('done');agEl[a.id].st.textContent='ok'});
     });
-    at(lastAg+0.8,function(){verdict.classList.add('show');});
-
-    at(lastChat+1.2,function(){btn.disabled=false;btn.querySelector('span').textContent='Rodar de novo';});
+    at(lastAg+0.8,showResultAg);
+    at(lastChat+1.2,function(){btn.disabled=false;btn.querySelector('span').textContent='Rodar de novo'});
   }
 
-  btn.addEventListener('click',run);
-  buildGrid();
+  $('run').addEventListener('click',run);
+  buildNet();
 })();
 </script>
 </body>
