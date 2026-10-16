@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#1C262F">
-<title>Um chat contra cinco agentes</title>
+<title>Queda de venda · Swarm, by HYPR</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -26,6 +26,9 @@ html,body{margin:0;background:var(--cloud);color:var(--midnight);font-family:Urb
 .cover{background:var(--midnight);color:var(--off);padding:0 24px}
 .cover .in{max-width:1320px;margin:0 auto;padding:40px 0 48px}
 .cover .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:44px}
+.cover .cases{display:flex;gap:8px;flex-wrap:wrap}
+.cover .cases a{border:1px solid rgba(252,254,254,.3);border-radius:999px;padding:6px 14px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(252,254,254,.7);text-decoration:none}
+.cover .cases a.on{background:var(--off);color:var(--midnight);border-color:var(--off)}
 .cover .tag{border:1px solid rgba(252,254,254,.35);border-radius:999px;padding:6px 14px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--off)}
 .cover .wm{height:17px;width:auto;display:block}
 .cover h1{font-weight:300;font-size:clamp(36px,5vw,60px);line-height:1.08;letter-spacing:-.015em;margin:0;max-width:20ch}
@@ -174,7 +177,7 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
 <body>
 <section class="cover">
   <div class="in">
-    <div class="top"><span class="tag">Simulação</span><img class="wm" src="hypr-wordmark-white.svg" alt="HYPR" width="96" height="17"></div>
+    <div class="top"><nav class="cases"><a href="/hypr-agents/" class="on">queda de venda</a><a href="/hypr-agents/cases/canibalizacao/">canibalização</a><a href="/hypr-agents/cases/ruptura/">ruptura</a><a href="/hypr-agents/cases/elasticidade/">elasticidade</a></nav><img class="wm" src="/hypr-agents/hypr-wordmark-white.svg" alt="HYPR" width="96" height="17"></div>
     <div class="grid">
       <div>
         <h1>Por que as vendas de protetor solar caíram <em>18%</em> em junho?</h1>
@@ -236,29 +239,11 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
   </table>
   <p class="foot">Os tempos, os turnos e os tokens são simulados. Os nomes e volumes de audiência vêm do catálogo HYPR. Os datasets, as consultas e os números do caso são ilustrativos. Clima vem de fonte externa (INMET); o resto vem das bases HYPR: notas fiscais, lugares, audiências, performance das campanhas na rede e pesquisas.</p>
 </section>
-  <div class="more"><p>Isso vira produto: <b>Swarm, by HYPR</b>. Casos abertos em uma frase, hipóteses com % de confiança em minutos, ação pronta no bidIQ.</p><a href="swarm/">Saiba mais</a></div>
+  <div class="more"><p>Isso vira produto: <b>Swarm, by HYPR</b>. Casos abertos em uma frase, hipóteses com % de confiança em minutos, ação pronta no bidIQ.</p><a href="/hypr-agents/swarm/">Saiba mais</a></div>
 </div>
 
 <script>
-(function(){
-  var MIN=750;
-  var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var NS='http://www.w3.org/2000/svg';
-
-  var pipes=[
-    {id:'p_pl', n:'places',       s:'Places Graph'},
-    {id:'p_tr', n:'transactions', s:'Groundflow'},
-    {id:'p_au', n:'audiences',    s:'Audiences Graph'},
-    {id:'p_pf', n:'performance',  s:'Max Attention'}
-  ];
-  var bases=[
-    {id:'geo', n:'geoIQ', s:'onde?',     feeds:['p_pl','p_tr']},
-    {id:'rev', n:'revIQ', s:'quanto?',   feeds:['p_tr','p_pf']},
-    {id:'bid', n:'bidIQ', s:'quem?',     feeds:['p_au','p_pl']},
-    {id:'ad',  n:'adsIQ',  s:'com o quê?',feeds:['p_pf','p_au']},
-    {id:'ask', n:'askIQ', s:'por quê?',  feeds:['p_au','p_pf']}
-  ];
-
+window.SCENARIO=(function(){
   var agents=[
     {id:'a1', n:'Agente 1', role:'preço e promoção', uses:['rev'], l:[
       [0.3,'hyp',null,'Hipótese: ruptura de estoque ou mudança de preço'],
@@ -338,11 +323,11 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
   var orq={id:'orq', n:'Orquestrador', role:'', l:[
     [0.0,'note',null,'Pergunta recebida. Quebrando em 5 hipóteses: preço, clima, concorrência, canal/região, mídia'],
     [0.15,'note',null,'5 agentes disparados em paralelo, cada um com acesso às bases que precisa'],
-    [8.0,'note',null,'Recebeu 5 conclusões. Somando: clima 8 + promoção 11 + concorrente 6 + mídia 9 = 34 pts. Não fecha com 18'],
+    [8.0,'note',null,'Recebeu 5 conclusões. Somando: clima 8 + promoção 11 + concorrente 6 + mídia 9 = 34 pts. Não fecha com 18','gather'],
     [8.6,'note',null,'Sobreposição: promoção retirada, B na prateleira e campanhas pausadas são o mesmo evento visto de três lados. Agentes 1, 3 e 5 apontam a mesma semana'],
-    [9.3,'note',null,'Pedindo ao Agente 2 um teste: onde não houve a B nem corte de mídia, quanto caiu?'],
-    [10.4,'note',null,'Agente 2: Nordeste, sem B e com sol, −4%. Clima sozinho em SP, sem o evento, seria ≈ −8%'],
-    [11.0,'note',null,'Reconciliado: clima ≈ 8 pts, evento de campanhas + promoção + concorrente ≈ 10 pts. Enviando ao Auditor'],
+    [9.3,'note',null,'Pedindo ao Agente 2 um teste: onde não houve a B nem corte de mídia, quanto caiu?',['ask','a2']],
+    [10.4,'note',null,'Agente 2: Nordeste, sem B e com sol, −4%. Clima sozinho em SP, sem o evento, seria ≈ −8%',['reply','a2']],
+    [11.0,'note',null,'Reconciliado: clima ≈ 8 pts, evento de campanhas + promoção + concorrente ≈ 10 pts. Enviando ao Auditor','audit'],
     [13.6,'conn','bid','search_audiences("farmácia")'],
     [14.2,'res','bid','88 audiências · Visitantes de Farmácias · 21.647.167 pessoas · 9.991 endereços'],
     [14.8,'find',null,'Resposta pronta, auditada'],
@@ -357,7 +342,7 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
     [12.8,'sql','geo','<k>SELECT</k> p.region, AVG(w.uv_index) uv, SUM(n.qty) un\n<k>FROM</k> `transactions.nf_items` n <k>JOIN</k> `places.pois` p <k>USING</k> (store_id)\n<k>JOIN</k> `places.weather_daily` w <k>ON</k> w.city = p.city <k>AND</k> w.dt = n.dt\n<k>WHERE</k> n.brand = <s>\'marca\'</s> <k>AND</k> n.dt >= <s>\'2026-05-01\'</s> <k>GROUP BY</k> 1'],
     [13.2,'res','geo','5 linhas · 2.816.220 lidas · 3,6 s'],
     [13.3,'dead',null,'Ressalva: os agentes compararam junho com maio. Contra junho/2025 a queda é 17,6%, não 18%. Dentro da margem, mas vai na nota'],
-    [13.4,'find',null,'Conta fecha: 8 + 10 = 18. Controle do Nordeste confirma o clima. Aprovado com uma ressalva'],
+    [13.4,'find',null,'Conta fecha: 8 + 10 = 18. Controle do Nordeste confirma o clima. Aprovado com uma ressalva','approve'],
     [13.5,'done',null,'Concluído']]};
 
   var chat=[
@@ -379,6 +364,54 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
     [56,'user','Ok, me manda um resumo com a causa principal.',100],
     [61,'bot','Resumo: a queda de 18% tem causas combinadas: clima, retirada de promoção, concorrente em farmácia e corte de mídia. Recomendo investigar qual pesou mais.',100]
   ];
+
+
+  return {
+    pageTitle:'Queda de venda · Swarm, by HYPR',
+    title:'Por que as vendas de protetor solar caíram <em>18%</em> em junho?',
+    lede:'A mesma pergunta, respondida de dois jeitos. À esquerda, uma pessoa num chat, uma hipótese por vez. À direita, sete agentes: um <b>orquestrador</b> quebra a pergunta em cinco hipóteses, cinco investigam ao mesmo tempo nas bases da HYPR e um auditor refaz a conta sem ter visto o trabalho.',
+    agents:agents, orq:orq, aud:aud, chat:chat, lastChat:61, lastAg:15,
+    chatFail:'sem causa principal',
+    resultChat:'<div class="h"><h3>Resumo do chat</h3><span>61 min · 9 turnos · {tok} tokens</span></div>'+
+      '<p>A queda de 18% em junho tem <b>causas combinadas</b>: clima, retirada de promoção, concorrente em farmácia e corte de mídia.</p>'+
+      '<p><span class="pill bad">causa principal</span>não identificada. "Recomendo investigar qual pesou mais."</p>'+
+      '<p><span class="pill bad">ação</span>nenhuma. A análise de clima se perdeu no caminho e a de mídia não foi cruzada com as outras.</p>',
+    resultAg:'<div class="h"><h3>Resposta do orquestrador</h3><span>{min} min · 1 pedido · {q} consultas · {tok} tokens</span></div>'+
+      '<p><span class="pill good">causa principal ≈ 10 pts · confiança 82%</span>um único evento visto de três lados. A marca pausou as campanhas na rede em maio e retirou promoção de farmácia em 2/jun (notas fiscais); na mesma semana a marca B entrou na mesma prateleira com 25% off e chegou a 5.400 farmácias. Share de atenção medido 18% → 9%, recall 41% → 27%.</p>'+
+      '<p><span class="pill good">causa secundária ≈ 8 pts · confiança 74%</span>clima (fonte externa, INMET). 22 dias sem sol em SP e litoral, UV 8 → 4. Sazonal: no Nordeste, com sol e sem a B, a queda foi de 4%.</p>'+
+      '<p><b>Descartado com dado:</b> ruptura de estoque, alcance das campanhas, UV nacional. <b>Ressalva do auditor:</b> contra junho/2025 a queda é 17,6%.</p>'+
+      '<p><span class="pill good">ação</span>retomar promoção e campanhas em farmácia no Sul e Sudeste antes de outubro, na audiência <b>Visitantes de Farmácias</b> (21,6 mi de pessoas, 9.991 endereços) com recorte geográfico.</p>',
+    compareChat:{1:'9',2:'61 min',3:'5, sob demanda da pessoa',4:'Nenhuma: só as que a pessoa pediu',5:'Não: cada resposta trata uma hipótese',6:'Análise de clima saiu do contexto no minuto 40',7:'Não: "causas combinadas", sem peso',8:'Não: "recomendo investigar"',10:'Não: quem respondeu foi quem conferiu'},
+    c4:'4: ruptura, UV nacional, alcance, UF sem canal',
+    c7:'Sim: campanhas e promoção ≈ 10 pts, clima ≈ 8 pts',
+    c8:'Sim, com audiência e volume',
+    c10:'Sim: auditor refez 2 consultas e achou uma ressalva (base de comparação)',
+    foot:'Clima vem de fonte externa (INMET); o resto vem das bases HYPR: notas fiscais, lugares, audiências, performance das campanhas na rede e pesquisas.'
+  };
+})();
+
+</script>
+<script>
+(function(){
+  var MIN=750;
+  var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NS='http://www.w3.org/2000/svg';
+
+  var pipes=[
+    {id:'p_pl', n:'places',       s:'Places Graph'},
+    {id:'p_tr', n:'transactions', s:'Groundflow'},
+    {id:'p_au', n:'audiences',    s:'Audiences Graph'},
+    {id:'p_pf', n:'performance',  s:'Max Attention'}
+  ];
+  var bases=[
+    {id:'geo', n:'geoIQ', s:'onde?',     feeds:['p_pl','p_tr']},
+    {id:'rev', n:'revIQ', s:'quanto?',   feeds:['p_tr','p_pf']},
+    {id:'bid', n:'bidIQ', s:'quem?',     feeds:['p_au','p_pl']},
+    {id:'ad',  n:'adsIQ',  s:'com o quê?',feeds:['p_pf','p_au']},
+    {id:'ask', n:'askIQ', s:'por quê?',  feeds:['p_au','p_pf']}
+  ];
+
+  var S=window.SCENARIO,agents=S.agents,orq=S.orq,aud=S.aud,chat=S.chat;
 
   var $=function(id){return document.getElementById(id)};
   var thread=$('thread'),cons=$('console'),net=$('net');
@@ -525,35 +558,23 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
   }
   function showResultChat(){
     var r=$('r-chat');r.className='result show';
-    r.innerHTML='<div class="h"><h3>Resumo do chat</h3><span>61 min · 9 turnos · '+fmtTok(tokChat)+' tokens</span></div>'+
-      '<p>A queda de 18% em junho tem <b>causas combinadas</b>: clima, retirada de promoção, concorrente em farmácia e corte de mídia.</p>'+
-      '<p><span class="pill bad">causa principal</span>não identificada. "Recomendo investigar qual pesou mais."</p>'+
-      '<p><span class="pill bad">ação</span>nenhuma. A análise de clima se perdeu no caminho e a de mídia não foi cruzada com as outras.</p>';
+    r.innerHTML=S.resultChat.replace('{tok}',fmtTok(tokChat));
   }
   function showResultAg(){
     var r=$('r-ag');r.className='result show';
-    r.innerHTML='<div class="h"><h3>Resposta do orquestrador</h3><span>13 min · 1 pedido · '+queries+' consultas · '+fmtTok(tokAg)+' tokens</span></div>'+
-      '<p><span class="pill good">causa principal ≈ 10 pts</span>um único evento visto de três lados. A marca pausou as campanhas na rede em maio e retirou promoção de farmácia em 2/jun (notas fiscais); na mesma semana a marca B entrou na mesma prateleira com 25% off e chegou a 5.400 farmácias. Share de atenção medido 18% → 9%, recall 41% → 27%.</p>'+
-      '<p><span class="pill good">causa secundária ≈ 8 pts</span>clima (fonte externa, INMET). 22 dias sem sol em SP e litoral, UV 8 → 4. Sazonal: no Nordeste, com sol e sem a B, a queda foi de 4%.</p>'+
-      '<p><b>Descartado com dado:</b> ruptura de estoque, alcance das campanhas, UV nacional.</p>'+
-      '<p><span class="pill good">ação</span>retomar promoção e campanhas em farmácia no Sul e Sudeste antes de outubro, na audiência <b>Visitantes de Farmácias</b> (21,6 mi de pessoas, 9.991 endereços) com recorte geográfico.</p>';
+    r.innerHTML=S.resultAg.replace('{min}',S.lastAg).replace('{q}',queries).replace('{tok}',fmtTok(tokAg));
   }
   function fillCompare(){
     var k=function(i,v){$('k'+i).textContent=v};
-    k(1,'9');k(2,'61 min');k(9,fmtTok(tokChat)+', contexto reenviado a cada turno');$('t-ag-k').textContent=fmtTok(tokAg)+', cada agente paga só o seu trecho';
-    k(3,'5, sob demanda da pessoa');
-    k(4,'Nenhuma: só as que a pessoa pediu');
-    k(5,'Não: cada resposta trata uma hipótese');
-    k(6,'Análise de clima saiu do contexto no minuto 40');
-    k(7,'Não: "causas combinadas", sem peso');
-    k(8,'Não: "recomendo investigar"');k(10,'Não: quem respondeu foi quem conferiu');
+    k(9,fmtTok(tokChat)+', contexto reenviado a cada turno');$('t-ag-k').textContent=fmtTok(tokAg)+', cada agente paga só o seu trecho';
+    for(var i in S.compareChat)k(i,S.compareChat[i]);
     $('compare').classList.add('show');
   }
 
   function run(){
     reset();
     var btn=$('run');btn.disabled=true;btn.querySelector('span').textContent='Rodando…';
-    var lastChat=61,lastAg=15;
+    var lastChat=S.lastChat,lastAg=S.lastAg;
     for(var m=1;m<=lastChat;m++){(function(m){at(m,function(){setClock('chat',m)})})(m)}
     for(var m2=1;m2<=lastAg;m2++){(function(m){at(m,function(){setClock('ag',m,m===lastAg)})})(m2)}
     chat.forEach(function(row){
@@ -565,7 +586,7 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
         if(row[1]==='user')at(0.6,function(){showTyping(true)});
       });
     });
-    at(lastChat+0.6,function(){showResultChat();$('k-chat').classList.add('bad');$('k-chat').querySelector('.l').textContent='sem causa principal'});
+    at(lastChat+0.6,function(){showResultChat();$('k-chat').classList.add('bad');$('k-chat').querySelector('.l').textContent=S.chatFail});
     at(lastChat+1,fillCompare);
 
     agents.concat([orq,aud]).forEach(function(a){
@@ -575,11 +596,12 @@ td .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-family:va
         at(line[0],function(){
           logLine(a,line);
           setProg(a.id,(i+1)/n);
-          if(a.id==='orq'&&line[0]===8.0){agents.forEach(function(x){packet(x.id,'orq',false);var l=links[x.id+'-orq'];l.classList.add('on');setTimeout(function(){l.classList.remove('on')},1100)})}
-          if(a.id==='orq'&&line[0]===9.3){packet('orq','a2',true)}
-          if(a.id==='orq'&&line[0]===10.4){packet('a2','orq',false)}
-          if(a.id==='orq'&&line[0]===11.0){packet('orq','aud',false);var lo=links['orq-aud'];lo.classList.add('on');setTimeout(function(){lo.classList.remove('on')},1100)}
-          if(a.id==='aud'&&line[0]===13.4){packet('aud','orq',true)}
+          var ev=line[4];
+          if(ev==='gather'){agents.forEach(function(x){packet(x.id,'orq',false);var l=links[x.id+'-orq'];l.classList.add('on');setTimeout(function(){l.classList.remove('on')},1100)})}
+          else if(ev&&ev[0]==='ask'){packet('orq',ev[1],true)}
+          else if(ev&&ev[0]==='reply'){packet(ev[1],'orq',false)}
+          else if(ev==='audit'){packet('orq','aud',false);var lo=links['orq-aud'];lo.classList.add('on');setTimeout(function(){lo.classList.remove('on')},1100)}
+          else if(ev==='approve'){packet('aud','orq',true)}
         });
       });
       at(last+0.3,function(){agEl[a.id].g.classList.remove('live');agEl[a.id].g.classList.add('done');agEl[a.id].st.textContent='ok'});
