@@ -85,17 +85,17 @@ window.SwarmLive = (function () {
     // reposiciona todas
     this.tbOrder.forEach(function (tid, i) {
       var x = Math.round(320 + (i - (n - 1) / 2) * Math.min(120, 600 / n)), y = 128; self.pos[tid] = { x: x, y: y };
-      if (self.tb[tid]) { self.tb[tid].g.setAttribute('transform', 'translate(' + x + ',' + y + ')'); self.redraw(tid); }
+      if (self.tb[tid]) { self.tb[tid].g.setAttribute('transform', 'translate(' + x + ',' + y + ')'); var mx2 = n >= 5 ? 14 : n >= 4 ? 17 : 24, lb = self.tb[tid].label; self.tb[tid].tx.textContent = lb.length > mx2 ? lb.slice(0, mx2 - 1) + '…' : lb; self.redraw(tid); }
     });
     var p = this.pos[id];
     var g = el('g', { class: 'base', transform: 'translate(' + p.x + ',' + p.y + ')' }, this.gT);
     el('circle', { class: 'ring', r: 15 }, g); el('circle', { r: 15 }, g);
     var cnt = el('text', { class: 'cnt', y: 4, 'text-anchor': 'middle' }, g); cnt.textContent = '';
-    var tx = el('text', { class: 'tn', y: 30, 'text-anchor': 'middle' }, g); tx.textContent = label.length > 24 ? label.slice(0, 23) + '…' : label;
+    var tx = el('text', { class: 'tn', y: 30, 'text-anchor': 'middle' }, g); var mx = n >= 5 ? 14 : n >= 4 ? 17 : 24; tx.textContent = label.length > mx ? label.slice(0, mx - 1) + '…' : label;
     el('title', {}, g).textContent = id;
     var feeds = [];
     (FEED[ds] || []).forEach(function (pid, j) { feeds.push(pid); });
-    var rec = { g: g, cnt: cnt, c: 0, feeds: feeds };
+    var rec = { g: g, cnt: cnt, c: 0, feeds: feeds, tx: tx, label: label };
     this.tb[id] = rec; this.redraw(id);
     return rec;
   };
