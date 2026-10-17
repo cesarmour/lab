@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="/hypr-agents/swarm/auth.js"></script>
+<script src="/hypr-agents/swarm/app/live.js"></script>
 <script>var USER=SwarmAuth.require();if(!USER)document.documentElement.style.visibility='hidden';</script>
 <style>
 :root{--midnight:#1C262F;--cloud:#FAFAFA;--off:#FCFEFE;--mist:#E5EBF2;--steel:#78909C;--slate:#536872;--cyan:#3397B9;--deep:#246C84;--soft:#C5EAF6;--good:#018376;--good-bg:#E6F3EA;--bad:#B41048;--bad-bg:#FBE4EA;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--shadow:0 8px 28px rgba(28,38,47,.06),0 1px 2px rgba(28,38,47,.04)}
@@ -17,11 +18,11 @@
 .cover .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}.cover .top a{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(252,254,254,.7);text-decoration:none;border:1px solid rgba(252,254,254,.3);border-radius:999px;padding:6px 14px}
 .cover .wm{height:17px;width:auto;display:block}
 .cover .right{display:flex;align-items:center;gap:14px}
-.who{display:inline-flex;align-items:center;gap:8px;padding:4px 6px 4px 4px;border-radius:999px;background:rgba(10,15,20,.3);border:1px solid rgba(252,254,254,.1);font-size:13px;color:rgba(252,254,254,.85)}
-.who img,.who .av{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,rgba(86,187,220,.35),rgba(51,151,185,.15));color:#d6f1fa;font-size:10px;font-weight:700}
-.who .em{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.who button{background:none;border:0;padding:2px 8px;font:inherit;font-size:12px;font-weight:600;color:rgba(252,254,254,.6);cursor:pointer;border-radius:999px}.who button:hover{color:#fff;background:rgba(252,254,254,.08)}
-@media (max-width:600px){.who .em{display:none}}
+.usr{display:inline-flex;align-items:center;gap:8px;padding:4px 6px 4px 4px;border-radius:999px;background:rgba(10,15,20,.3);border:1px solid rgba(252,254,254,.1);font-size:13px;color:rgba(252,254,254,.85)}
+.usr img,.usr .av{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,rgba(86,187,220,.35),rgba(51,151,185,.15));color:#d6f1fa;font-size:10px;font-weight:700}
+.usr .em{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.usr button{background:none;border:0;padding:2px 8px;font:inherit;font-size:12px;font-weight:600;color:rgba(252,254,254,.6);cursor:pointer;border-radius:999px}.usr button:hover{color:#fff;background:rgba(252,254,254,.08)}
+@media (max-width:600px){.usr .em{display:none}}
 .cover h1{font-weight:300;font-size:clamp(30px,4.6vw,48px);line-height:1.08;letter-spacing:-.015em;margin:0}.cover h1 em{font-style:normal;color:var(--cyan)}
 .cover p{color:rgba(252,254,254,.72);margin:10px 0 0;font-weight:300;max-width:56ch}
 .page{max-width:1080px;margin:0 auto;padding:24px 20px 80px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
@@ -50,11 +51,61 @@ details{border-top:1px solid var(--mist);padding:8px 0}summary{cursor:pointer;fo
 .dis{margin:0;padding-left:18px;color:var(--slate);font-size:14.5px}
 .audit li{list-style:none;padding:8px 0 8px 24px;position:relative;color:var(--slate);border-top:1px solid var(--mist);font-size:14.5px}.audit li::before{position:absolute;left:0;font-family:var(--mono)}.audit li.ok::before{content:"✓";color:var(--good)}.audit li.no::before{content:"✕";color:var(--bad)}.audit ul{padding:0;margin:0}
 @media (max-width:860px){.page{grid-template-columns:1fr}.hyp{grid-template-columns:32px 1fr}.conf{text-align:left;grid-column:2}}
+
+/* execução ao vivo (mesmo visual da simulação) */
+#live{padding:0;overflow:hidden}
+.lv-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:22px 22px 0}
+.lv-head h2{font-size:20px}
+#live .kpis{padding:0 22px;margin:10px 0 6px}
+.net{padding:8px 14px 0}.net svg{width:100%;height:auto;display:block}
+.net text{font-family:Urbanist,system-ui,sans-serif;fill:var(--slate);font-size:12px;font-weight:600}
+.net text.sub{font-family:var(--mono);fill:var(--steel);font-size:9px;font-weight:400;letter-spacing:.04em}
+.net text.role{fill:var(--steel);font-size:10.5px;font-weight:400}
+.net text.bq{font-family:var(--mono);fill:var(--steel);font-size:9.5px;letter-spacing:.08em}
+.net text.tn{font-family:var(--mono);fill:var(--slate);font-size:9px;font-weight:500;letter-spacing:.02em}
+.net .bqbox{fill:var(--cloud);stroke:var(--mist)}
+.net .pipe rect{fill:var(--midnight)}
+.net text.pn{font-family:var(--mono);fill:var(--off);font-size:10px;font-weight:500;letter-spacing:.04em}
+.net text.ps{fill:var(--steel);font-size:9.5px;font-weight:400}
+.net .feed{stroke:var(--mist);stroke-width:1;fill:none}
+.net .drop{fill:var(--cyan);opacity:.8}
+.net .link{stroke:var(--mist);stroke-width:1.2;fill:none;transition:stroke .3s,stroke-width .3s}
+.net .link.on{stroke:var(--cyan);stroke-width:1.6;stroke-dasharray:3 5;animation:flow .6s linear infinite}
+.net .base circle{fill:var(--off);stroke:var(--mist);stroke-width:1.5;transition:stroke .3s,fill .3s}
+.net .base.on circle{stroke:var(--cyan);fill:var(--soft)}
+.net .base .ring{fill:none;stroke:var(--cyan);stroke-width:1;opacity:0;transform-origin:center;transform-box:fill-box}
+.net .base.on .ring{animation:ring .9s ease-out}
+.net .base .cnt{font-family:var(--mono);fill:var(--deep);font-size:10.5px;font-weight:500}
+.net .ag circle.c{fill:var(--off);stroke:var(--mist);stroke-width:1.5;transition:stroke .3s,fill .3s}
+.net .ag.live circle.c{stroke:var(--soft)}
+.net .ag.done circle.c{stroke:var(--good);fill:var(--good-bg)}
+.net .ag .st{font-family:var(--mono);font-size:9px;fill:var(--steel);letter-spacing:.04em}
+.net .ag.live .st{fill:var(--cyan)}.net .ag.done .st{fill:var(--good)}
+.net .ag .prog{stroke:var(--cyan);stroke-width:2.5;fill:none;stroke-linecap:round;transition:stroke-dashoffset .5s ease}
+.net .ag.done .prog{stroke:var(--good)}
+.net .ag.born{animation:born .6s ease-out}
+.net .pkt{fill:var(--cyan)}.net .pkt.back{fill:var(--deep)}
+.console{height:300px;overflow-y:auto;scroll-behavior:smooth;padding:10px 20px 14px;font-size:13px;display:flex;flex-direction:column;gap:4px;border-top:1px solid var(--mist);background:var(--cloud)}
+.ln{display:grid;grid-template-columns:3.4em 7.5em 1fr;gap:10px;align-items:baseline;opacity:0;animation:in .3s ease forwards;color:var(--slate)}
+.ln .m{font-family:var(--mono);font-size:10.5px;color:var(--steel)}
+.ln .who{font-weight:600;color:var(--midnight);white-space:nowrap;font-size:12.5px}
+.ln.orq .who,.ln.aud .who{color:var(--deep)}
+.ln pre{margin:4px 0 2px;padding:8px 12px;background:var(--off);border:1px solid var(--mist);border-radius:8px;font-family:var(--mono);font-size:10.5px;line-height:1.5;color:var(--slate);white-space:pre-wrap;overflow:hidden}
+.ln pre .k{color:var(--deep)}.ln pre .s{color:var(--cyan)}
+.ln .res{font-family:var(--mono);font-size:10.5px;color:var(--steel)}
+.ln.hyp{color:var(--steel);font-style:italic}.ln.dead{color:var(--bad)}.ln.find{color:var(--midnight)}.ln.find .who{color:var(--good)}
+#lv-foot{padding:0 22px 22px}#lv-foot:empty{padding:0}
+@keyframes in{to{opacity:1;transform:none}}
+@keyframes flow{to{stroke-dashoffset:-8}}
+@keyframes ring{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(2.3)}}
+@keyframes born{from{opacity:0}to{opacity:1}}
+@media (max-width:600px){.ln{grid-template-columns:3.2em 1fr}.ln .who{grid-column:2}.ln>div{grid-column:2}}
+@media (prefers-reduced-motion:reduce){.net .drop{display:none}.ln{animation:none;opacity:1}.net .link.on,.net .base.on .ring{animation:none}}
 </style>
 </head>
 <body>
 <section class="cover"><div class="in">
-<div class="top"><div><a href="/hypr-agents/swarm/">← conceito</a> <a href="/hypr-agents/swarm/playbooks/">playbooks</a></div><div class="right"><span class="who" id="who"></span><img class="wm" src="/hypr-agents/hypr-wordmark-white.svg" alt="HYPR"></div></div>
+<div class="top"><div><a href="/hypr-agents/swarm/">← conceito</a> <a href="/hypr-agents/swarm/playbooks/">playbooks</a></div><div class="right"><span class="usr" id="who"></span><img class="wm" src="/hypr-agents/hypr-wordmark-white.svg" alt="HYPR"></div></div>
 <h1>Swarm<em>.</em> Abrir um caso.</h1>
 <p>Uma pergunta, uma marca, um período. O orquestrador cria os investigadores, o auditor confere, e o resultado aparece aqui com hipóteses e confiança.</p>
 </div></section>
@@ -84,6 +135,7 @@ details{border-top:1px solid var(--mist);padding:8px 0}summary{cursor:pointer;fo
     <ul class="list" id="cases"><li><span class="t">…</span></li></ul>
   </div>
 
+  <div class="card full" id="live" hidden></div>
   <div class="card full" id="view" hidden></div>
 </div>
 
@@ -125,10 +177,14 @@ details{border-top:1px solid var(--mist);padding:8px 0}summary{cursor:pointer;fo
     var ul=$('runs');
     try{var r=await gh('/actions/workflows/swarm.yml/runs?per_page=8');var j=await r.json();
       if(!j.workflow_runs){ul.innerHTML='<li><span class="t">Sem acesso. Salve um token.</span></li>';return}
+      j.workflow_runs=j.workflow_runs.filter(function(w){return w.event==='workflow_dispatch'});
       if(!j.workflow_runs.length){ul.innerHTML='<li><span class="t">Nenhuma execução ainda.</span></li>';return}
       ul.innerHTML=j.workflow_runs.map(function(w){var st=w.status==='completed'?(w.conclusion==='success'?'ok':'no'):'run';var lbl=w.status==='completed'?(w.conclusion==='success'?'concluído':w.conclusion):(w.status==='in_progress'?'rodando':'na fila');
-        return '<li onclick="window.open(\''+w.html_url+'\',\'_blank\')"><div><div class="t">'+esc(w.display_title||w.name)+'</div><div class="s">'+new Date(w.created_at).toLocaleString('pt-BR')+'</div></div><span class="pill '+st+'">'+lbl+'</span></li>'}).join('');
-      if(j.workflow_runs.some(function(w){return w.status!=='completed'}))setTimeout(loadRuns,20000);
+        return '<li data-run="'+w.id+'"><div><div class="t">'+esc(w.display_title||w.name)+'</div><div class="s">'+new Date(w.created_at).toLocaleString('pt-BR')+'</div></div><span class="pill '+st+'">'+lbl+'</span></li>'}).join('');
+      RUNS={};j.workflow_runs.forEach(function(w){RUNS[w.id]=w});
+      ul.querySelectorAll('li[data-run]').forEach(function(li){li.onclick=function(){var w=RUNS[li.dataset.run];if(w.status!=='completed')followRun(w);else window.open(w.html_url,'_blank')}});
+      var active=j.workflow_runs.filter(function(w){return w.status!=='completed'})[0];
+      if(active){if(!FOLLOWING)followRun(active);setTimeout(loadRuns,20000)}
     }catch(e){ul.innerHTML='<li><span class="t">Erro ao listar execuções.</span></li>'}
   }
   // casos
@@ -154,12 +210,41 @@ details{border-top:1px solid var(--mist);padding:8px 0}summary{cursor:pointer;fo
         (res.discarded&&res.discarded.length?'<h2 style="margin-top:22px">Descartado com dado</h2><ul class="dis">'+res.discarded.map(function(d){return '<li>'+esc(d)+'</li>'}).join('')+'</ul>':'')+
         '<h2 style="margin-top:22px">Auditoria <span class="pill '+(au.approved?'ok':'no')+'">'+(au.approved?'aprovado':'devolvido')+'</span></h2><div class="audit"><ul>'+checks+'</ul>'+(au.caveats?'<p class="hint">'+esc(au.caveats)+'</p>':'')+'</div>'+
         '<h2 style="margin-top:22px">Investigadores</h2>'+ags+
-        '<p class="hint" style="margin-top:16px"><a href="https://github.com/'+OWNER+'/'+REPO+'/tree/main/cases/'+id+'" target="_blank" rel="noopener">Arquivos do caso no GitHub</a> (events.jsonl com todas as consultas).</p>';
+        '<p class="hint" style="margin-top:16px"><button class="ghost" type="button" id="replay">Reassistir a execução</button> &nbsp; <a href="https://github.com/'+OWNER+'/'+REPO+'/tree/main/cases/'+id+'" target="_blank" rel="noopener">Arquivos do caso no GitHub</a> (events.jsonl com todas as consultas).</p>';
+      $('replay').onclick=function(){replayCase(id,c)};
     }catch(e){v.innerHTML='<h2>Não consegui abrir o caso '+id+'.</h2><p class="hint">Verifique o token.</p>'}
   }
   if(USER){var ini=(USER.name||USER.email).trim().split(/\s+/).map(function(w){return w[0]}).slice(0,2).join('').toUpperCase();
     $('who').innerHTML=(USER.picture?'<img src="'+esc(USER.picture)+'" alt="" referrerpolicy="no-referrer">':'<span class="av">'+esc(ini)+'</span>')+'<span class="em">'+esc(USER.email)+'</span><button type="button" id="out">sair</button>';
     $('out').onclick=function(){SwarmAuth.signOut()}}
+  // ---- execução ao vivo ----
+  var RUNS={},FOLLOWING=null,live=null;
+  function liveView(){if(!live)live=new SwarmLive($('live'));$('live').hidden=false;return live}
+  async function rawLive(path){var r=await gh('/contents/'+path+'?ref=live',{headers:{'Accept':'application/vnd.github.raw+json'}});if(!r.ok)return null;return r.json()}
+  async function findSnapForRun(run){
+    var r=await gh('/contents/live?ref=live');var l=await r.json();if(!Array.isArray(l))return null;
+    var files=l.filter(function(f){return f.name.endsWith('.json')}).sort(function(a,b){return a.name<b.name?1:-1}).slice(0,6);
+    for(var i=0;i<files.length;i++){var s=await rawLive('live/'+files[i].name);if(s&&String(s.run_id)===String(run.id))return s}
+    return null;
+  }
+  function followRun(run){
+    if(FOLLOWING===run.id)return;FOLLOWING=run.id;
+    var lv=liveView();$('live').scrollIntoView({behavior:'smooth',block:'start'});
+    lv.follow(function(){return findSnapForRun(run)},function(snap){FOLLOWING=null;whenCaseReady(snap.id)});
+    lv.preparing(run);
+  }
+  function followId(id){var lv=liveView();FOLLOWING=id;lv.follow(function(){return rawLive('live/'+id+'.json')},function(snap){FOLLOWING=null;whenCaseReady(snap.id)})}
+  async function whenCaseReady(id,n){n=n||0;var r=await gh('/contents/cases/'+id+'/case.json');if(r.ok){loadCases();openCase(id);return}if(n<20)setTimeout(function(){whenCaseReady(id,n+1)},6000)}
+  async function replayCase(id,c){
+    var lv=liveView();$('live').scrollIntoView({behavior:'smooth',block:'start'});
+    var r=await gh('/contents/cases/'+id+'/events.jsonl',{headers:{'Accept':'application/vnd.github.raw'}});var txt=await r.text();
+    var evs=txt.split('\n').filter(Boolean).map(function(l){try{return JSON.parse(l)}catch(e){return null}}).filter(Boolean);
+    lv.replay({id:id,question:c.question,agents:c.agents,metrics:c.metrics,result:c.result},evs,12);
+  }
+  var P=new URLSearchParams(location.search);
+  if(tok&&P.get('live'))followId(P.get('live'));
+  if(tok&&P.get('replay'))(async function(){var id=P.get('replay');var r=await gh('/contents/cases/'+id+'/case.json',{headers:{'Accept':'application/vnd.github.raw+json'}});if(r.ok)replayCase(id,await r.json())})();
+
   function boot(){loadPlaybooks();loadRuns();loadCases()}
   $('from').value='2026-05-01';$('to').value='2026-06-30';
   boot();
