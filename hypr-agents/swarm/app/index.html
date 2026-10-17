@@ -268,7 +268,8 @@ details{border-top:1px solid var(--mist);padding:8px 0}summary{cursor:pointer;fo
         '<div class="action"><div class="mono">ação</div><p>'+esc(res.action)+'</p></div>'+
         (res.discarded&&res.discarded.length?'<h2 style="margin-top:22px">Descartado com dado</h2><ul class="dis">'+res.discarded.map(function(d){return '<li>'+esc(d)+'</li>'}).join('')+'</ul>':'')+
         '<h2 style="margin-top:22px">Auditoria <span class="pill '+(au.approved?'ok':'no')+'">'+(au.approved?'aprovado':'devolvido')+'</span></h2><div class="audit"><ul>'+checks+'</ul>'+(au.caveats?'<p class="hint">'+esc(au.caveats)+'</p>':'')+'</div>'+
-        '<h2 style="margin-top:22px">Investigadores</h2>'+ags+
+        (c.memory?'<h2 style="margin-top:22px">Memória do caso <span class="pill ok">gravada</span></h2><p class="ev">'+esc(c.memory.summary)+'</p>'+(c.memory.brand_facts&&c.memory.brand_facts.length?'<p class="mono" style="margin:12px 0 4px">marca e categoria</p><ul class="dis">'+c.memory.brand_facts.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>':'')+(c.memory.data_facts&&c.memory.data_facts.length?'<p class="mono" style="margin:12px 0 4px">dados</p><ul class="dis">'+c.memory.data_facts.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>':'')+(c.memory.queries&&c.memory.queries.length?'<details><summary>'+c.memory.queries.length+' consultas reutilizáveis</summary>'+c.memory.queries.map(function(q){return '<p class="hint">'+esc(q.purpose)+'</p><pre>'+esc(q.sql)+'</pre>'}).join('')+'</details>':'')+'<p class="hint">Os próximos casos desta marca e deste playbook recebem esta memória antes de criar hipóteses.</p>':'')+
+        '<h2 style="margin-top:22px">Agentes</h2>'+ags+
         '<p class="hint" style="margin-top:16px"><button class="ghost" type="button" id="replay">Reassistir a execução</button></p>';
       $('replay').onclick=function(){replayCase(id,c)};
     }catch(e){v.innerHTML='<h2>Não consegui abrir o caso '+id+'.</h2>'}
