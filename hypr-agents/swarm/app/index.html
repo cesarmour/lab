@@ -92,11 +92,16 @@ details{border-top:1px solid var(--mist);padding:8px 0}summary{cursor:pointer;fo
   function gb(b){return b>=1e9?(b/1e9).toFixed(1)+' GB':Math.round(b/1e6)+' MB'}
 
   // playbooks
+  var PLAYBOOKS=['queda-de-venda','avaliacao-de-campanha','lancamento-expansao','movimento-concorrente','canibalizacao','ruptura','elasticidade','mix-de-portfolio','performance-por-rede','cesta-e-ocasiao'];
+  function renderPlaybooks(list){$('pb').innerHTML=list.map(function(s){return '<option value="'+s+'"'+(s==='queda-de-venda'?' selected':'')+'>'+s.replace(/-/g,' ').replace('canibalizacao','canibalização').replace('lancamento expansao','lançamento ou expansão').replace('avaliacao','avaliação').replace('ocasiao','ocasião').replace('mix de portfolio','mix de portfólio')+'</option>'}).join('')+'<option value="">sem playbook (hipóteses do zero)</option>'}
   async function loadPlaybooks(){
-    var sel=$('pb');
-    try{var r=await gh('/contents/playbooks');var l=await r.json();if(!Array.isArray(l))throw 0;
-      sel.innerHTML='<option value="">sem playbook (hipóteses do zero)</option>'+l.filter(function(f){return f.name.endsWith('.md')}).map(function(f){var s=f.name.replace('.md','');return '<option value="'+s+'"'+(s==='queda-de-venda'?' selected':'')+'>'+s.replace(/-/g,' ')+'</option>'}).join('');
-    }catch(e){sel.innerHTML='<option value="queda-de-venda">queda de venda</option><option value="">sem playbook</option>'}
+    renderPlaybooks(PLAYBOOKS);
+    if(!tok)return;
+    try{var r=await gh('/contents/playbooks');var l=await r.json();if(!Array.isArray(l))return;
+      var names=l.filter(function(f){return f.name.endsWith('.md')}).map(function(f){return f.name.replace('.md','')});
+      var merged=PLAYBOOKS.filter(function(p){return names.indexOf(p)>=0}).concat(names.filter(function(n){return PLAYBOOKS.indexOf(n)<0}));
+      if(merged.length)renderPlaybooks(merged);
+    }catch(e){}
   }
   // abrir caso
   $('f').onsubmit=async function(ev){ev.preventDefault();if(!tok){say('Salve um token do GitHub primeiro (abaixo).',1);return}
@@ -144,7 +149,7 @@ details{border-top:1px solid var(--mist);padding:8px 0}summary{cursor:pointer;fo
     }catch(e){v.innerHTML='<h2>Não consegui abrir o caso '+id+'.</h2><p class="hint">Verifique o token.</p>'}
   }
   function boot(){loadPlaybooks();loadRuns();loadCases()}
-  var d=new Date();$('to').value=new Date(d.getFullYear(),d.getMonth(),0).toISOString().slice(0,10);$('from').value=new Date(d.getFullYear(),d.getMonth()-2,1).toISOString().slice(0,10);
+  $('from').value='2026-05-01';$('to').value='2026-06-30';
   boot();
 })();
 </script>
