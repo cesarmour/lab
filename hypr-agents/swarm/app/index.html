@@ -104,6 +104,12 @@ details{border-top:1px solid var(--mist);padding:8px 0}summary{cursor:pointer;fo
 .ln .res{font-family:var(--mono);font-size:10.5px;color:var(--steel)}
 .ln.hyp{color:var(--steel);font-style:italic}.ln.dead{color:var(--bad)}.ln.find{color:var(--midnight)}.ln.find .who{color:var(--good)}
 #lv-foot{padding:0 22px 22px}#lv-foot:empty{padding:0}
+.lv-phase{display:flex;align-items:center;gap:8px;margin-top:8px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--steel)}
+.lv-phase i{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:lvp 1.6s ease-out infinite}.lv-phase.done i{background:var(--good);animation:none}.lv-phase.failed i{background:var(--bad);animation:none}
+@keyframes lvp{0%{box-shadow:0 0 0 0 rgba(51,151,185,.5)}70%{box-shadow:0 0 0 8px rgba(51,151,185,0)}100%{box-shadow:0 0 0 0 rgba(51,151,185,0)}}
+.net text.iq{fill:var(--midnight);font-size:12px;font-weight:600}
+.net .res rect{fill:var(--off);stroke:var(--mist);stroke-width:1.2;transition:fill .4s,stroke .4s}.net .res text.rt{fill:var(--steel);font-size:12px;font-weight:600}.net .res text.rs{font-family:var(--mono);fill:var(--steel);font-size:9px;font-weight:400;letter-spacing:.04em}
+.net .res.on rect{stroke:var(--cyan)}.net .res.on text.rt{fill:var(--midnight)}.net .res.act.on rect{fill:var(--good-bg);stroke:var(--good)}.net .res.act.on text.rt{fill:var(--good)}.net .res.act.on text.rs{fill:var(--good)}
 @keyframes in{to{opacity:1;transform:none}}
 @keyframes flow{to{stroke-dashoffset:-8}}
 @keyframes ring{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(2.3)}}

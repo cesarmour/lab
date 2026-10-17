@@ -10,7 +10,11 @@ window.SwarmLive = (function () {
     { id: 'p_pf', n: 'performance', s: 'Max Attention' }
   ];
   var FEED = { geoiq_mart: ['p_pl'], hypr_invoice_data: ['p_tr', 'p_pl'], reviq_mart: ['p_tr'], bidiq_mart: ['p_pf', 'p_au'] };
-  var MAXT = 6;
+  var MAXT = 5;
+  var SHORT = { unified_store_brand_monthly: 'store_brand', unified_chain_monthly: 'chain', fireho_basket_brand: 'basket', fireho_nf_season_brand_category: 'nf_season',
+    fact_ean_dia: 'ean_dia', fact_ean_loja_mes: 'ean_loja', dim_loja: 'loja', dim_marcas: 'marcas', dim_categorias: 'categorias', ean_enriquecidos_com_categoria_e_marca: 'ean_enriq',
+    unified_token_geo_daily: 'token_geo', singlepoint_pdvs: 'pdvs' };
+  var DSHORT = { reviq_mart: 'revIQ', hypr_invoice_data: 'invoice', bidiq_mart: 'bidIQ', geoiq_mart: 'geoIQ' };
 
   function el(tag, attrs, parent) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -18,7 +22,7 @@ window.SwarmLive = (function () {
   function gb(b) { return b >= 1e9 ? (b / 1e9).toFixed(1).replace('.', ',') + ' GB' : Math.round(b / 1e6) + ' MB'; }
   function tok(n) { return n >= 1e6 ? (n / 1e6).toFixed(1).replace('.', ',') + ' mi' : n >= 1000 ? Math.round(n / 1000) + ' mil' : String(n); }
   function tablesIn(sql) { var m = sql.match(/`([\w\-\.]+)`/g) || []; return m.map(function (t) { return t.replace(/`/g, ''); }); }
-  function short(t) { var p = t.split('.'); return p[p.length - 1]; }
+  function short(t) { var n = t.split('.').pop(); return SHORT[n] || n.replace(/^(unified_|fact_|dim_)/, '').replace(/_monthly$/, '_m').replace(/_daily$/, '_d'); }
   function dataset(t) { var p = t.split('.'); return p.length >= 2 ? p[p.length - 2] : ''; }
   function hiSql(s) {
     return esc(s).replace(/\b(SELECT|FROM|WHERE|GROUP BY|ORDER BY|AND|OR|AS|JOIN|LEFT|ON|WITH|CASE|WHEN|THEN|ELSE|END|SUM|COUNT|AVG|DISTINCT|BETWEEN|IN|LIMIT|HAVING|OVER|PARTITION BY|SAFE_DIVIDE|DATE|EXTRACT|QUALIFY|UNION ALL|NOT|IS|NULL)\b/g, '<span class="k">$1</span>')
@@ -28,9 +32,9 @@ window.SwarmLive = (function () {
   function View(root) {
     this.root = root;
     root.innerHTML =
-      '<div class="lv-head"><div><div class="mono" id="lv-id">caso ao vivo</div><h2 id="lv-q" style="margin:6px 0 0"></h2></div><span class="pill run" id="lv-st">rodando</span></div>' +
-      '<div class="kpis"><div class="kpi"><div class="v" id="lv-ag">0</div><div class="l">investigadores</div></div><div class="kpi"><div class="v" id="lv-qn">0</div><div class="l">consultas</div></div><div class="kpi"><div class="v" id="lv-gb">0 MB</div><div class="l">lidos no BigQuery</div></div><div class="kpi"><div class="v" id="lv-tk">0</div><div class="l">tokens</div></div><div class="kpi"><div class="v" id="lv-cl">0:00</div><div class="l">tempo decorrido</div></div></div>' +
-      '<div class="net"><svg id="lv-net" viewBox="0 0 640 400" aria-label="Agentes consultando as bases HYPR no BigQuery"></svg></div>' +
+      '<div class="lv-head"><div><div class="mono" id="lv-id">caso ao vivo</div><h2 id="lv-q" style="margin:6px 0 0"></h2><div class="lv-phase"><i></i><span id="lv-phase">preparando</span></div></div><span class="pill run" id="lv-st">rodando</span></div>' +
+      '<div class="kpis"><div class="kpi"><div class="v" id="lv-ag">0</div><div class="l">agentes</div></div><div class="kpi"><div class="v" id="lv-qn">0</div><div class="l">consultas</div></div><div class="kpi"><div class="v" id="lv-gb">0 MB</div><div class="l">lidos no BigQuery</div></div><div class="kpi"><div class="v" id="lv-tk">0</div><div class="l">tokens</div></div><div class="kpi"><div class="v" id="lv-cl">0:00</div><div class="l">tempo decorrido</div></div></div>' +
+      '<div class="net"><svg id="lv-net" viewBox="0 0 640 490" aria-label="Agentes consultando as bases HYPR no BigQuery"></svg></div>' +
       '<div class="console" id="lv-con"></div>' +
       '<div id="lv-foot"></div>';
     this.$ = function (id) { return root.querySelector('#' + id); };
@@ -54,25 +58,44 @@ window.SwarmLive = (function () {
       el('text', { class: 'ps', y: -19, 'text-anchor': 'middle' }, g).textContent = p.s;
     }
     el('text', { class: 'bq', x: 18, y: 92 }, this.gN).textContent = 'BIGQUERY · SITE-HYPR';
-    el('rect', { class: 'bqbox', x: 6, y: 98, width: 628, height: 76, rx: 14 }, this.gN);
-    this.tbEmpty = el('text', { class: 'sub', x: 320, y: 140, 'text-anchor': 'middle' }, this.gN); this.tbEmpty.textContent = 'aguardando a primeira consulta';
+    el('rect', { class: 'bqbox', x: 6, y: 98, width: 628, height: 70, rx: 14 }, this.gN);
+    this.tbEmpty = el('text', { class: 'sub', x: 320, y: 137, 'text-anchor': 'middle' }, this.gN); this.tbEmpty.textContent = 'aguardando a primeira consulta';
     this.gT = el('g', {}, this.gN); this.gA = el('g', {}, this.gN);
+    el('text', { class: 'bq', x: 18, y: 200 }, this.gN).textContent = 'AGENTES';
+    this.agEmpty = el('text', { class: 'sub', x: 320, y: 262, 'text-anchor': 'middle' }, this.gN); this.agEmpty.textContent = 'o orquestrador ainda não criou agentes';
     // orquestrador e auditor
-    this.pos.orq = { x: 320, y: 360 }; this.pos.aud = { x: 470, y: 360 };
-    this.links['orq-aud'] = el('path', { class: 'link', d: 'M342 360 L448 360' }, this.gL);
-    var go = el('g', { class: 'ag', transform: 'translate(320,360)' }, this.gN);
+    this.pos.orq = { x: 300, y: 352 }; this.pos.aud = { x: 450, y: 352 };
+    this.links['orq-aud'] = el('path', { class: 'link', d: 'M322 352 L428 352' }, this.gL);
+    el('circle', { class: 'drop', r: 2.2, cx: 375, cy: 352 }, this.gF);
+    var go = el('g', { class: 'ag', transform: 'translate(300,352)' }, this.gN);
     el('circle', { class: 'c', r: 22 }, go);
     var ro = el('circle', { class: 'prog', r: 22, transform: 'rotate(-90)', 'stroke-dasharray': '138.2', 'stroke-dashoffset': '138.2' }, go);
-    el('text', { x: -34, y: 4, 'text-anchor': 'end' }, go).textContent = 'Orquestrador';
+    el('text', { x: -34, y: 0, 'text-anchor': 'end' }, go).textContent = 'Orquestrador';
+    el('text', { class: 'role', x: -34, y: 14, 'text-anchor': 'end' }, go).textContent = 'hipóteses, cruza, reconcilia';
     el('text', { class: 'st', y: 3, 'text-anchor': 'middle' }, go).textContent = '';
     this.ag.orq = { g: go, prog: ro, st: go.querySelector('.st'), n: 'Orquestrador', q: 0, done: false };
-    var ga = el('g', { class: 'ag', transform: 'translate(470,360)' }, this.gN);
+    var ga = el('g', { class: 'ag', transform: 'translate(450,352)' }, this.gN);
     el('circle', { class: 'c', r: 22 }, ga);
     var ra = el('circle', { class: 'prog', r: 22, transform: 'rotate(-90)', 'stroke-dasharray': '138.2', 'stroke-dashoffset': '138.2' }, ga);
-    el('text', { x: 34, y: 4, 'text-anchor': 'start' }, ga).textContent = 'Auditor';
-    el('text', { class: 'role', x: 34, y: 17, 'text-anchor': 'start' }, ga).textContent = 'checagem independente';
+    el('text', { x: 34, y: 0, 'text-anchor': 'start' }, ga).textContent = 'Auditor';
+    el('text', { class: 'role', x: 34, y: 14, 'text-anchor': 'start' }, ga).textContent = 'checagem independente';
     el('text', { class: 'st', y: 3, 'text-anchor': 'middle' }, ga).textContent = '';
     this.ag.aud = { g: ga, prog: ra, st: ga.querySelector('.st'), n: 'Auditor', q: 0, done: false };
+    // resultado
+    el('text', { class: 'bq', x: 18, y: 408 }, this.gN).textContent = 'RESULTADO';
+    this.links['orq|res'] = el('path', { class: 'link', d: 'M300 374 C 300 395, 250 405, 250 418' }, this.gL);
+    var rb = el('g', { class: 'res', transform: 'translate(250,440)' }, this.gN);
+    el('rect', { x: -120, y: -20, width: 240, height: 40, rx: 10 }, rb);
+    this.resT = el('text', { class: 'rt', y: -2, 'text-anchor': 'middle' }, rb); this.resT.textContent = 'Hipóteses ranqueadas';
+    this.resS = el('text', { class: 'rs', y: 12, 'text-anchor': 'middle' }, rb); this.resS.textContent = '% de confiança em cada uma';
+    this.resBox = rb;
+    el('path', { class: 'link', d: 'M372 440 L448 440' }, this.gL); el('circle', { class: 'drop', r: 2.2, cx: 410, cy: 440 }, this.gF);
+    var ab = el('g', { class: 'res act', transform: 'translate(545,440)' }, this.gN);
+    el('rect', { x: -95, y: -20, width: 190, height: 40, rx: 10 }, ab);
+    this.actT = el('text', { class: 'rt', y: -2, 'text-anchor': 'middle' }, ab); this.actT.textContent = 'Ação no bidIQ';
+    this.actS = el('text', { class: 'rs', y: 12, 'text-anchor': 'middle' }, ab); this.actS.textContent = 'plano de audiência pronto';
+    this.actBox = ab;
+    this.phase('preparing');
   };
   View.prototype.ensureTable = function (t) {
     if (this.tb[t]) return this.tb[t];
@@ -82,20 +105,19 @@ window.SwarmLive = (function () {
   View.prototype.addTable = function (id, label, ds) {
     this.tbOrder.push(id); this.tbEmpty.setAttribute('opacity', 0);
     var n = this.tbOrder.length, self = this;
-    // reposiciona todas
+    var W = 122, left = 320 - (n * W) / 2 + 20;
     this.tbOrder.forEach(function (tid, i) {
-      var x = Math.round(320 + (i - (n - 1) / 2) * Math.min(120, 600 / n)), y = 128; self.pos[tid] = { x: x, y: y };
-      if (self.tb[tid]) { self.tb[tid].g.setAttribute('transform', 'translate(' + x + ',' + y + ')'); var mx2 = n >= 5 ? 14 : n >= 4 ? 17 : 24, lb = self.tb[tid].label; self.tb[tid].tx.textContent = lb.length > mx2 ? lb.slice(0, mx2 - 1) + '…' : lb; self.redraw(tid); }
+      var x = Math.round(left + i * W), y = 133; self.pos[tid] = { x: x, y: y };
+      if (self.tb[tid]) { self.tb[tid].g.setAttribute('transform', 'translate(' + x + ',' + y + ')'); self.redraw(tid); }
     });
     var p = this.pos[id];
     var g = el('g', { class: 'base', transform: 'translate(' + p.x + ',' + p.y + ')' }, this.gT);
-    el('circle', { class: 'ring', r: 15 }, g); el('circle', { r: 15 }, g);
+    el('circle', { class: 'ring', r: 17 }, g); el('circle', { r: 17 }, g);
     var cnt = el('text', { class: 'cnt', y: 4, 'text-anchor': 'middle' }, g); cnt.textContent = '';
-    var tx = el('text', { class: 'tn', y: 30, 'text-anchor': 'middle' }, g); var mx = n >= 5 ? 14 : n >= 4 ? 17 : 24; tx.textContent = label.length > mx ? label.slice(0, mx - 1) + '…' : label;
+    var tx = el('text', { class: 'iq', x: 24, y: -2, 'text-anchor': 'start' }, g); tx.textContent = label.length > 12 ? label.slice(0, 11) + '…' : label;
+    el('text', { class: 'sub', x: 24, y: 10, 'text-anchor': 'start' }, g).textContent = DSHORT[ds] || ds || '';
     el('title', {}, g).textContent = id;
-    var feeds = [];
-    (FEED[ds] || []).forEach(function (pid, j) { feeds.push(pid); });
-    var rec = { g: g, cnt: cnt, c: 0, feeds: feeds, tx: tx, label: label };
+    var rec = { g: g, cnt: cnt, c: 0, feeds: (FEED[ds] || []).slice(), tx: tx, label: label };
     this.tb[id] = rec; this.redraw(id);
     return rec;
   };
@@ -106,7 +128,7 @@ window.SwarmLive = (function () {
     (rec.feedEls || []).forEach(function (e) { e.remove(); }); rec.feedEls = [];
     rec.feeds.forEach(function (pid, j) {
       var q = self.pos[pid];
-      var d = 'M' + q.x + ' ' + (q.y + 12) + ' C ' + q.x + ' ' + (q.y + 45) + ', ' + p.x + ' ' + (p.y - 55) + ', ' + p.x + ' ' + (p.y - 15);
+      var d = 'M' + q.x + ' ' + (q.y + 12) + ' C ' + q.x + ' ' + (q.y + 50) + ', ' + p.x + ' ' + (p.y - 60) + ', ' + p.x + ' ' + (p.y - 17);
       var f = el('path', { class: 'feed', d: d, id: 'feed-' + self.uid(tid) + '-' + pid }, self.gF);
       rec.feedEls.push(f);
       if (!reduced) { var c = el('circle', { class: 'drop', r: 2.2 }, self.gF); var am = el('animateMotion', { dur: (2.4 + (j * 0.7)) + 's', repeatCount: 'indefinite', begin: (-(j * 1.1)) + 's' }, c); el('mpath', { href: '#' + f.id }, am); rec.feedEls.push(c); }
@@ -119,8 +141,8 @@ window.SwarmLive = (function () {
   View.prototype.linkPath = function (aid, tid, path) {
     var a = this.pos[aid], t = this.pos[tid]; if (!a || !t) return;
     var up = aid === 'aud' || aid === 'orq';
-    var d = up ? 'M' + t.x + ' ' + (t.y + 15) + ' C ' + t.x + ' 250, ' + a.x + ' 290, ' + a.x + ' ' + (a.y - 22)
-               : 'M' + t.x + ' ' + (t.y + 15) + ' C ' + t.x + ' ' + (a.y - 60) + ', ' + a.x + ' ' + (t.y + 60) + ', ' + a.x + ' ' + (a.y - 22);
+    var d = up ? 'M' + t.x + ' ' + (t.y + 17) + ' C ' + t.x + ' 250, ' + a.x + ' 290, ' + a.x + ' ' + (a.y - 22)
+               : 'M' + t.x + ' ' + (t.y + 17) + ' C ' + t.x + ' ' + (a.y - 60) + ', ' + a.x + ' ' + (t.y + 60) + ', ' + a.x + ' ' + (a.y - 22);
     path.setAttribute('d', d);
   };
   View.prototype.ensureLink = function (aid, tid) {
@@ -129,7 +151,7 @@ window.SwarmLive = (function () {
   };
   View.prototype.ensureAgent = function (aid, role) {
     if (this.ag[aid]) return this.ag[aid];
-    this.agOrder.push(aid);
+    this.agOrder.push(aid); this.agEmpty.setAttribute('opacity', 0);
     var n = this.agOrder.length, self = this;
     this.agOrder.forEach(function (id, i) {
       var x = Math.round(320 + (i - (n - 1) / 2) * Math.min(120, 600 / n)), y = 262; self.pos[id] = { x: x, y: y };
@@ -151,10 +173,10 @@ window.SwarmLive = (function () {
     setTimeout(function () { g.classList.remove('born'); }, 700);
     return rec;
   };
-  View.prototype.agName = function (aid, n) { if (aid === 'controle') return 'Controle'; var m = /^inv(\d+)$/.exec(aid); if (!m) return aid; return (n > 6 ? 'Inv. ' : 'Investigador ') + m[1]; };
+  View.prototype.agName = function (aid, n) { if (aid === 'controle') return 'Controle'; var m = /^inv(\d+)$/.exec(aid); if (!m) return aid; return 'Agent ' + m[1]; };
   View.prototype.relink = function (aid) {
     var self = this, p = this.pos[aid];
-    var o = this.links[aid + '|orq']; if (o) o.setAttribute('d', 'M' + p.x + ' ' + (p.y + 22) + ' C ' + p.x + ' ' + (p.y + 52) + ', 320 ' + (p.y + 52) + ', 320 338');
+    var o = this.links[aid + '|orq']; if (o) o.setAttribute('d', 'M' + p.x + ' ' + (p.y + 22) + ' C ' + p.x + ' ' + (p.y + 50) + ', 300 ' + (p.y + 50) + ', 300 330');
     Object.keys(this.links).forEach(function (k) { var parts = k.split('|'); if (parts[0] === aid && parts[1] !== 'orq') self.linkPath(aid, parts[1], self.links[k]); });
   };
   View.prototype.packet = function (from, to, back) {
@@ -174,6 +196,12 @@ window.SwarmLive = (function () {
   View.prototype.prog = function (aid, f) { var a = this.ag[aid]; if (a) a.prog.setAttribute('stroke-dashoffset', String(138.2 * (1 - Math.max(0, Math.min(1, f))))); };
   View.prototype.setState = function (aid, cls) { var a = this.ag[aid]; if (!a) return; a.g.classList.remove('live', 'done'); if (cls) a.g.classList.add(cls); };
 
+  View.prototype.phase = function (p, extra) {
+    var T = { preparing: 'subindo um container dedicado a este caso no Cloud Run', boot: 'conectando ao BigQuery e ao modelo', control: 'controle de coleta medindo a base, a categoria e mesmas lojas',
+      spawn: 'orquestrador criou ' + (extra || '') + ' agentes; investigando em paralelo', cross: 'orquestrador cruzando as conclusões', audit: 'auditor refazendo os pilares por conta própria',
+      done: 'concluído' + (extra ? ' · ' + extra : ''), failed: 'interrompido' };
+    this.$('lv-phase').textContent = T[p] || p; this.root.querySelector('.lv-phase').className = 'lv-phase ' + p;
+  };
   View.prototype.line = function (ev, body, cls) {
     var key = ev.agent === 'orquestrador' ? 'orq' : ev.agent === 'auditor' ? 'aud' : ev.agent;
     var who = this.ag[key] ? this.ag[key].n : ev.agent;
@@ -193,6 +221,11 @@ window.SwarmLive = (function () {
     }
     var ag = this.ag[a];
     this.t = Math.max(this.t, ev.t || 0);
+    if (a === 'motor' && k === 'note') this.phase('boot');
+    if (a === 'controle' && k === 'hyp') this.phase('control');
+    if (a === 'orq' && k === 'note' && /^Criando (\d+)/.test(ev.text)) this.phase('spawn', /^Criando (\d+)/.exec(ev.text)[1]);
+    if (a === 'orq' && k === 'note' && /Fechamento|cruz/i.test(ev.text)) this.phase('cross');
+    if (a === 'aud' && k === 'hyp') this.phase('audit');
     if (k === 'hyp') {
       this.setState(a, 'live'); if (ag) ag.st.textContent = '…';
       this.line(ev, esc(ev.text), 'hyp');
@@ -217,7 +250,8 @@ window.SwarmLive = (function () {
       this.line(ev, '⚠ ' + esc(ev.text), 'dead');
     } else if (k === 'find') {
       if (ag) { ag.done = true; this.setState(a, 'done'); this.prog(a, 1); ag.st.textContent = ev.confidence != null ? Math.round(ev.confidence * 100) + '%' : '✓'; }
-      if (a !== 'orq' && a !== 'aud') this.packet(a, 'orq', true);
+      if (a !== 'orq' && a !== 'aud') { this.packet(a, 'orq', true); var self2 = this; if (this.agOrder.every(function (id) { return self2.ag[id].done; })) this.phase('cross'); }
+      if (a === 'orq') { this.resBox.classList.add('on'); this.resS.textContent = 'enviado ao auditor'; }
       if (a === 'orq') this.packet('orq', 'aud', false);
       this.line(ev, esc(ev.text), 'find');
     } else {
@@ -252,9 +286,13 @@ window.SwarmLive = (function () {
   View.prototype.setStatus = function (status, seconds, snap) {
     var st = this.$('lv-st');
     this.status = status;
-    if (status === 'done') { st.className = 'pill ok'; st.textContent = snap.result && snap.result.approved === false ? 'concluído · devolvido' : 'concluído'; this.setState('aud', 'done'); this.prog('aud', 1); if (this.onDone) this.onDone(snap); }
-    else if (status === 'failed') { st.className = 'pill no'; st.textContent = 'interrompido'; this.$('lv-foot').innerHTML = '<p class="hint">O caso não terminou. Abra de novo com a mesma pergunta.</p>'; }
-    else { st.className = 'pill run'; st.textContent = status === 'preparing' ? 'preparando' : 'rodando'; this.$('lv-foot').innerHTML = status === 'preparing' ? '<p class="hint">Subindo um container dedicado a este caso no Cloud Run; os agentes aparecem aqui em 1 a 3 minutos.</p>' : ''; }
+    if (status === 'done') { st.className = 'pill ok'; st.textContent = snap.result && snap.result.approved === false ? 'concluído · devolvido' : 'concluído'; this.setState('aud', 'done'); this.prog('aud', 1);
+      var r = snap.result || {}, hs = (r.hypotheses || []).filter(function (h) { return h && h.statement; });
+      this.resBox.classList.add('on'); if (hs.length) { this.resT.textContent = hs.length + ' hipóteses ranqueadas'; this.resS.textContent = 'confiança máxima ' + Math.round(100 * Math.max.apply(null, hs.map(function (h) { return h.confidence || 0; }))) + '%'; }
+      this.actBox.classList.add('on'); if (r.action) { this.actS.textContent = r.action.length > 26 ? r.action.slice(0, 25) + '…' : r.action; }
+      this.phase('done', r.approved === false ? 'auditor devolveu' : 'auditor aprovou'); if (this.onDone) this.onDone(snap); }
+    else if (status === 'failed') { this.phase('failed'); st.className = 'pill no'; st.textContent = 'interrompido'; this.$('lv-foot').innerHTML = '<p class="hint">O caso não terminou. Abra de novo com a mesma pergunta.</p>'; }
+    else { st.className = 'pill run'; st.textContent = status === 'preparing' ? 'preparando' : 'rodando'; if (status === 'preparing') this.phase('preparing'); }
     if (seconds != null) { var cur = this.base ? this.base.s + (Date.now() - this.base.at) / 1000 : 0; this.base = { s: Math.max(seconds, status === 'running' || status === 'preparing' ? cur : seconds), at: Date.now() }; }
   };
   View.prototype.tick = function () {
