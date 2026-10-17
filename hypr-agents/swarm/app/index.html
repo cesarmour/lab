@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1C262F">
+<title>Swarm · abrir caso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--midnight:#1C262F;--cloud:#FAFAFA;--off:#FCFEFE;--mist:#E5EBF2;--steel:#78909C;--slate:#536872;--cyan:#3397B9;--deep:#246C84;--soft:#C5EAF6;--good:#018376;--good-bg:#E6F3EA;--bad:#B41048;--bad-bg:#FBE4EA;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--shadow:0 8px 28px rgba(28,38,47,.06),0 1px 2px rgba(28,38,47,.04)}
+*{box-sizing:border-box}html,body{margin:0;background:var(--cloud);color:var(--midnight);font-family:Urbanist,system-ui,sans-serif;font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--steel)}
+.cover{background:var(--midnight);color:var(--off);padding:0 20px}.cover .in{max-width:1080px;margin:0 auto;padding:28px 0 32px}
+.cover .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}.cover .top a{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(252,254,254,.7);text-decoration:none;border:1px solid rgba(252,254,254,.3);border-radius:999px;padding:6px 14px}
+.cover .wm{height:17px;width:auto;display:block}
+.cover h1{font-weight:300;font-size:clamp(30px,4.6vw,48px);line-height:1.08;letter-spacing:-.015em;margin:0}.cover h1 em{font-style:normal;color:var(--cyan)}
+.cover p{color:rgba(252,254,254,.72);margin:10px 0 0;font-weight:300;max-width:56ch}
+.page{max-width:1080px;margin:0 auto;padding:24px 20px 80px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{background:var(--off);border:1px solid var(--mist);border-radius:20px;padding:22px 22px;box-shadow:var(--shadow)}
+h2{margin:0 0 14px;font-size:22px;font-weight:300}
+label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--steel);margin:14px 0 6px}
+input,select,textarea{width:100%;font:inherit;font-size:16px;color:var(--midnight);background:var(--cloud);border:1px solid var(--mist);border-radius:10px;padding:11px 12px}
+textarea{min-height:84px;resize:vertical}input:focus,select:focus,textarea:focus{outline:2px solid var(--soft);border-color:var(--cyan)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{appearance:none;border:0;font:inherit;font-weight:600;font-size:16px;padding:13px 22px;border-radius:999px;cursor:pointer}
+.primary{background:var(--midnight);color:var(--off);width:100%;margin-top:18px}.primary:disabled{opacity:.5;cursor:default}
+.ghost{background:transparent;color:var(--slate);border:1px solid var(--mist);padding:8px 14px;font-size:14px}
+.hint{font-size:13.5px;color:var(--steel);margin:8px 0 0}
+.msg{margin-top:12px;font-size:14.5px;padding:10px 14px;border-radius:10px;background:var(--good-bg);color:var(--good)}.msg.err{background:var(--bad-bg);color:var(--bad)}
+.list{list-style:none;margin:0;padding:0}.list li{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--mist);cursor:pointer}.list li:first-child{border-top:0}
+.list .t{font-size:15.5px}.list .s{font-family:var(--mono);font-size:10.5px;color:var(--steel);letter-spacing:.04em}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase}
+.pill.ok{background:var(--good-bg);color:var(--good)}.pill.run{background:var(--soft);color:var(--deep)}.pill.no{background:var(--bad-bg);color:var(--bad)}.pill.q{background:var(--mist);color:var(--slate)}
+.full{grid-column:1/-1}
+.hyp{display:grid;grid-template-columns:40px 1fr 100px;gap:14px;padding:16px 0;border-top:1px solid var(--mist)}.hyp:first-child{border-top:0;padding-top:0}
+.rank{font-weight:300;font-size:30px;line-height:1;color:var(--cyan)}.st{margin:0;font-size:17px;font-weight:600}.ev{margin:6px 0 0;color:var(--slate);font-size:15px}.an{margin:6px 0 0;color:var(--deep);font-size:14px}
+.conf{text-align:right}.conf .v{font-weight:300;font-size:28px;line-height:1;color:var(--good)}.conf .l{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--steel)}.conf .w{font-size:12.5px;color:var(--slate);margin-top:4px}
+.action{background:var(--midnight);color:var(--off);border-radius:16px;padding:18px 22px;margin-top:16px}.action p{margin:6px 0 0;font-weight:300;font-size:17px}
+.kpis{display:flex;gap:28px;flex-wrap:wrap;margin:6px 0 16px}.kpi .v{font-weight:300;font-size:28px;line-height:1}.kpi .l{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--steel);margin-top:4px}
+details{border-top:1px solid var(--mist);padding:8px 0}summary{cursor:pointer;font-size:14.5px;color:var(--slate)}pre{margin:8px 0;padding:10px 12px;background:var(--cloud);border:1px solid var(--mist);border-radius:8px;font-family:var(--mono);font-size:11px;white-space:pre-wrap;word-break:break-word;color:var(--slate)}
+.dis{margin:0;padding-left:18px;color:var(--slate);font-size:14.5px}
+.audit li{list-style:none;padding:8px 0 8px 24px;position:relative;color:var(--slate);border-top:1px solid var(--mist);font-size:14.5px}.audit li::before{position:absolute;left:0;font-family:var(--mono)}.audit li.ok::before{content:"✓";color:var(--good)}.audit li.no::before{content:"✕";color:var(--bad)}.audit ul{padding:0;margin:0}
+@media (max-width:860px){.page{grid-template-columns:1fr}.hyp{grid-template-columns:32px 1fr}.conf{text-align:left;grid-column:2}}
+</style>
+</head>
+<body>
+<section class="cover"><div class="in">
+<div class="top"><a href="/hypr-agents/swarm/">← conceito</a><img class="wm" src="/hypr-agents/hypr-wordmark-white.svg" alt="HYPR"></div>
+<h1>Swarm<em>.</em> Abrir um caso.</h1>
+<p>Uma pergunta, uma marca, um período. O orquestrador cria os investigadores, o auditor confere, e o resultado aparece aqui com hipóteses e confiança.</p>
+</div></section>
+
+<div class="page">
+  <div class="card">
+    <h2>Novo caso</h2>
+    <form id="f">
+      <label>Pergunta</label><textarea id="q" required placeholder="Por que as vendas da Monster caíram 12,5% em junho?"></textarea>
+      <div class="row"><div><label>Marca (como na base)</label><input id="brand" required placeholder="MONSTER"></div><div><label>Playbook</label><select id="pb"><option value="">carregando…</option></select></div></div>
+      <div class="row"><div><label>De</label><input id="from" type="date" required></div><div><label>Até</label><input id="to" type="date" required></div></div>
+      <button class="primary" id="go" type="submit">Abrir caso</button>
+      <div id="m"></div>
+    </form>
+    <details style="margin-top:18px"><summary>Acesso ao GitHub</summary>
+      <label>Token (fine-grained, repo HYPR-Projects/hypr-swarm: Actions read/write, Contents read/write)</label>
+      <input id="tok" type="password" placeholder="github_pat_…">
+      <p class="hint">Fica só neste aparelho (localStorage). <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Gerar token</a></p>
+      <button class="ghost" id="savetok" type="button">Salvar token</button>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>Execuções</h2>
+    <ul class="list" id="runs"><li><span class="t">…</span></li></ul>
+    <h2 style="margin-top:22px">Casos concluídos</h2>
+    <ul class="list" id="cases"><li><span class="t">…</span></li></ul>
+  </div>
+
+  <div class="card full" id="view" hidden></div>
+</div>
+
+<script>
+(function(){
+  var OWNER='HYPR-Projects',REPO='hypr-swarm',API='https://api.github.com/repos/'+OWNER+'/'+REPO;
+  var $=function(id){return document.getElementById(id)};
+  var tok=localStorage.getItem('swarm_gh_token')||'';$('tok').value=tok;
+  $('savetok').onclick=function(){tok=$('tok').value.trim();localStorage.setItem('swarm_gh_token',tok);boot()};
+  function gh(path,opt){opt=opt||{};opt.headers=Object.assign({'Accept':'application/vnd.github+json','Authorization':'Bearer '+tok,'X-GitHub-Api-Version':'2022-11-28'},opt.headers||{});return fetch(API+path,opt)}
+  function say(t,err){$('m').innerHTML='<div class="msg'+(err?' err':'')+'">'+t+'</div>'}
+  function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function fmtTok(n){return n>=1000?(n/1000).toFixed(0)+' mil':n}
+  function gb(b){return b>=1e9?(b/1e9).toFixed(1)+' GB':Math.round(b/1e6)+' MB'}
+
+  // playbooks
+  async function loadPlaybooks(){
+    var sel=$('pb');
+    try{var r=await gh('/contents/playbooks');var l=await r.json();if(!Array.isArray(l))throw 0;
+      sel.innerHTML='<option value="">sem playbook (hipóteses do zero)</option>'+l.filter(function(f){return f.name.endsWith('.md')}).map(function(f){var s=f.name.replace('.md','');return '<option value="'+s+'"'+(s==='queda-de-venda'?' selected':'')+'>'+s.replace(/-/g,' ')+'</option>'}).join('');
+    }catch(e){sel.innerHTML='<option value="queda-de-venda">queda de venda</option><option value="">sem playbook</option>'}
+  }
+  // abrir caso
+  $('f').onsubmit=async function(ev){ev.preventDefault();if(!tok){say('Salve um token do GitHub primeiro (abaixo).',1);return}
+    $('go').disabled=true;say('Disparando…');
+    var inputs={question:$('q').value.trim(),brand:$('brand').value.trim(),period:$('from').value+':'+$('to').value,playbook:$('pb').value};
+    var r=await gh('/actions/workflows/swarm.yml/dispatches',{method:'POST',body:JSON.stringify({ref:'main',inputs:inputs})});
+    if(r.status===204){say('Caso aberto. A execução aparece ao lado em alguns segundos; o resultado em 3 a 10 minutos.');setTimeout(loadRuns,4000)}else{var t=await r.text();say('Falhou ('+r.status+'): '+esc(t.slice(0,200)),1)}
+    $('go').disabled=false;
+  };
+  // execuções
+  async function loadRuns(){
+    var ul=$('runs');
+    try{var r=await gh('/actions/workflows/swarm.yml/runs?per_page=8');var j=await r.json();
+      if(!j.workflow_runs){ul.innerHTML='<li><span class="t">Sem acesso. Salve um token.</span></li>';return}
+      if(!j.workflow_runs.length){ul.innerHTML='<li><span class="t">Nenhuma execução ainda.</span></li>';return}
+      ul.innerHTML=j.workflow_runs.map(function(w){var st=w.status==='completed'?(w.conclusion==='success'?'ok':'no'):'run';var lbl=w.status==='completed'?(w.conclusion==='success'?'concluído':w.conclusion):(w.status==='in_progress'?'rodando':'na fila');
+        return '<li onclick="window.open(\''+w.html_url+'\',\'_blank\')"><div><div class="t">'+esc(w.display_title||w.name)+'</div><div class="s">'+new Date(w.created_at).toLocaleString('pt-BR')+'</div></div><span class="pill '+st+'">'+lbl+'</span></li>'}).join('');
+      if(j.workflow_runs.some(function(w){return w.status!=='completed'}))setTimeout(loadRuns,20000);
+    }catch(e){ul.innerHTML='<li><span class="t">Erro ao listar execuções.</span></li>'}
+  }
+  // casos
+  async function loadCases(){
+    var ul=$('cases');
+    try{var r=await gh('/contents/cases');var l=await r.json();if(!Array.isArray(l)){ul.innerHTML='<li><span class="t">Sem casos ou sem acesso.</span></li>';return}
+      l=l.filter(function(d){return d.type==='dir'}).sort(function(a,b){return a.name<b.name?1:-1});
+      ul.innerHTML=l.map(function(d){return '<li data-id="'+d.name+'"><div><div class="t">'+d.name+'</div><div class="s">cases/'+d.name+'</div></div><span class="pill q">abrir</span></li>'}).join('')||'<li><span class="t">Nenhum caso ainda.</span></li>';
+      ul.querySelectorAll('li[data-id]').forEach(function(li){li.onclick=function(){openCase(li.dataset.id)}});
+    }catch(e){ul.innerHTML='<li><span class="t">Erro ao listar casos.</span></li>'}
+  }
+  async function openCase(id){
+    var v=$('view');v.hidden=false;v.innerHTML='<h2>Carregando '+id+'…</h2>';v.scrollIntoView({behavior:'smooth'});
+    try{var r=await gh('/contents/cases/'+id+'/case.json',{headers:{'Accept':'application/vnd.github.raw+json'}});if(!r.ok)throw 0;var c=await r.json();
+      var res=c.result,au=c.audit||{},m=c.metrics||{},tk=(m.tokens||{});
+      var hyps=(res.hypotheses||[]).map(function(h){return '<div class="hyp"><div class="rank">'+(h.rank||'')+'</div><div><p class="st">'+esc(h.statement)+'</p><p class="ev">'+esc(h.evidence)+'</p>'+(h.audit_note?'<p class="an">Auditor: '+esc(h.audit_note)+'</p>':'')+'</div><div class="conf"><div class="v">'+Math.round(100*(h.confidence||0))+'%</div><div class="l">confiança</div><div class="w">'+esc(h.weight||'')+'</div></div></div>'}).join('');
+      var checks=(au.checks||[]).map(function(k){return '<li class="'+(k.reproduced?'ok':'no')+'">'+esc(k.claim)+'<br><span style="color:var(--midnight)">'+esc(k.found)+'</span></li>'}).join('');
+      var ags=Object.keys(c.agents||{}).map(function(k){var a=c.agents[k],co=a.conclusion||{};return '<details><summary><b>'+k+'</b> · '+esc(a.role)+' · '+Math.round(100*(co.confidence||0))+'%</summary><p class="ev"><i>'+esc(a.hypothesis)+'</i></p><p class="ev">'+esc(co.finding)+'</p>'+(co.caveats?'<p class="hint">'+esc(co.caveats)+'</p>':'')+'</details>'}).join('');
+      v.innerHTML='<div class="mono">caso '+id+'</div><h2 style="margin-top:6px">'+esc(c.question)+'</h2>'+
+        '<div class="kpis"><div class="kpi"><div class="v">'+Object.keys(c.agents||{}).length+'</div><div class="l">investigadores</div></div><div class="kpi"><div class="v">'+(m.queries||0)+'</div><div class="l">consultas</div></div><div class="kpi"><div class="v">'+gb(m.bytes||0)+'</div><div class="l">lidos</div></div><div class="kpi"><div class="v">'+Math.round((m.seconds||0)/60)+' min</div><div class="l">tempo</div></div><div class="kpi"><div class="v">'+fmtTok((tk.input||0)+(tk.output||0))+'</div><div class="l">tokens</div></div></div>'+
+        '<h2>Hipóteses ranqueadas</h2>'+hyps+
+        '<div class="action"><div class="mono">ação</div><p>'+esc(res.action)+'</p></div>'+
+        (res.discarded&&res.discarded.length?'<h2 style="margin-top:22px">Descartado com dado</h2><ul class="dis">'+res.discarded.map(function(d){return '<li>'+esc(d)+'</li>'}).join('')+'</ul>':'')+
+        '<h2 style="margin-top:22px">Auditoria <span class="pill '+(au.approved?'ok':'no')+'">'+(au.approved?'aprovado':'devolvido')+'</span></h2><div class="audit"><ul>'+checks+'</ul>'+(au.caveats?'<p class="hint">'+esc(au.caveats)+'</p>':'')+'</div>'+
+        '<h2 style="margin-top:22px">Investigadores</h2>'+ags+
+        '<p class="hint" style="margin-top:16px"><a href="https://github.com/'+OWNER+'/'+REPO+'/tree/main/cases/'+id+'" target="_blank" rel="noopener">Arquivos do caso no GitHub</a> (events.jsonl com todas as consultas).</p>';
+    }catch(e){v.innerHTML='<h2>Não consegui abrir o caso '+id+'.</h2><p class="hint">Verifique o token.</p>'}
+  }
+  function boot(){loadPlaybooks();loadRuns();loadCases()}
+  var d=new Date();$('to').value=new Date(d.getFullYear(),d.getMonth(),0).toISOString().slice(0,10);$('from').value=new Date(d.getFullYear(),d.getMonth()-2,1).toISOString().slice(0,10);
+  boot();
+})();
+</script>
+</body>
+</html>
