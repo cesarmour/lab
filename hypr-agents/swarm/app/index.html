@@ -46,7 +46,7 @@ details{border-top:1px solid var(--mist);padding:8px 0}summary{cursor:pointer;fo
 </head>
 <body>
 <section class="cover"><div class="in">
-<div class="top"><a href="/hypr-agents/swarm/">← conceito</a><img class="wm" src="/hypr-agents/hypr-wordmark-white.svg" alt="HYPR"></div>
+<div class="top"><div><a href="/hypr-agents/swarm/">← conceito</a> <a href="/hypr-agents/swarm/playbooks/">playbooks</a></div><img class="wm" src="/hypr-agents/hypr-wordmark-white.svg" alt="HYPR"></div>
 <h1>Swarm<em>.</em> Abrir um caso.</h1>
 <p>Uma pergunta, uma marca, um período. O orquestrador cria os investigadores, o auditor confere, e o resultado aparece aqui com hipóteses e confiança.</p>
 </div></section>
@@ -92,8 +92,9 @@ details{border-top:1px solid var(--mist);padding:8px 0}summary{cursor:pointer;fo
   function gb(b){return b>=1e9?(b/1e9).toFixed(1)+' GB':Math.round(b/1e6)+' MB'}
 
   // playbooks
-  var PLAYBOOKS=['queda-de-venda','avaliacao-de-campanha','lancamento-expansao','movimento-concorrente','canibalizacao','ruptura','elasticidade','mix-de-portfolio','performance-por-rede','cesta-e-ocasiao'];
-  function renderPlaybooks(list){$('pb').innerHTML=list.map(function(s){return '<option value="'+s+'"'+(s==='queda-de-venda'?' selected':'')+'>'+s.replace(/-/g,' ').replace('canibalizacao','canibalização').replace('lancamento expansao','lançamento ou expansão').replace('avaliacao','avaliação').replace('ocasiao','ocasião').replace('mix de portfolio','mix de portfólio')+'</option>'}).join('')+'<option value="">sem playbook (hipóteses do zero)</option>'}
+  var PLAYBOOKS=['queda-de-venda','movimento-concorrente','ruptura','sazonalidade-e-calendario','lancamento-expansao','performance-por-rede','mix-de-portfolio','canibalizacao','elasticidade','avaliacao-de-campanha','cesta-e-ocasiao','fidelidade-e-churn'];
+  var WANT=new URLSearchParams(location.search).get('playbook')||'queda-de-venda';
+  function renderPlaybooks(list){$('pb').innerHTML=list.map(function(s){return '<option value="'+s+'"'+(s===WANT?' selected':'')+'>'+s.replace(/-/g,' ').replace('canibalizacao','canibalização').replace('lancamento expansao','lançamento ou expansão').replace('avaliacao','avaliação').replace('ocasiao','ocasião').replace('mix de portfolio','mix de portfólio').replace('sazonalidade e calendario','sazonalidade e calendário')+'</option>'}).join('')+'<option value="">sem playbook (hipóteses do zero)</option>'}
   async function loadPlaybooks(){
     renderPlaybooks(PLAYBOOKS);
     if(!tok)return;
