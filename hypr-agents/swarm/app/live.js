@@ -151,7 +151,7 @@ window.SwarmLive = (function () {
     setTimeout(function () { g.classList.remove('born'); }, 700);
     return rec;
   };
-  View.prototype.agName = function (aid, n) { var m = /^inv(\d+)$/.exec(aid); if (!m) return aid; return (n > 6 ? 'Inv. ' : 'Investigador ') + m[1]; };
+  View.prototype.agName = function (aid, n) { if (aid === 'controle') return 'Controle'; var m = /^inv(\d+)$/.exec(aid); if (!m) return aid; return (n > 6 ? 'Inv. ' : 'Investigador ') + m[1]; };
   View.prototype.relink = function (aid) {
     var self = this, p = this.pos[aid];
     var o = this.links[aid + '|orq']; if (o) o.setAttribute('d', 'M' + p.x + ' ' + (p.y + 22) + ' C ' + p.x + ' ' + (p.y + 52) + ', 320 ' + (p.y + 52) + ', 320 338');
@@ -187,7 +187,7 @@ window.SwarmLive = (function () {
   View.prototype.apply = function (ev) {
     var a = ev.agent, k = ev.kind, self = this;
     if (a === 'orquestrador') a = 'orq'; else if (a === 'auditor') a = 'aud';
-    if (/^inv\d+$/.test(a) && !this.ag[a]) {
+    if ((/^inv\d+$/.test(a) || a === 'controle') && !this.ag[a]) {
       var role = (this.agents && this.agents[a] && this.agents[a].role) || '';
       this.ensureAgent(a, role);
     }
