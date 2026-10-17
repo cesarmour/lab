@@ -254,7 +254,7 @@ window.SwarmLive = (function () {
     this.status = status;
     if (status === 'done') { st.className = 'pill ok'; st.textContent = snap.result && snap.result.approved === false ? 'concluído · devolvido' : 'concluído'; this.setState('aud', 'done'); this.prog('aud', 1); if (this.onDone) this.onDone(snap); }
     else if (status === 'failed') { st.className = 'pill no'; st.textContent = 'interrompido'; this.$('lv-foot').innerHTML = '<p class="hint">O caso não terminou. Abra de novo com a mesma pergunta.</p>'; }
-    else { st.className = 'pill run'; st.textContent = status === 'preparing' ? 'preparando' : 'rodando'; }
+    else { st.className = 'pill run'; st.textContent = status === 'preparing' ? 'preparando' : 'rodando'; this.$('lv-foot').innerHTML = status === 'preparing' ? '<p class="hint">Subindo um container dedicado a este caso no Cloud Run; os agentes aparecem aqui em 1 a 3 minutos.</p>' : ''; }
     if (seconds != null) { var cur = this.base ? this.base.s + (Date.now() - this.base.at) / 1000 : 0; this.base = { s: Math.max(seconds, status === 'running' || status === 'preparing' ? cur : seconds), at: Date.now() }; }
   };
   View.prototype.tick = function () {
