@@ -36,6 +36,15 @@ button{appearance:none;border:0;font:inherit;font-weight:600;font-size:16px;padd
 .primary{background:var(--midnight);color:var(--off);width:100%;margin-top:18px}.primary:disabled{opacity:.5;cursor:default}
 .ghost{background:transparent;color:var(--slate);border:1px solid var(--mist);padding:8px 14px;font-size:14px}
 .hint{font-size:13.5px;color:var(--steel);margin:8px 0 0}
+.cb{position:relative}.cb .hint{min-height:1.2em;font-size:12.5px;margin-top:6px}
+.dd{position:absolute;z-index:5;left:0;width:max(100%,460px);max-width:calc(100vw - 60px);top:calc(100% - 24px);background:var(--off);border:1px solid var(--mist);border-radius:12px;box-shadow:0 12px 32px rgba(28,38,47,.12);max-height:280px;overflow:auto;padding:6px}
+.dd div{padding:8px 10px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;gap:10px;font-size:15px}.dd div:hover,.dd div.on{background:var(--cloud)}
+.dd b{font-weight:600}.dd span{font-family:var(--mono);font-size:10.5px;color:var(--steel);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cards{display:grid;gap:8px}
+.cardq{background:var(--cloud);border:1px solid var(--mist);border-radius:12px;padding:10px 12px;cursor:pointer;font-size:14.5px;line-height:1.35;color:var(--midnight);display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;opacity:0;animation:cin .45s ease forwards}
+.cardq:hover{border-color:var(--cyan);background:var(--off)}.cardq span{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--deep);background:var(--soft);padding:2px 8px;border-radius:999px;white-space:nowrap}
+.cardq.out{animation:cout .35s ease forwards}
+@keyframes cin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}@keyframes cout{to{opacity:0;transform:translateY(-6px)}}
 .msg{margin-top:12px;font-size:14.5px;padding:10px 14px;border-radius:10px;background:var(--good-bg);color:var(--good)}.msg.err{background:var(--bad-bg);color:var(--bad)}
 .list{list-style:none;margin:0;padding:0}.list li{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--mist);cursor:pointer}.list li:first-child{border-top:0}
 .list .t{font-size:15.5px}.list .s{font-family:var(--mono);font-size:10.5px;color:var(--steel);letter-spacing:.04em}
@@ -115,7 +124,8 @@ details{border-top:1px solid var(--mist);padding:8px 0}summary{cursor:pointer;fo
     <h2>Novo caso</h2>
     <form id="f">
       <label>Pergunta</label><textarea id="q" required placeholder="Por que as vendas da Monster caíram 12,5% em junho?"></textarea>
-      <div class="row"><div><label>Marca (como na base)</label><input id="brand" required placeholder="MONSTER"></div><div><label>Playbook</label><select id="pb"><option value="">carregando…</option></select></div></div>
+      <div class="row"><div class="cb"><label>Marca</label><input id="brand" required placeholder="buscar marca…" autocomplete="off"><div class="dd" id="dd" hidden></div><div class="hint" id="bmeta"></div></div><div><label>Playbook</label><select id="pb"><option value="">carregando…</option></select></div></div>
+      <div id="sug" hidden><label>Sugestões para a marca</label><div class="cards" id="cards"></div></div>
       <div class="row"><div><label>De</label><input id="from" type="date" required></div><div><label>Até</label><input id="to" type="date" required></div></div>
       <button class="primary" id="go" type="submit">Abrir caso</button>
       <div id="m"></div>
@@ -158,8 +168,52 @@ details{border-top:1px solid var(--mist);padding:8px 0}summary{cursor:pointer;fo
   function renderPlaybooks(list){$('pb').innerHTML=list.map(function(p){var slug=p.slug||p,t=p.title||NAMES[slug]||slug.replace(/-/g,' ');return '<option value="'+slug+'"'+(slug===WANT?' selected':'')+'>'+esc(t.toLowerCase())+'</option>'}).join('')+'<option value="">sem playbook (hipóteses do zero)</option>'}
   async function loadPlaybooks(){renderPlaybooks(PLAYBOOKS);try{var r=await api('/playbooks');var l=await r.json();if(Array.isArray(l)&&l.length)renderPlaybooks(l)}catch(e){}}
 
+  // ---- marcas (do BigQuery, via serviço) ----
+  var BRANDS=[],BRAND=null,dd=$('dd'),bi=$('brand'),sel=-1;
+  function money(v){return v>=1e6?(v/1e6).toFixed(1).replace('.',',')+' mi':v>=1e3?Math.round(v/1e3)+' mil':Math.round(v)}
+  function nice(m){return m.toLowerCase().replace(/(^|\s)(\S)/g,function(a,b,c){return b+c.toUpperCase()})}
+  function pct(a,b){return b?((a-b)/b*100):0}
+  function fmtPct(p){return Math.abs(p).toFixed(1).replace('.',',')+'%'}
+  async function loadBrands(){try{var r=await api('/brands');BRANDS=await r.json();bi.placeholder='buscar entre '+BRANDS.length+' marcas…';var w=new URLSearchParams(location.search).get('brand');if(w){var b=BRANDS.filter(function(x){return x.marca===w.toUpperCase()})[0];if(b)pick(b)}}catch(e){bi.placeholder='MONSTER (digite como na base)'}}
+  function filterBrands(q){q=q.trim().toUpperCase();if(!q)return BRANDS.slice(0,12);var st=BRANDS.filter(function(b){return b.marca.indexOf(q)===0}),inn=BRANDS.filter(function(b){return b.marca.indexOf(q)>0||(b.categoria||'').toUpperCase().indexOf(q)>=0});return st.concat(inn).slice(0,12)}
+  function showDD(list){sel=-1;if(!list.length){dd.hidden=true;return}dd.innerHTML=list.map(function(b,i){return '<div data-i="'+i+'"><b>'+esc(b.marca)+'</b><span>'+esc(b.categoria||'')+' · R$ '+money(b.jun)+'/mês · '+b.lojas+' lojas</span></div>'}).join('');dd.hidden=false;dd._list=list;
+    dd.querySelectorAll('div[data-i]').forEach(function(d){d.onmousedown=function(ev){ev.preventDefault();pick(list[+d.dataset.i])}})}
+  function pick(b){BRAND=b;bi.value=b.marca;dd.hidden=true;$('bmeta').textContent=(b.categoria||'')+' · mai R$ '+money(b.mai)+' · jun R$ '+money(b.jun)+' ('+(pct(b.jun,b.mai)>=0?'+':'−')+fmtPct(pct(b.jun,b.mai))+') · jul R$ '+money(b.jul);suggest(b)}
+  bi.oninput=function(){BRAND=null;$('bmeta').textContent='';showDD(filterBrands(bi.value))};
+  bi.onfocus=function(){if(BRANDS.length)showDD(filterBrands(bi.value))};
+  bi.onblur=function(){setTimeout(function(){dd.hidden=true;if(!BRAND&&bi.value){var ex=BRANDS.filter(function(b){return b.marca===bi.value.trim().toUpperCase()})[0];if(ex)pick(ex);else bi.value=bi.value.toUpperCase()}},150)};
+  bi.onkeydown=function(ev){if(dd.hidden)return;var items=dd.querySelectorAll('div[data-i]');if(ev.key==='ArrowDown'){sel=Math.min(items.length-1,sel+1)}else if(ev.key==='ArrowUp'){sel=Math.max(0,sel-1)}else if(ev.key==='Enter'){ev.preventDefault();if(sel>=0)pick(dd._list[sel]);else if(dd._list.length)pick(dd._list[0]);return}else return;items.forEach(function(d,i){d.classList.toggle('on',i===sel)})};
+
+  // ---- sugestões de pergunta por marca ----
+  var SUGS=[],sugI=0,sugT=null;
+  function suggest(b){
+    var B=nice(b.marca),cat=(b.categoria||'a categoria').toLowerCase(),d=pct(b.jun,b.mai),dj=pct(b.jul,b.jun),mov=d<0?'queda':'alta';
+    SUGS=[];
+    if(d<=-2)SUGS.push(['Por que as vendas da '+B+' caíram '+fmtPct(d)+' em junho?','queda-de-venda','2026-05-01:2026-06-30']);
+    else if(d>=2)SUGS.push(['O que explica a alta de '+fmtPct(d)+' da '+B+' em junho?','queda-de-venda','2026-05-01:2026-06-30']);
+    else SUGS.push(['O que segurou a '+B+' estável em junho ('+(d>=0?'+':'−')+fmtPct(d)+')?','queda-de-venda','2026-05-01:2026-06-30']);
+    if(Math.abs(dj)>=3)SUGS.push([(dj>0?'A '+B+' recuperou '+fmtPct(dj)+' em julho. O que mudou?':'A '+B+' caiu mais '+fmtPct(dj)+' em julho. É tendência?'),'queda-de-venda','2026-06-01:2026-07-31']);
+    SUGS.push(['A '+B+' perdeu distribuição ou teve ruptura em junho?','ruptura','2026-05-01:2026-06-30']);
+    SUGS.push([d<0?'Quem ganhou o share que a '+B+' perdeu em '+cat+'?':'De quem a '+B+' tirou share em '+cat+'?','movimento-concorrente','2026-05-01:2026-06-30']);
+    SUGS.push(['Quais redes concentram a '+mov+' da '+B+'?','performance-por-rede','2026-05-01:2026-06-30']);
+    SUGS.push(['Qual a elasticidade de preço da '+B+' e onde há espaço para subir?','elasticidade','2026-02-01:2026-07-31']);
+    SUGS.push(['Há canibalização dentro do portfólio da '+B+'?','canibalizacao','2026-03-01:2026-07-31']);
+    SUGS.push(['Quanto do movimento da '+B+' em junho é calendário e sazonalidade?','sazonalidade-e-calendario','2026-05-01:2026-06-30']);
+    SUGS.push(['Com o que a '+B+' vai junto na cesta e em que ocasião?','cesta-e-ocasiao','2026-05-01:2026-06-30']);
+    SUGS.push(['A '+B+' está ganhando ou perdendo lojas fiéis?','fidelidade-e-churn','2026-02-01:2026-07-31']);
+    SUGS.push(['Qual embalagem ou SKU está puxando a '+B+' em '+cat+'?','mix-de-portfolio','2026-05-01:2026-06-30']);
+    sugI=0;$('sug').hidden=false;renderSugs(true);clearInterval(sugT);sugT=setInterval(function(){sugI=(sugI+3)%SUGS.length;renderSugs(false)},7000);
+  }
+  function renderSugs(first){
+    var c=$('cards'),show=[0,1,2].map(function(k){return SUGS[(sugI+k)%SUGS.length]});
+    var draw=function(){c.innerHTML=show.map(function(sg){return '<div class="cardq" title="usar esta pergunta">'+esc(sg[0])+'<span>'+esc(NAMES[sg[1]]||sg[1])+'</span></div>'}).join('');
+      c.querySelectorAll('.cardq').forEach(function(d,i){d.onclick=function(){var sg=show[i];$('q').value=sg[0];$('pb').value=sg[1];var p=sg[2].split(':');$('from').value=p[0];$('to').value=p[1];clearInterval(sugT);$('q').focus()}})};
+    if(first||!c.children.length)draw();else{c.querySelectorAll('.cardq').forEach(function(d){d.classList.add('out')});setTimeout(draw,330)}
+  }
+
   // abrir caso
   $('f').onsubmit=async function(ev){ev.preventDefault();
+    if(BRANDS.length&&!BRAND){say('Escolha uma marca da lista.',1);bi.focus();return}
     $('go').disabled=true;say('Abrindo o caso…');
     try{var r=await api('/cases',{method:'POST',body:JSON.stringify({question:$('q').value.trim(),brand:$('brand').value.trim(),period:$('from').value+':'+$('to').value,playbook:$('pb').value})});
       var j=await r.json();
@@ -225,7 +279,7 @@ details{border-top:1px solid var(--mist);padding:8px 0}summary{cursor:pointer;fo
   if(P.get('case'))openCase(P.get('case'));
 
   $('from').value='2026-05-01';$('to').value='2026-06-30';
-  if(USER){loadPlaybooks();loadRuns();loadCases()}
+  if(USER){loadPlaybooks();loadBrands();loadRuns();loadCases()}
 })();
 </script>
 </body>
