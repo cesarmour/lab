@@ -178,7 +178,7 @@ window.SwarmLive = (function () {
     setTimeout(function () { g.classList.remove('born'); }, 700);
     return rec;
   };
-  View.prototype.agName = function (aid, n) { if (aid === 'controle') return 'Controle'; if (aid === 'memoria') return 'Memória'; var m = /^inv(\d+)$/.exec(aid); if (!m) return aid; return 'Agent ' + m[1]; };
+  View.prototype.agName = function (aid, n) { if (aid === 'controle') return 'Controle'; if (aid === 'memoria') return 'Memória'; if (aid === 'curador') return 'Curador'; var m = /^inv(\d+)$/.exec(aid); if (!m) return aid; return 'Agent ' + m[1]; };
   View.prototype.relink = function (aid) {
     var self = this, p = this.pos[aid];
     var o = this.links[aid + '|orq']; if (o) o.setAttribute('d', 'M' + p.x + ' ' + (p.y + 22) + ' C ' + p.x + ' ' + (p.y + 50) + ', 300 ' + (p.y + 50) + ', 300 330');
@@ -204,7 +204,7 @@ window.SwarmLive = (function () {
   View.prototype.phase = function (p, extra) {
     var T = { preparing: 'subindo um container dedicado a este caso no Cloud Run', boot: 'conectando ao BigQuery e ao modelo', control: 'controle de coleta medindo a base, a categoria e mesmas lojas',
       spawn: 'orquestrador criou ' + (extra || '') + ' agentes; investigando em paralelo', cross: 'orquestrador cruzando as conclusões', audit: 'auditor refazendo os pilares por conta própria',
-      memory: 'agente de memória gravando o que vale lembrar para os próximos casos', done: 'concluído' + (extra ? ' · ' + extra : ''), failed: 'interrompido' };
+      curate: 'curador recortando as tabelas grandes para o caso (uma leitura, depois só MB)', memory: 'agente de memória gravando o que vale lembrar para os próximos casos', done: 'concluído' + (extra ? ' · ' + extra : ''), failed: 'interrompido' };
     this.$('lv-phase').textContent = T[p] || p; this.root.querySelector('.lv-phase').className = 'lv-phase ' + p;
   };
   View.prototype.line = function (ev, body, cls) {
@@ -220,13 +220,14 @@ window.SwarmLive = (function () {
   View.prototype.apply = function (ev) {
     var a = ev.agent, k = ev.kind, self = this;
     if (a === 'orquestrador') a = 'orq'; else if (a === 'auditor') a = 'aud';
-    if ((/^inv\d+$/.test(a) || a === 'controle' || a === 'memoria') && !this.ag[a]) {
+    if ((/^inv\d+$/.test(a) || a === 'controle' || a === 'memoria' || a === 'curador') && !this.ag[a]) {
       var role = (this.agents && this.agents[a] && this.agents[a].role) || '';
       this.ensureAgent(a, role);
     }
     var ag = this.ag[a];
     this.t = Math.max(this.t, ev.t || 0);
     if (a === 'motor' && k === 'note') this.phase('boot');
+    if (a === 'curador' && k === 'hyp') this.phase('curate');
     if (a === 'controle' && k === 'hyp') this.phase('control');
     if (a === 'orq' && k === 'note' && /^Criando (\d+)/.test(ev.text)) this.phase('spawn', /^Criando (\d+)/.exec(ev.text)[1]);
     if (a === 'orq' && k === 'note' && /Fechamento|cruz/i.test(ev.text)) this.phase('cross');
