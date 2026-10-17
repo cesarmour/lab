@@ -121,6 +121,7 @@ table.tb{width:100%;border-collapse:collapse;font-size:14px}table.tb th{font-fam
 @media (max-width:600px){.ln{grid-template-columns:3.2em 1fr}.ln .who{grid-column:2}.ln>div{grid-column:2}}
 @media (prefers-reduced-motion:reduce){.net .drop{display:none}.ln{animation:none;opacity:1}.net .link.on,.net .base.on .ring{animation:none}}
 </style>
+<script src="/hypr-agents/swarm/track.js" defer></script>
 </head>
 <body>
 <section class="cover"><div class="in">
@@ -232,7 +233,7 @@ table.tb{width:100%;border-collapse:collapse;font-size:14px}table.tb th{font-fam
     $('go').disabled=true;say('Abrindo o caso…');
     try{var r=await api('/cases',{method:'POST',body:JSON.stringify({question:$('q').value.trim(),brand:$('brand').value.trim(),period:$('from').value+':'+$('to').value,playbook:$('pb').value})});
       var j=await r.json();
-      if(r.status===202){say('Caso '+j.id+' aberto. Acompanhe abaixo; o resultado leva de 3 a 10 minutos.');followId(j.id);loadRuns()}else say('Falhou: '+esc(j.error||r.status),1);
+      if(r.status===202){if(window.SwarmTrack)SwarmTrack('open_case',{brand:$('brand').value.trim(),playbook:$('pb').value});say('Caso '+j.id+' aberto. Acompanhe abaixo; o resultado leva de 3 a 10 minutos.');followId(j.id);loadRuns()}else say('Falhou: '+esc(j.error||r.status),1);
     }catch(e){say('Não consegui falar com o serviço: '+esc(e.message),1)}
     $('go').disabled=false;
   };
@@ -256,7 +257,7 @@ table.tb{width:100%;border-collapse:collapse;font-size:14px}table.tb th{font-fam
       ul.querySelectorAll('li[data-id]').forEach(function(li){li.onclick=function(){openCase(li.dataset.id)}});
     }catch(e){ul.innerHTML='<li><span class="t">Serviço indisponível.</span></li>'}
   }
-  async function openCase(id,tries){tries=tries||0;
+  async function openCase(id,tries){tries=tries||0;if(!tries&&window.SwarmTrack)SwarmTrack('view_case',{case:id});
     var v=$('view');v.hidden=false;if(!tries){v.innerHTML='<h2>Carregando '+id+'…</h2>';v.scrollIntoView({behavior:'smooth'})}
     try{var r=await api('/cases/'+id);if(r.status===404&&tries<8){setTimeout(function(){openCase(id,tries+1)},4000);return}if(!r.ok)throw 0;var c=await r.json();
       var res=c.result,au=c.audit||{},m=c.metrics||{},tk=(m.tokens||{});
@@ -284,7 +285,7 @@ table.tb{width:100%;border-collapse:collapse;font-size:14px}table.tb th{font-fam
     var lv=liveView();$('live').scrollIntoView({behavior:'smooth',block:'start'});
     lv.follow(async function(){var r=await api('/live/'+id);if(!r.ok)return null;return r.json()},function(snap){FOLLOWING=null;setTimeout(function(){loadCases();loadRuns();openCase(snap.id)},2500)});
   }
-  async function replayCase(id,c){
+  async function replayCase(id,c){if(window.SwarmTrack)SwarmTrack('replay',{case:id});
     var lv=liveView();$('live').scrollIntoView({behavior:'smooth',block:'start'});
     var r=await api('/cases/'+id+'/events');var txt=await r.text();
     var evs=txt.split('\n').filter(Boolean).map(function(l){try{return JSON.parse(l)}catch(e){return null}}).filter(Boolean);
