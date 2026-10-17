@@ -178,7 +178,12 @@ details{border-top:1px solid var(--mist);padding:8px 0}summary{cursor:pointer;fo
   function filterBrands(q){q=q.trim().toUpperCase();if(!q)return BRANDS.slice(0,12);var st=BRANDS.filter(function(b){return b.marca.indexOf(q)===0}),inn=BRANDS.filter(function(b){return b.marca.indexOf(q)>0||(b.categoria||'').toUpperCase().indexOf(q)>=0});return st.concat(inn).slice(0,12)}
   function showDD(list){sel=-1;if(!list.length){dd.hidden=true;return}dd.innerHTML=list.map(function(b,i){return '<div data-i="'+i+'"><b>'+esc(b.marca)+'</b><span>'+esc(b.categoria||'')+' · R$ '+money(b.jun)+'/mês · '+b.lojas+' lojas</span></div>'}).join('');dd.hidden=false;dd._list=list;
     dd.querySelectorAll('div[data-i]').forEach(function(d){d.onmousedown=function(ev){ev.preventDefault();pick(list[+d.dataset.i])}})}
-  function pick(b){BRAND=b;bi.value=b.marca;dd.hidden=true;$('bmeta').textContent=(b.categoria||'')+' · mai R$ '+money(b.mai)+' · jun R$ '+money(b.jun)+' ('+(pct(b.jun,b.mai)>=0?'+':'−')+fmtPct(pct(b.jun,b.mai))+') · jul R$ '+money(b.jul);suggest(b)}
+  function norm(b){ // variação da marca descontada a variação da base (coleta), em %
+    var d=pct(b.jun,b.mai),dj=pct(b.jul,b.jun),bd=b.base_mai?pct(b.base_jun,b.base_mai):0,bdj=b.base_jun?pct(b.base_jul,b.base_jun):0;
+    return {d:d,dj:dj,bd:bd,bdj:bdj,n:b.base_mai?((1+d/100)/(1+bd/100)-1)*100:d,nj:b.base_jun?((1+dj/100)/(1+bdj/100)-1)*100:dj}}
+  function sg(v){return (v>=0?'+':'−')+fmtPct(v)}
+  function pick(b){BRAND=b;bi.value=b.marca;dd.hidden=true;var v=norm(b);
+    $('bmeta').innerHTML=esc(b.categoria||'')+' · mai R$ '+money(b.mai)+' · jun R$ '+money(b.jun)+' ('+sg(v.d)+' bruto; base '+sg(v.bd)+'; <b>'+sg(v.n)+' normalizado</b>) · jul R$ '+money(b.jul)+' ('+sg(v.nj)+' norm.)';suggest(b)}
   bi.oninput=function(){BRAND=null;$('bmeta').textContent='';showDD(filterBrands(bi.value))};
   bi.onfocus=function(){if(BRANDS.length)showDD(filterBrands(bi.value))};
   bi.onblur=function(){setTimeout(function(){dd.hidden=true;if(!BRAND&&bi.value){var ex=BRANDS.filter(function(b){return b.marca===bi.value.trim().toUpperCase()})[0];if(ex)pick(ex);else bi.value=bi.value.toUpperCase()}},150)};
@@ -187,18 +192,18 @@ details{border-top:1px solid var(--mist);padding:8px 0}summary{cursor:pointer;fo
   // ---- sugestões de pergunta por marca ----
   var SUGS=[],sugI=0,sugT=null;
   function suggest(b){
-    var B=nice(b.marca),cat=(b.categoria||'a categoria').toLowerCase(),d=pct(b.jun,b.mai),dj=pct(b.jul,b.jun),mov=d<0?'queda':'alta';
+    var B=nice(b.marca),cat=(b.categoria||'a categoria').toLowerCase(),v=norm(b),d=v.n,dj=v.nj,mov=d<0?'queda':'alta';
     SUGS=[];
-    if(d<=-2)SUGS.push(['Por que as vendas da '+B+' caíram '+fmtPct(d)+' em junho?','queda-de-venda','2026-05-01:2026-06-30']);
-    else if(d>=2)SUGS.push(['O que explica a alta de '+fmtPct(d)+' da '+B+' em junho?','queda-de-venda','2026-05-01:2026-06-30']);
-    else SUGS.push(['O que segurou a '+B+' estável em junho ('+(d>=0?'+':'−')+fmtPct(d)+')?','queda-de-venda','2026-05-01:2026-06-30']);
-    if(Math.abs(dj)>=3)SUGS.push([(dj>0?'A '+B+' recuperou '+fmtPct(dj)+' em julho. O que mudou?':'A '+B+' caiu mais '+fmtPct(dj)+' em julho. É tendência?'),'queda-de-venda','2026-06-01:2026-07-31']);
+    if(d<=-2)SUGS.push(['Por que a '+B+' caiu '+fmtPct(d)+' além da base em junho ('+sg(v.d)+' bruto, base '+sg(v.bd)+')?','queda-de-venda','2026-05-01:2026-06-30']);
+    else if(d>=2)SUGS.push(['O que explica a '+B+' crescer '+fmtPct(d)+' acima da base em junho ('+sg(v.d)+' bruto, base '+sg(v.bd)+')?','queda-de-venda','2026-05-01:2026-06-30']);
+    else SUGS.push(['A '+B+' variou '+sg(v.d)+' em junho, mas a base '+sg(v.bd)+'. Descontada a coleta, sobra algo ('+sg(d)+')?','queda-de-venda','2026-05-01:2026-06-30']);
+    if(Math.abs(dj)>=3)SUGS.push([(dj>0?'A '+B+' subiu '+fmtPct(dj)+' acima da base em julho. O que mudou?':'A '+B+' caiu '+fmtPct(dj)+' além da base em julho. É tendência?'),'queda-de-venda','2026-06-01:2026-07-31']);
     SUGS.push(['A '+B+' perdeu distribuição ou teve ruptura em junho?','ruptura','2026-05-01:2026-06-30']);
     SUGS.push([d<0?'Quem ganhou o share que a '+B+' perdeu em '+cat+'?':'De quem a '+B+' tirou share em '+cat+'?','movimento-concorrente','2026-05-01:2026-06-30']);
     SUGS.push(['Quais redes concentram a '+mov+' da '+B+'?','performance-por-rede','2026-05-01:2026-06-30']);
     SUGS.push(['Qual a elasticidade de preço da '+B+' e onde há espaço para subir?','elasticidade','2026-02-01:2026-07-31']);
     SUGS.push(['Há canibalização dentro do portfólio da '+B+'?','canibalizacao','2026-03-01:2026-07-31']);
-    SUGS.push(['Quanto do movimento da '+B+' em junho é calendário e sazonalidade?','sazonalidade-e-calendario','2026-05-01:2026-06-30']);
+    SUGS.push(['Quanto do movimento da '+B+' em junho é coleta, calendário e sazonalidade?','sazonalidade-e-calendario','2026-05-01:2026-06-30']);
     SUGS.push(['Com o que a '+B+' vai junto na cesta e em que ocasião?','cesta-e-ocasiao','2026-05-01:2026-06-30']);
     SUGS.push(['A '+B+' está ganhando ou perdendo lojas fiéis?','fidelidade-e-churn','2026-02-01:2026-07-31']);
     SUGS.push(['Qual embalagem ou SKU está puxando a '+B+' em '+cat+'?','mix-de-portfolio','2026-05-01:2026-06-30']);
