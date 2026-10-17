@@ -20,7 +20,7 @@ for slug, label, out in CASES:
     js = (ROOT / 'scenarios' / f'{slug}.js').read_text()
     nav = "".join(
         f'<a href="/hypr-agents/{o + "/" if o else ""}"{" class=\"on\"" if s == slug else ""}>{l}</a>'
-        for s, l, o in CASES) + '<a href="/hypr-agents/cases/monster/">caso real</a>'
+        for s, l, o in CASES) + '<a href="/hypr-agents/cases/monster/">caso real</a><a href="/hypr-agents/cases/monster-motor/">rodada do motor</a>'
     page = (tpl.replace('{{SCENARIO}}', js)
             .replace('{{NAV}}', nav)
             .replace('{{PAGETITLE}}', meta(js, 'pageTitle'))
