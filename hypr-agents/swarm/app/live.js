@@ -23,6 +23,8 @@ window.SwarmLive = (function () {
   var PR = { inM: 3, outM: 15, bqTB: 6.25 };
   function usd(v) { return 'US$ ' + (v < 10 ? v.toFixed(2) : v.toFixed(1)).replace('.', ','); }
   function costOf(tk, bytes) { tk = tk || {}; return ((tk.input || 0) * PR.inM + (tk.output || 0) * PR.outM) / 1e6 + (bytes || 0) * PR.bqTB / 1e12; }
+  function costLLM(tk) { tk = tk || {}; return ((tk.input || 0) * PR.inM + (tk.output || 0) * PR.outM) / 1e6; }
+  function costBQ(bytes) { return (bytes || 0) * PR.bqTB / 1e12; }
   function tok(n) { return n >= 1e6 ? (n / 1e6).toFixed(1).replace('.', ',') + ' mi' : n >= 1000 ? Math.round(n / 1000) + ' mil' : String(n); }
   function tablesIn(sql) { var m = sql.match(/`([\w\-\.]+)`/g) || []; return m.map(function (t) { return t.replace(/`/g, ''); }); }
   function short(t) { var n = t.split('.').pop(); return SHORT[n] || n.replace(/^(unified_|fact_|dim_)/, '').replace(/_monthly$/, '_m').replace(/_daily$/, '_d'); }
@@ -36,7 +38,7 @@ window.SwarmLive = (function () {
     this.root = root;
     root.innerHTML =
       '<div class="lv-head"><div><div class="mono" id="lv-id">caso ao vivo</div><h2 id="lv-q" style="margin:6px 0 0"></h2><div class="lv-phase"><i></i><span id="lv-phase">preparando</span></div></div><span class="pill run" id="lv-st">rodando</span></div>' +
-      '<div class="kpis"><div class="kpi"><div class="v" id="lv-ag">0</div><div class="l">agentes</div></div><div class="kpi"><div class="v" id="lv-qn">0</div><div class="l">consultas</div></div><div class="kpi"><div class="v" id="lv-gb">0 MB</div><div class="l">lidos no BigQuery</div></div><div class="kpi"><div class="v" id="lv-tk">0</div><div class="l">tokens</div></div><div class="kpi"><div class="v" id="lv-cost">US$ 0</div><div class="l">custo estimado</div></div><div class="kpi"><div class="v" id="lv-cl">0:00</div><div class="l">tempo decorrido</div></div></div>' +
+      '<div class="kpis"><div class="kpi"><div class="v" id="lv-ag">0</div><div class="l">agentes</div></div><div class="kpi"><div class="v" id="lv-qn">0</div><div class="l">consultas</div></div><div class="kpi"><div class="v" id="lv-gb">0 MB</div><div class="l">lidos no BigQuery</div></div><div class="kpi"><div class="v" id="lv-tk">0</div><div class="l">tokens</div></div><div class="kpi"><div class="v" id="lv-cost">US$ 0</div><div class="l">custo tokens</div></div><div class="kpi"><div class="v" id="lv-costbq">US$ 0</div><div class="l">custo bigquery</div></div><div class="kpi"><div class="v" id="lv-cl">0:00</div><div class="l">tempo decorrido</div></div></div>' +
       '<div class="net"><svg id="lv-net" viewBox="0 0 640 490" aria-label="Agentes consultando as bases HYPR no BigQuery"></svg></div>' +
       '<div class="console" id="lv-con"></div>' +
       '<div id="lv-foot"></div>';
@@ -278,7 +280,7 @@ window.SwarmLive = (function () {
     var fresh = evs.slice(this.done); this.done = evs.length;
     if (this.queue) { this.queue = this.queue.concat(fresh); } else { this.queue = fresh; this.drain(); }
     var m = snap.metrics || {};
-    if (m.tokens) { this.$('lv-tk').textContent = tok((m.tokens.input || 0) + (m.tokens.output || 0)); this.$('lv-cost').textContent = usd(m.cost && m.cost.usd != null ? m.cost.usd : costOf(m.tokens, m.bytes || this.bytes)); this.$('lv-cost').title = 'tokens + leitura no BigQuery'; }
+    if (m.tokens) { this.$('lv-tk').textContent = tok((m.tokens.input || 0) + (m.tokens.output || 0)); this.$('lv-cost').textContent = usd(m.cost && m.cost.llm_usd != null ? m.cost.llm_usd : costLLM(m.tokens)); this.$('lv-costbq').textContent = usd(m.cost && m.cost.bq_usd != null ? m.cost.bq_usd : costBQ(m.bytes || this.bytes)); }
     if (m.bytes != null && m.bytes > this.bytes) { this.bytes = m.bytes; this.$('lv-gb').textContent = gb(this.bytes); }
     this.setStatus(snap.status, m.seconds, snap);
   };
@@ -346,7 +348,7 @@ window.SwarmLive = (function () {
         (function step() {
           var now = first + (Date.now() - t0) / 1000 * speed;
           while (i < events.length && events[i].t <= now) { view.apply(events[i]); i++; }
-          view.t = now; if (tk) { var f = Math.min(1, i / events.length); view.$('lv-tk').textContent = tok(Math.round(tk * f)); var mt = meta.metrics || {}; view.$('lv-cost').textContent = usd((mt.cost && mt.cost.usd != null ? mt.cost.usd : costOf(mt.tokens, mt.bytes)) * f); }
+          view.t = now; if (tk) { var f = Math.min(1, i / events.length); view.$('lv-tk').textContent = tok(Math.round(tk * f)); var mt = meta.metrics || {}; view.$('lv-cost').textContent = usd((mt.cost && mt.cost.llm_usd != null ? mt.cost.llm_usd : costLLM(mt.tokens)) * f); view.$('lv-costbq').textContent = usd((mt.cost && mt.cost.bq_usd != null ? mt.cost.bq_usd : costBQ(mt.bytes)) * f); }
           if (i < events.length) timer = setTimeout(step, 120);
           else { view.t = events.length ? events[events.length - 1].t : 0; view.setStatus('done', view.t, { result: meta.result }); }
         })();
