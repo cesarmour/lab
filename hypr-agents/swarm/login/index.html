@@ -18,13 +18,13 @@ canvas.bg{position:absolute;inset:0;width:100%;height:100%;display:block}
 .top img{display:block;height:22px;width:auto}
 .tag{padding:2px 8px;border-radius:6px;background:var(--chip-bg);color:var(--chip-ink);font-size:12px;font-weight:600;letter-spacing:.04em}
 .wrap{position:relative;z-index:2;min-height:100vh;min-height:100dvh;display:flex;align-items:center;padding:96px var(--mx) 72px;pointer-events:none}
-.copy{pointer-events:auto;width:min(720px,100%)}
+.copy{pointer-events:auto;width:min(640px,100%)}
 .copy>*{animation:rise .8s var(--ease) both}.copy>:nth-child(2){animation-delay:.06s}.copy>:nth-child(3){animation-delay:.12s}.copy>:nth-child(4){animation-delay:.18s}.copy>:nth-child(5){animation-delay:.24s}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .eyebrow{margin:0 0 22px;display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
 .live{width:6px;height:6px;border-radius:50%;background:var(--accent-bright);animation:live 2.4s ease-out infinite}
 @keyframes live{0%{box-shadow:0 0 0 0 rgba(86,187,220,.6)}70%{box-shadow:0 0 0 10px rgba(86,187,220,0)}100%{box-shadow:0 0 0 0 rgba(86,187,220,0)}}
-h1{margin:0;font-size:clamp(40px,5.6vw,80px);line-height:.98;font-weight:400;letter-spacing:-.045em;color:var(--ink)}h1 em{font-style:normal;color:var(--accent)}
+h1{margin:0;font-size:clamp(48px,7vw,100px);line-height:.98;font-weight:400;letter-spacing:-.045em;color:var(--ink)}h1 em{font-style:normal;color:var(--accent)}
 .lede{margin:30px 0 0;max-width:36ch;color:var(--lede);font-size:clamp(16px,1.5vw,20px);line-height:1.5}
 .actions{margin-top:36px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .pill{height:48px;padding:0 22px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;gap:10px;margin:0;font:inherit;font-weight:600;font-size:14px;letter-spacing:.01em;cursor:pointer;text-decoration:none;border:1px solid var(--ink);background:var(--ink);color:var(--on-ink);transition:background .18s var(--ease),box-shadow .25s var(--ease),transform .18s var(--ease)}
@@ -51,7 +51,7 @@ h1{margin:0;font-size:clamp(40px,5.6vw,80px);line-height:.98;font-weight:400;let
   <header class="top"><img src="/hypr-agents/hypr-wordmark-white.svg" alt="HYPR"><span class="tag">Swarm</span></header>
   <main class="wrap"><section class="copy" aria-labelledby="h1">
     <p class="eyebrow"><span class="live" aria-hidden="true"></span>Inteligência do mundo físico</p>
-    <h1 id="h1">IA que responde com<br>dado de <em>vendas</em>,<br>não com opinião.</h1>
+    <h1 id="h1">HYPR AI agents<br>para o mundo <em>real</em></h1>
     <p class="lede">Um orquestrador, investigadores em paralelo sobre os pipelines da HYPR e um auditor independente. Para o time da HYPR.</p>
     <div class="actions"><button class="pill" id="go" type="button"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>Entrar com Google</span></button></div>
     <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg> Restrito a contas @hypr.mobi</p>
