@@ -36,7 +36,8 @@ date,cnpj,endereco,ean,qty_net,revenue_net
 
 - 5 calendar days. Expect 12 to 20 hours of work; scope down and say so rather than pad.
 - Any language, any framework, any tool including AI assistants. We will ask you to walk through every design decision and every line that matters, live, for 90 minutes. You own all of it.
-- Deliver a repository (or zip) with a README that lets us run it in under 15 minutes on a laptop, plus `demand_daily.csv` and a one-page `FINDINGS.md`: what you found in the data, what you did about it, what you could not fix and how much it matters.
+- Deliver a private GitHub repository with a README that lets us run it in under 15 minutes on a laptop, plus `demand_daily.csv` and a one-page `FINDINGS.md` at the root: what you found in the data, what you did about it, what you could not fix and how much it matters.
+- **How to submit**: invite the GitHub user `cesarmour` to the repository as a collaborator, then email the repository link to cesar@hypr.mobi with the subject `HYPR Platform Case: <your name>`. The email timestamp is the submission time. No GitHub? Email a zip under 25 MB instead.
 - Do not include material from current or former employers.
 
 ## What we look at
