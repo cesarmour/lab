@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>HYPR Platform Case</title>
+<meta name="robots" content="noindex">
+<style>
+body{margin:0;background:#000;color:#f2f2f2;font-family:system-ui,sans-serif;padding:64px 24px;line-height:1.55}
+main{max-width:860px;margin:0 auto}
+h1{font-weight:500;font-size:32px;letter-spacing:-1px;margin:0 0 16px}h2{font-weight:500;font-size:20px;margin:40px 0 12px}
+p,li{color:#c8c8cc}a{color:#fff}code{background:#151517;padding:2px 6px;border-radius:4px;font-size:.9em}pre{background:#151517;padding:14px;border-radius:6px;overflow:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}td,th{border:1px solid #2a2a2e;padding:8px 10px;text-align:left;vertical-align:top}th{color:#fff}
+.dl{display:grid;gap:10px;margin:16px 0 8px}.dl a{display:block;padding:14px 16px;border:1px solid #2a2a2e;border-radius:8px;text-decoration:none}.dl small{color:#9a9aa0;display:block}
+</style></head><body><main>
+<section class="dl">
+<a href="receipt_lines_part1.csv.gz" download>receipt_lines_part1.csv.gz <small>15 MB · gzip CSV, rows 1 to 250,211</small></a>
+<a href="receipt_lines_part2.csv.gz" download>receipt_lines_part2.csv.gz <small>15 MB · gzip CSV, rows 250,212 to 500,422</small></a>
+<a href="stores.csv" download>stores.csv <small>16 KB · store master</small></a>
+<a href="products_reference.csv" download>products_reference.csv <small>17 KB · partial product catalog</small></a>
+<a href="README.md" download>README.md <small>this brief, as a file</small></a>
+</section>
+<h1>HYPR Platform Case: build on the receipts</h1>
+<p>You are given 60 days of synthetic retail receipt data from 150 stores, delivered the way real data arrives: by two sources, with gaps, duplicates, free-text products and a partially wrong store master. Build an application on top of it. We will run your app, read your code, and compare your numbers with a hidden ground truth.</p>
+<h2>Files</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>receipt_lines_part1.csv.gz</code>, <code>receipt_lines_part2.csv.gz</code></td>
+<td>500k line items in two files with the same header (load both and concatenate; the split is arbitrary), two sources (<code>fonte</code> A and B), 2026-08-01 to 2026-09-29. Columns: <code>fonte, chave_nfce, numero_item, data_emissao, cnpj_emitente, endereco_loja, cidade, uf, descricao_produto, ean, quantidade, valor_unitario, desconto, valor_total, tipo_operacao, forma_pagamento</code></td>
+</tr>
+<tr>
+<td><code>stores.csv</code></td>
+<td>Store master as it exists today. Known to contain errors</td>
+</tr>
+<tr>
+<td><code>products_reference.csv</code></td>
+<td>Product catalog, EAN to canonical description. Known to be incomplete</td>
+</tr>
+</tbody>
+</table>
+<p>No PII. All names, CNPJs and addresses are invented.</p>
+<h2>What to build</h2>
+<p>An application (web app, API plus UI, or notebook-driven dashboard, your choice) that a HYPR client could use to answer:</p>
+<ol>
+<li><strong>Daily net demand per product per store</strong>: quantity and revenue, after returns, in Brazilian business dates.</li>
+<li><strong>Share by chain and by city</strong>, over any date range.</li>
+<li><strong>Anomalies</strong>: days or stores where the numbers should not be trusted or should be looked at, with the reason.</li>
+<li><strong>Data quality</strong>: what is wrong with the input and how much of the output it affects.</li>
+</ol>
+<p>Plus one file we score automatically: <code>demand_daily.csv</code>, one row per date × store × product, columns exactly:</p>
+<pre><code>date,cnpj,endereco,ean,qty_net,revenue_net
+</code></pre>
+<ul>
+<li><code>date</code> in <code>YYYY-MM-DD</code>, Brazil time (America/Sao_Paulo)</li>
+<li><code>cnpj</code> and <code>endereco</code> exactly as they appear in the receipt files</li>
+<li><code>ean</code> is the canonical EAN from <code>products_reference.csv</code>. Leave it blank when you could not map the product to the reference. Do not invent EANs and do not force a product into the nearest match.</li>
+<li><code>qty_net</code> and <code>revenue_net</code> are net of returns.</li>
+</ul>
+<h2>Rules</h2>
+<ul>
+<li>5 calendar days. Expect 12 to 20 hours of work; scope down and say so rather than pad.</li>
+<li>Any language, any framework, any tool including AI assistants. We will ask you to walk through every design decision and every line that matters, live, for 90 minutes. You own all of it.</li>
+<li>Deliver a repository (or zip) with a README that lets us run it in under 15 minutes on a laptop, plus <code>demand_daily.csv</code> and a one-page <code>FINDINGS.md</code>: what you found in the data, what you did about it, what you could not fix and how much it matters.</li>
+<li>Do not include material from current or former employers.</li>
+</ul>
+<h2>What we look at</h2>
+<ul>
+<li>Whether your numbers match the hidden truth (we publish the metrics, not the truth).</li>
+<li>Whether you found what is wrong with the data, and whether the app tells its user about it.</li>
+<li>Whether the thing you built would survive a second data drop with new problems.</li>
+<li>Whether you can defend it.</li>
+</ul>
+</main></body></html>
