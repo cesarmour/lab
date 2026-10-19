@@ -254,13 +254,13 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
     </div></div>
     <div class="ft"><p><b>Swarm, by HYPR</b></p><a href="https://swarm.hyprgrid.ai/">swarm.hyprgrid.ai</a></div>
   </div>
-  <div id="play"><b>▶ Rodar (50 s)</b></div>
+  <div id="play"><b>▶ Rodar (50 s, com som)</b></div>
 </div>
 
 <script>
 (function(){
   var NS='http://www.w3.org/2000/svg',$=function(i){return document.getElementById(i)};
-  var P=new URLSearchParams(location.search),LOOP=P.get('loop')==='1',AUTO=P.get('auto')!=='0';
+  var P=new URLSearchParams(location.search),LOOP=P.get('loop')==='1',AUTO=P.get('auto')==='1';
   function fit(){var s=Math.min(innerWidth/1600,innerHeight/900);var st=$('stage');st.style.transform='translate('+((innerWidth-1600*s)/2)+'px,'+((innerHeight-900*s)/2)+'px) scale('+s+')'}
   addEventListener('resize',fit);fit();
 
@@ -278,6 +278,43 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
     aud:{l:'Auditor · agente fixo',h:'Checagem independente',p:'Refaz os números sem ver o raciocínio. Se não bate, devolve.'}
   };
 
+
+  /* trilha original, sintetizada no navegador (Web Audio); sem arquivo, sem licença */
+  var MUTE=P.get('mute')==='1',AC=null,master=null;
+  function music(){
+    if(MUTE)return;
+    try{AC=AC||new (window.AudioContext||window.webkitAudioContext)()}catch(e){return}
+    if(master){try{master.disconnect()}catch(e){}}
+    if(AC.state==='suspended')AC.resume();
+    var t0=AC.currentTime+0.05,END=51,BPM=96,B=60/BPM;
+    master=AC.createGain();master.gain.setValueAtTime(0,t0);master.gain.linearRampToValueAtTime(0.22,t0+2);
+    master.gain.setValueAtTime(0.22,t0+END-3);master.gain.linearRampToValueAtTime(0,t0+END);
+    // reverb simples
+    var cv=AC.createConvolver(),len=AC.sampleRate*2.2,ir=AC.createBuffer(2,len,AC.sampleRate);
+    for(var c=0;c<2;c++){var d=ir.getChannelData(c);for(var i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.6)}
+    cv.buffer=ir;var wet=AC.createGain();wet.gain.value=0.35;cv.connect(wet);wet.connect(master);
+    var lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.setValueAtTime(900,t0);lp.frequency.linearRampToValueAtTime(2600,t0+36);lp.frequency.linearRampToValueAtTime(1200,t0+END);
+    lp.connect(master);lp.connect(cv);master.connect(AC.destination);
+    var f=function(n){return 440*Math.pow(2,(n-69)/12)};
+    // Ré menor: Dm · Bb · F · C (8 compassos de 4 tempos ≈ 10 s por acorde)
+    var CH=[[50,57,62,65],[46,53,58,62],[41,48,53,57],[48,55,60,64],[50,57,62,65]];
+    var chordLen=B*4*2.5;
+    function pad(notes,at,dur){notes.forEach(function(n,i){[0,7].forEach(function(dt){var o=AC.createOscillator(),g=AC.createGain();o.type=i?'sawtooth':'triangle';o.frequency.value=f(n);o.detune.value=dt-3;
+      g.gain.setValueAtTime(0,at);g.gain.linearRampToValueAtTime(0.045,at+1.2);g.gain.setValueAtTime(0.045,at+dur-1.2);g.gain.linearRampToValueAtTime(0,at+dur);o.connect(g);g.connect(lp);o.start(at);o.stop(at+dur+0.1)})})}
+    function pluck(n,at,v){var o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.value=f(n);g.gain.setValueAtTime(0,at);g.gain.linearRampToValueAtTime(v,at+0.01);g.gain.exponentialRampToValueAtTime(0.0008,at+0.5);o.connect(g);g.connect(lp);o.start(at);o.stop(at+0.6)}
+    function kick(at,v){var o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(120,at);o.frequency.exponentialRampToValueAtTime(42,at+0.12);g.gain.setValueAtTime(v,at);g.gain.exponentialRampToValueAtTime(0.001,at+0.28);o.connect(g);g.connect(master);o.start(at);o.stop(at+0.3)}
+    function tick(at,v){var nb=AC.createBuffer(1,AC.sampleRate*0.05,AC.sampleRate),dd=nb.getChannelData(0);for(var i=0;i<dd.length;i++)dd[i]=(Math.random()*2-1)*Math.pow(1-i/dd.length,3);var src=AC.createBufferSource();src.buffer=nb;var hp=AC.createBiquadFilter();hp.type='highpass';hp.frequency.value=6000;var g=AC.createGain();g.gain.value=v;src.connect(hp);hp.connect(g);g.connect(master);src.start(at)}
+    var ci=0;
+    for(var t=0;t<END;t+=chordLen){var ch=CH[ci%CH.length];ci++;pad(ch,t0+t,Math.min(chordLen+0.8,END-t));
+      for(var b=0;b<chordLen/B&&t+b*B<END-3;b++){var at=t0+t+b*B,bar=b%4;
+        if(t>=6){kick(at,bar===0?0.5:0.3)}
+        if(t>=12&&bar%2===1)tick(at,0.05);
+        if(t>=3){var arp=[0,2,1,3,2,1];[0,0.5].forEach(function(off,k){var idx=(b*2+k)%arp.length;if(t>=3&&(t<41||k===0))pluck(ch[arp[idx]]+12,at+off*B,t>=41?0.05:0.09)})}
+      }
+    }
+    // fecho: acorde final aberto
+    pad([50,57,62,69,74],t0+41.5,END-41.5);
+  }
   function zoom(id){var o=id==='bases'?{x:340,y:264}:pos[id];net.style.transformOrigin=(o.x/680*100)+'% '+(o.y/300*100)+'%';net.style.transform='scale(1.3)';var c=CARDS[id];$('card').innerHTML='<div class="l">'+c.l+'</div><h3>'+c.h+'</h3><p>'+c.p+'</p>';$('card').classList.add('show')}
   function unzoom(){net.style.transform='';$('card').classList.remove('show')}
 
@@ -393,7 +430,7 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
   }
 
   function run(){
-    reset();$('play').classList.add('off');
+    reset();$('play').classList.add('off');music();
     // pergunta digitada
     var i=0;(function type(){if(i<=QUESTION.length){$('qt').textContent=QUESTION.slice(0,i);i++;timers.push(setTimeout(type,38))}else $('q').classList.add('done')})();
 
