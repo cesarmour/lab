@@ -34,7 +34,7 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
 /* arena */
 .arena{display:grid;grid-template-columns:1fr 64px 1fr;padding:28px 56px 0;min-height:0}
 .lane{position:relative;background:var(--off);border:1px solid var(--mist);border-radius:20px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 28px rgba(28,38,47,.06)}
-.lh{display:grid;grid-template-columns:1fr auto;align-items:end;padding:20px 26px 14px;border-bottom:1px solid var(--mist)}
+.lh{display:grid;grid-template-columns:1fr auto auto;gap:28px;align-items:end;padding:20px 26px 14px;border-bottom:1px solid var(--mist)}
 .lh h2{margin:0;font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1}
 .lh p{margin:6px 0 0;color:var(--steel);font-size:15px}
 .clock{text-align:right}
@@ -168,16 +168,24 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
 .nums b{display:block;font-size:56px;font-weight:300;letter-spacing:-.02em;line-height:1}
 .nums span{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgba(252,254,254,.55);margin-top:10px}
 .mid{align-self:center}
-.bm{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;align-self:center}
-.bm .tile{padding:32px 34px 30px}
-.bm .big{font-size:84px;font-weight:300;letter-spacing:-.03em;line-height:1;color:var(--cyan);margin:18px 0 26px}
-.bm .big small{font-size:26px;color:var(--midnight);letter-spacing:0;font-weight:300;margin-left:4px}
+.mid{align-self:center}
+.bm{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.bm .tile{padding:24px 26px 22px}
+.bm .big{font-size:64px;font-weight:300;letter-spacing:-.03em;line-height:1;color:var(--cyan);margin:14px 0 18px}
+.bm .big small{font-size:20px;color:var(--midnight);letter-spacing:0;font-weight:300;margin-left:4px}
 .bm .bar{display:grid;grid-template-columns:72px 1fr;gap:4px 14px;align-items:center;margin-top:14px;font-size:15px}
 .bm .bar span{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--steel)}
 .bm .bar .t{height:14px;background:var(--mist);border-radius:7px;overflow:hidden}
 .bm .bar i{display:block;height:100%;width:0;border-radius:7px;transition:width 1.1s cubic-bezier(.2,.7,.2,1)}
 .bm .bar i.g{background:var(--steel)}.bm .bar i.c{background:var(--cyan)}
-.bm .bar em{grid-column:2;font-style:normal;color:var(--slate);font-size:16px}
+.bm .bar em{grid-column:2;font-style:normal;color:var(--slate);font-size:14px}
+.mem{margin-top:24px;background:var(--off);border:1px solid var(--mist);border-left:6px solid var(--cyan);border-radius:20px;padding:20px 28px}
+.mem .l{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--steel)}
+.mem .cols{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:10px}
+.mem .who{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.mem .who.g{color:var(--steel)}.mem .who.c{color:var(--cyan)}
+.mem p{margin:4px 0 0;font-size:17px;line-height:1.4;color:var(--slate)}
+.mem p b{color:var(--midnight);font-weight:600}
 #play{position:absolute;inset:0;background:rgba(28,38,47,.55);display:flex;align-items:center;justify-content:center;cursor:pointer}
 #play.off{display:none}
 #play b{background:var(--off);color:var(--midnight);font-weight:600;font-size:22px;padding:18px 32px;border-radius:999px}
@@ -194,19 +202,19 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
       <div class="k">a mesma pergunta, dois caminhos</div>
       <p class="q" id="q"><span id="qt"></span><span class="cur"></span></p>
     </div>
-    <div class="brand"><img class="wm" src="/hypr-agents/hypr-wordmark-white.svg" alt="HYPR" width="100" height="18"><b>Swarm, by HYPR</b><span>AI agents para o mundo real</span></div>
+    <div class="brand"><img class="wm" src="/hypr-agents/hypr-wordmark-white.svg" alt="HYPR" width="100" height="18"></div>
   </header>
 
   <section class="arena">
     <div class="lane">
-      <div class="lh"><div><h2>Um chat</h2><p>Uma pessoa, uma pergunta de cada vez, dado na mão</p></div><div class="clock" id="ck-c"><div class="v">0 min</div><div class="l">tempo decorrido</div></div></div>
+      <div class="lh"><div><h2>Prompt</h2><p>Um chat, uma pergunta de cada vez, dado na mão</p></div><div class="clock" id="tk-c"><div class="v">0</div><div class="l">tokens</div></div><div class="clock" id="ck-c"><div class="v">0 min</div><div class="l">tempo decorrido</div></div></div>
       <div class="ctx" id="ctx"><span class="mono">contexto</span><div class="bar"><i id="ctxb"></i></div><span class="pct" id="ctxp">0%</span></div>
       <div class="thread" id="thread"></div>
       <div class="res" id="res-c"></div>
     </div>
     <div class="vs"><span>VS</span></div>
     <div class="lane">
-      <div class="lh"><div><h2>Swarm</h2><p>Doze agentes: seis fixos em todo caso, seis investigadores por pergunta</p></div><div class="clock" id="ck-s"><div class="v">0 min</div><div class="l">tempo decorrido</div></div></div>
+      <div class="lh"><div><h2>System</h2><p>Swarm: 6 agentes fixos + 6 investigadores por pergunta</p></div><div class="clock" id="tk-s"><div class="v">0</div><div class="l">tokens</div></div><div class="clock" id="ck-s"><div class="v">0 min</div><div class="l">tempo decorrido</div></div></div>
       <div class="net"><svg id="net" viewBox="0 0 680 300"></svg></div>
       <div class="log" id="log"></div>
       <div class="res" id="res-s"></div>
@@ -223,18 +231,28 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
 
   <div class="end" id="end1">
     <h1>Mesma pergunta, <em>dois</em> resultados</h1>
-    <div class="bm">
+    <div class="mid"><div class="bm">
       <div class="tile"><div class="l">tempo até a resposta</div><div class="big">4× <small>mais rápido</small></div>
-        <div class="bar"><span>Um chat</span><div class="t"><i class="g" data-w="100"></i></div><em>61 min</em></div>
-        <div class="bar"><span>Swarm</span><div class="t"><i class="c" data-w="25"></i></div><em>15 min</em></div></div>
-      <div class="tile"><div class="l">trabalho da pessoa</div><div class="big">1 <small>frase</small></div>
-        <div class="bar"><span>Um chat</span><div class="t"><i class="g" data-w="100"></i></div><em>7 turnos + 2 planilhas</em></div>
-        <div class="bar"><span>Swarm</span><div class="t"><i class="c" data-w="11"></i></div><em>1 frase</em></div></div>
+        <div class="bar"><span>Prompt</span><div class="t"><i class="g" data-w="100"></i></div><em>61 min</em></div>
+        <div class="bar"><span>System</span><div class="t"><i class="c" data-w="25"></i></div><em>15 min</em></div></div>
+      <div class="tile"><div class="l">input humano necessário</div><div class="big">1 <small>frase</small></div>
+        <div class="bar"><span>Prompt</span><div class="t"><i class="g" data-w="100"></i></div><em>7 turnos + 2 planilhas</em></div>
+        <div class="bar"><span>System</span><div class="t"><i class="c" data-w="11"></i></div><em>1 frase</em></div></div>
       <div class="tile"><div class="l">hipóteses testadas com dado</div><div class="big">6 <small>hipóteses</small></div>
-        <div class="bar"><span>Um chat</span><div class="t"><i class="g" data-w="33"></i></div><em>2, com planilha colada</em></div>
-        <div class="bar"><span>Swarm</span><div class="t"><i class="c" data-w="100"></i></div><em>6, direto nas bases, auditadas</em></div></div>
+        <div class="bar"><span>Prompt</span><div class="t"><i class="g" data-w="33"></i></div><em>2, com planilha colada</em></div>
+        <div class="bar"><span>System</span><div class="t"><i class="c" data-w="100"></i></div><em>6, direto nas bases, auditadas</em></div></div>
+      <div class="tile"><div class="l">custo em tokens</div><div class="big">2× <small>menos tokens</small></div>
+        <div class="bar"><span>Prompt</span><div class="t"><i class="g" data-w="100"></i></div><em>139 mil, contexto reenviado a cada turno</em></div>
+        <div class="bar"><span>System</span><div class="t"><i class="c" data-w="47"></i></div><em>65 mil, cada agente paga só o seu trecho</em></div></div>
     </div>
-    <div class="ft"><p><b>Swarm, by HYPR</b> · AI agents para o mundo real</p><a href="https://swarm.hyprgrid.ai/">swarm.hyprgrid.ai</a></div>
+    <div class="mem">
+      <div class="l">gestão de memória · o que fica depois da resposta</div>
+      <div class="cols">
+        <div><span class="who g">Prompt</span><p>Contexto cheio aos 99%: o começo da conversa é descartado. A próxima pergunta começa do zero.</p></div>
+        <div><span class="who c">System</span><p>Memória lê 3 casos antes e grava 4 fatos depois; o Curador deixa o recorte pronto. <b>O próximo caso começa sabendo, a custo zero de banco.</b></p></div>
+      </div>
+    </div></div>
+    <div class="ft"><p><b>Swarm, by HYPR</b></p><a href="https://swarm.hyprgrid.ai/">swarm.hyprgrid.ai</a></div>
   </div>
   <div id="play"><b>▶ Rodar (45 s)</b></div>
 </div>
@@ -280,7 +298,9 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
     [21.2,'sys','Contexto cheio: o começo da conversa foi descartado',100],
     [22.6,'bot','Pode ser clima, preço ou concorrência. Recomendo analisar os dados.',100]
   ];
-  var CHAT_END=24.0,CHAT_MIN=61,turns=0,hypC=0;
+  var CHAT_END=24.0,CHAT_MIN=61,turns=0,hypC=0,tokC=0,tokS=0,WIN=32000;
+  function fmtTok(n){return n>=1000?(n/1000).toFixed(n<10000?1:0).replace('.',',')+' mil':String(n)}
+  function tok(side,n){if(side==='c'){tokC+=n;$('tk-c').querySelector('.v').textContent=fmtTok(tokC)}else{tokS+=n;$('tk-s').querySelector('.v').textContent=fmtTok(tokS)}}
 
   /* swarm */
   var FX=[ // agentes fixos, nesta ordem
@@ -360,7 +380,7 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
   function sc(id,v,cls){var e=$(id);e.innerHTML=v;if(cls)e.classList.add(cls)}
 
   function reset(){
-    timers.forEach(clearTimeout);timers=[];turns=0;hypC=0;queries=0;hypS={};cnt={};
+    timers.forEach(clearTimeout);timers=[];turns=0;hypC=0;queries=0;hypS={};cnt={};tokC=0;tokS=0;$('tk-c').querySelector('.v').textContent='0';$('tk-s').querySelector('.v').textContent='0';
     $('qt').textContent='';$('q').classList.remove('done');
     $('thread').innerHTML='';$('thread').style.paddingBottom='';$('log').innerHTML='';build();
     $('ctx').classList.remove('full');$('ctxb').style.width='0';$('ctxp').textContent='0%';
@@ -382,7 +402,7 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
 
     // chat
     CHAT.forEach(function(r){at(C(r[0]),function(){
-      msg(r[1],r[2]);$('ctxb').style.width=r[3]+'%';$('ctxp').textContent=r[3]+'%';
+      msg(r[1],r[2]);if(r[1]==='bot')tok('c',Math.round(WIN*r[3]/100)+220);$('ctxb').style.width=r[3]+'%';$('ctxp').textContent=r[3]+'%';
       if(r[3]>=100)$('ctx').classList.add('full');
       if(r[4]){turns++;sc('s1a',turns,turns>3?'bad':'')}
       if(r[1]==='bot'&&/explicar parte/.test(r[2])){hypC++;sc('s2a',hypC)}
@@ -390,11 +410,11 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
     at(C(CHAT_END),function(){var r=$('res-c');r.className='res show';setTimeout(function(){$('thread').style.paddingBottom=(r.offsetHeight+16)+'px'},30);r.innerHTML='<div class="h"><h3>Resposta do chat</h3><span>61 min · 7 turnos · 2 planilhas coladas</span></div><p>"Pode ser clima, preço ou concorrência. Recomendo analisar os dados."</p><p style="margin-top:10px"><span class="tag bad">sem causa principal</span> <span class="tag bad">sem ação</span></p>';sc('s4a','nenhuma','bad');$('s4a').style.fontSize='26px'});
 
     // swarm
-    function fx(id,t0,t1){t0=T(t0);t1=T(t1);at(t0,function(){nd[id].classList.add('live');var k;for(k in links)if(k.slice(-id.length-1)==='-'+id&&links[k].classList.contains('fl'))links[k].classList.add('on')});at(t1,function(){nd[id].classList.remove('live');nd[id].classList.add('done')})}
+    function fx(id,t0,t1){t0=T(t0);t1=T(t1);at(t0,function(){nd[id].classList.add('live');tok('s',2400);var k;for(k in links)if(k.slice(-id.length-1)==='-'+id&&links[k].classList.contains('fl'))links[k].classList.add('on')});at(t1,function(){nd[id].classList.remove('live');nd[id].classList.add('done')})}
     fx('mem',3.0,3.9);fx('cur',4.0,4.9);fx('ctl',5.0,5.9);fx('orq',6.0,15.0);fx('aud',13.8,15.0);at(T(15.8),function(){nd.mem.classList.remove('done');nd.mem.classList.add('live')});at(T(16.8),function(){nd.mem.classList.remove('live');nd.mem.classList.add('done')});fx('rel',17.4,18.4);
-    AG.forEach(function(a,i){at(T(6.2+i*0.12),function(){nd[a.id].classList.remove('hide');nd[a.id].classList.add('live');packet('orq',a.id)})});
+    AG.forEach(function(a,i){at(T(6.2+i*0.12),function(){nd[a.id].classList.remove('hide');nd[a.id].classList.add('live');packet('orq',a.id);tok('s',2400)})});
     LOG.forEach(function(r){at(T(r[0]),function(){
-      line(r[1],r[2],r[3]);
+      line(r[1],r[2],r[3]);tok('s',1800);
       if(r[4]){on(r[1]+'-'+r[4]);packet(r[1],r[4]);setTimeout(function(){hit(r[4],r[5]||1);packet(r[1],r[4],true)},350);queries+=r[5]||1;sc('s3b',queries,'good')}
       if(r[2]==='find'&&r[1]!=='aud'){hypS[r[1]]=1;sc('s2b',Object.keys(hypS).length,'good');nd[r[1]].classList.remove('live');nd[r[1]].classList.add('done');packet('orq',r[1],true);on('orq-'+r[1])}
       if(r[2]==='dead'){hypS[r[1]]=1;sc('s2b',Object.keys(hypS).length,'good')}
@@ -410,7 +430,7 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
         '<div class="row"><span class="n">Litoral sem sol</span><div class="b"><i data-w="10"></i></div><span class="p">10%</span></div></div>'+
         '<div class="act">Ação no <b>bidIQ</b>: reimpactar 6,1 mi pessoas da audiência em farmácias do Sul e Sudeste</div>';
       setTimeout(function(){r.querySelectorAll('.b i').forEach(function(b){b.style.width=b.dataset.w+'%'})},80);
-      sc('s4b','72%','good');
+      sc('s4b','72%','good');tok('s',6000);
     });
 
     // fecho
