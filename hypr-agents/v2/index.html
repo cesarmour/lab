@@ -22,13 +22,13 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
 
 /* topo */
 .top{background:var(--midnight);color:var(--off);padding:26px 56px 0;display:grid;grid-template-columns:1fr auto;align-items:start}
-.top .wm{height:18px;display:block;margin-top:4px}
-.top .k{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgba(252,254,254,.55)}
+.top .wm{height:18px;display:block;margin:0 0 0 auto}
+.top .k{font-family:var(--mono);font-size:12px;line-height:18px;letter-spacing:.1em;text-transform:uppercase;color:rgba(252,254,254,.55)}
 .top .q{margin:8px 0 0;font-weight:300;font-size:44px;line-height:1.1;letter-spacing:-.015em;min-height:52px}
 .top .q .cur{display:inline-block;width:2px;height:40px;background:var(--cyan);vertical-align:-6px;margin-left:4px;animation:blink 1s steps(2) infinite}
 .top .q.done .cur{display:none}
 .top .brand{text-align:right}
-.top .brand b{display:block;font-weight:600;font-size:16px;margin-top:10px}
+.top .brand b{display:block;font-weight:600;font-size:16px;margin-top:12px;line-height:1.2}
 .top .brand span{display:block;font-size:13px;color:rgba(252,254,254,.6)}
 
 /* arena */
@@ -86,22 +86,31 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
 .net svg{width:100%;height:auto;display:block}
 .net text{font-family:Urbanist,system-ui,sans-serif;font-size:13px;font-weight:600;fill:var(--midnight)}
 .net text.r{font-size:11px;font-weight:400;fill:var(--steel)}
-.net text.lb{font-family:var(--mono);font-size:10px;letter-spacing:.1em;fill:var(--steel)}
+.net text.lb{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;fill:var(--steel)}
+.net .band{fill:var(--cloud);stroke:var(--mist);stroke-width:1}
+.net .band.fx{fill:#F2F8FB;stroke:var(--soft)}
+.net text.fn{font-family:var(--mono);font-size:9px;letter-spacing:.06em;fill:var(--deep);text-transform:uppercase}
+.net .nd.live text.fn{fill:var(--cyan)}
+.net .fl{stroke:var(--soft);stroke-width:1.5;fill:none;marker-end:url(#ar)}
+.net .fl.on{stroke:var(--cyan)}
 .net .lk{stroke:var(--mist);stroke-width:1.3;fill:none;transition:stroke .25s}
 .net .lk.on{stroke:var(--cyan);stroke-width:2;stroke-dasharray:4 5;animation:flow .5s linear infinite}
 .net .nd circle{fill:var(--off);stroke:var(--mist);stroke-width:1.6;transition:all .3s}
 .net .nd.live circle{stroke:var(--cyan);fill:var(--soft)}
 .net .nd.done circle{stroke:var(--good);fill:var(--good-bg)}
+.net .nd.fx circle{stroke:var(--deep);stroke-width:2}
+.net .nd.fx.live circle{stroke:var(--cyan);fill:var(--soft)}
+.net .nd.fx.done circle{stroke:var(--good);fill:var(--good-bg)}
 .net .nd.hide{opacity:0}
 .net .nd{transition:opacity .4s,transform .4s}
 .net .base circle{fill:var(--cloud)}
 .net .base.on circle{stroke:var(--cyan);fill:var(--soft)}
 .net .base text.c{font-family:var(--mono);font-size:12px;fill:var(--deep);font-weight:500}
 .net .pk{fill:var(--cyan)}
-.log{flex:1;min-height:0;overflow:hidden;padding:12px 26px 10px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--mist);background:var(--cloud)}
-.ln{display:grid;grid-template-columns:110px 1fr;gap:12px;font-size:16px;line-height:1.3;color:var(--slate);opacity:0;transform:translateY(6px);animation:in .3s ease forwards}
+.log{flex:1;min-height:0;overflow:hidden;padding:10px 26px 10px;display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--mist);background:var(--cloud)}
+.ln{display:grid;grid-template-columns:118px 1fr;gap:12px;font-size:16px;line-height:1.3;color:var(--slate);opacity:0;transform:translateY(6px);animation:in .3s ease forwards}
 .ln .w{font-weight:600;color:var(--midnight);white-space:nowrap}
-.ln.orq .w,.ln.aud .w{color:var(--deep)}
+.ln.fx .w{color:var(--deep)}
 .ln.dead{color:var(--steel)}.ln.dead .t:before{content:"✕ ";color:var(--bad)}
 .ln.find{color:var(--midnight)}.ln.find .t:before{content:"✓ ";color:var(--good)}
 
@@ -159,8 +168,8 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
     </div>
     <div class="vs"><span>VS</span></div>
     <div class="lane">
-      <div class="lh"><div><h2>Swarm</h2><p>Sete agentes em paralelo, direto nas bases HYPR</p></div><div class="clock" id="ck-s"><div class="v">0 min</div><div class="l">tempo decorrido</div></div></div>
-      <div class="net"><svg id="net" viewBox="0 0 680 236"></svg></div>
+      <div class="lh"><div><h2>Swarm</h2><p>Doze agentes: seis fixos em todo caso, seis investigadores por pergunta</p></div><div class="clock" id="ck-s"><div class="v">0 min</div><div class="l">tempo decorrido</div></div></div>
+      <div class="net"><svg id="net" viewBox="0 0 680 300"></svg></div>
       <div class="log" id="log"></div>
       <div class="res" id="res-s"></div>
     </div>
@@ -177,7 +186,7 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
     <h1>Mesma pergunta, <em>dois</em> resultados</h1>
     <div class="tiles">
       <div class="tile"><div class="l">tempo até a resposta</div><div class="from">61 min</div><div class="to"><b>15 min</b><small>sem ninguém colando planilha</small></div></div>
-      <div class="tile"><div class="l">o que a pessoa faz</div><div class="from">7 turnos</div><div class="to"><b>1 frase</b><small>o resto é com os agentes</small></div></div>
+      <div class="tile"><div class="l">o que a pessoa faz</div><div class="from">7 turnos</div><div class="to"><b>1 frase</b><small>o resto é com os 12 agentes</small></div></div>
       <div class="tile"><div class="l">o que volta</div><div class="from">"pode ser clima, preço…"</div><div class="to">3 hipóteses com <b>% de confiança</b><small>e a ação pronta no bidIQ</small></div></div>
     </div>
     <div class="ft"><p><b>Swarm, by HYPR</b> · AI agents para o mundo real</p><a href="https://swarm.hyprgrid.ai/">swarm.hyprgrid.ai</a></div>
@@ -217,24 +226,32 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
   var CHAT_END=24.0,CHAT_MIN=61,turns=0,hypC=0;
 
   /* swarm */
-  var AG=[{id:'a1',n:'Agent 1',r:'preço',u:['rev']},{id:'a2',n:'Agent 2',r:'clima',u:['geo','rev']},{id:'a3',n:'Agent 3',r:'concorrência',u:['rev','ads']},{id:'a4',n:'Agent 4',r:'canal',u:['rev','geo']},{id:'a5',n:'Agent 5',r:'mídia',u:['ads','bid','ask']}];
+  var FX=[ // agentes fixos, nesta ordem
+    {id:'mem',n:'Memória',fn:'lembra'},{id:'cur',n:'Curador',fn:'recorta o banco'},{id:'ctl',n:'Controle',fn:'normaliza'},
+    {id:'orq',n:'Orquestrador',fn:'cruza'},{id:'aud',n:'Auditor',fn:'confere'},{id:'rel',n:'Relator',fn:'reporta'}];
+  var AG=[{id:'a1',n:'Agent 1',r:'preço',u:['rev']},{id:'a2',n:'Agent 2',r:'clima',u:['geo','rev']},{id:'a3',n:'Agent 3',r:'concorrência',u:['rev','ads']},{id:'a4',n:'Agent 4',r:'canal',u:['rev','geo']},{id:'a5',n:'Agent 5',r:'mídia',u:['ads','bid','ask']},{id:'a6',n:'Agent 6',r:'sortimento',u:['rev']}];
   var BASES=[{id:'geo',n:'geoIQ'},{id:'rev',n:'revIQ'},{id:'bid',n:'bidIQ'},{id:'ads',n:'adsIQ'},{id:'ask',n:'askIQ'}];
+  var NAMES={};FX.concat(AG).forEach(function(a){NAMES[a.id]=a.n});
   var LOG=[ // [s, quem, tipo, texto, base, nQueries]
-    [3.0,'orq','note','Pergunta recebida. 5 hipóteses: preço, clima, concorrência, canal, mídia'],
-    [3.8,'orq','note','5 agentes disparados em paralelo'],
-    [4.8,'a1','dead','Não é ruptura: 9.812 → 9.790 lojas vendendo','rev',2],
-    [5.7,'a2','dead','UV nacional 7,1 → 6,4: pouco para explicar 18%','geo',1],
-    [6.6,'a5','dead','Alcance de mídia estável até abril','ads',1],
-    [7.5,'a1','find','Promoção saiu em 2/jun; a queda começa nessa semana','rev',2],
-    [8.4,'a3','find','Marca B: 25% off em farmácia, +2.300 lojas','rev',3],
-    [9.3,'a2','find','Litoral sem sol: −21%. Nordeste: −3%','geo',2],
-    [10.2,'a4','find','Farmácia Sul/Sudeste −31%, supermercado −6%','rev',2],
-    [11.1,'a5','find','6,1 mi pessoas da audiência sem nenhum impacto em junho','bid',2],
-    [12.2,'orq','note','Cruzando as 5 conclusões: 3 hipóteses sobrevivem'],
-    [13.4,'aud','note','Refazendo os números sem ver o raciocínio','rev',2],
-    [15.2,'aud','find','Confere. Aprovado']
+    [3.0,'mem','note','3 casos da marca na memória: promoção de junho já apareceu antes'],
+    [4.0,'cur','note','Recorta 3 tabelas da marca no BigQuery: 1,2 TB viram 38 GB','rev',3],
+    [5.0,'ctl','note','Base inteira caiu 7%; mesmas lojas, a marca cai 11 p.p. a mais','rev',2],
+    [6.0,'orq','note','6 hipóteses, 6 agentes em paralelo'],
+    [7.0,'a1','dead','Não é ruptura: 9.812 → 9.790 lojas vendendo','rev',1],
+    [7.7,'a2','dead','UV nacional 7,1 → 6,4: pouco para explicar 18%','geo',1],
+    [8.4,'a6','dead','Sortimento igual: 14 SKUs ativos nos dois meses','rev',1],
+    [9.1,'a1','find','Promoção saiu em 2/jun; a queda começa nessa semana','rev',2],
+    [9.8,'a3','find','Marca B: 25% off em farmácia, +2.300 lojas','rev',3],
+    [10.5,'a2','find','Litoral sem sol: −21%. Nordeste: −3%','geo',2],
+    [11.2,'a4','find','Farmácia Sul/Sudeste −31%, supermercado −6%','rev',2],
+    [11.9,'a5','find','6,1 mi pessoas da audiência sem nenhum impacto em junho','bid',2],
+    [12.8,'orq','note','Cruzando as 6 conclusões: 3 hipóteses sobrevivem'],
+    [13.8,'aud','note','Refaz os números sem ver o raciocínio','rev',2],
+    [15.0,'aud','find','Confere. Aprovado'],
+    [15.8,'mem','note','Grava o caso: 4 fatos novos, perfil da marca atualizado'],
+    [17.4,'rel','note','Resumo da hora vai por e-mail: custo, memória, impacto']
   ];
-  var SW_END=16.4,SW_MIN=15,queries=0,hypS={};
+  var SW_END=18.2,SW_MIN=15,queries=0,hypS={};
 
   var net=$('net'),pos={},links={},nd={};
   function el(t,a,p){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);(p||net).appendChild(e);return e}
@@ -250,14 +267,28 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
   function link(a,b){var p=pos[a],q=pos[b];links[a+'-'+b]=el('path',{class:'lk',d:'M'+p.x+' '+(p.y+p.r)+' C '+p.x+' '+((p.y+q.y)/2)+', '+q.x+' '+((p.y+q.y)/2)+', '+q.x+' '+(q.y-q.r)});net.insertBefore(links[a+'-'+b],net.firstChild)}
   function build(){
     net.innerHTML='';pos={};links={};nd={};
-    el('text',{class:'lb',x:10,y:14}).textContent='ORQUESTRADOR';
-    node('orq',250,40,18,'','Orquestrador','',  'l');node('aud',430,40,18,'','Auditor','checagem independente','r');
-    el('text',{class:'lb',x:10,y:118}).textContent='AGENTES';
-    AG.forEach(function(a,i){node(a.id,110+i*115,118,15,'hide',a.n,a.r)});
-    el('text',{class:'lb',x:10,y:212}).textContent='BASES HYPR';
-    BASES.forEach(function(b,i){node(b.id,110+i*115,206,15,'base',b.n,'');el('text',{class:'c',y:4,'text-anchor':'middle'},nd[b.id]).textContent=''});
+    var defs=el('defs');var mk=el('marker',{id:'ar',viewBox:'0 0 6 6',refX:'6',refY:'3',markerWidth:'5',markerHeight:'5',orient:'auto'},defs);el('path',{d:'M0 0 L6 3 L0 6 z',fill:'#C5EAF6'},mk);
+    el('rect',{class:'band fx',x:4,y:4,width:672,height:92,rx:12});
+    el('text',{class:'lb',x:16,y:20}).textContent='AGENTES FIXOS · EM TODO CASO';
+    el('rect',{class:'band',x:4,y:106,width:672,height:92,rx:12});
+    el('text',{class:'lb',x:16,y:122}).textContent='INVESTIGADORES · CRIADOS PARA ESTA PERGUNTA';
+    el('text',{class:'lb',x:16,y:226}).textContent='BASES HYPR';
+    FX.forEach(function(a,i){
+      var x=70+i*108,y=58;pos[a.id]={x:x,y:y,r:14};
+      var g=el('g',{class:'nd fx',transform:'translate('+x+','+y+')'});el('circle',{r:14},g);
+      el('text',{y:-21,'text-anchor':'middle'},g).textContent=a.n;
+      el('text',{class:'fn',y:30,'text-anchor':'middle'},g).textContent=a.fn;
+      nd[a.id]=g;
+      if(i)links[FX[i-1].id+'-'+a.id]=el('path',{class:'fl',d:'M'+(x-108+16)+' '+y+' L'+(x-17)+' '+y});
+    });
+    AG.forEach(function(a,i){var x=70+i*108,y=160;pos[a.id]={x:x,y:y,r:14};
+      var g=el('g',{class:'nd hide',transform:'translate('+x+','+y+')'});el('circle',{r:14},g);
+      el('text',{y:-21,'text-anchor':'middle'},g).textContent=a.n;el('text',{class:'r',y:30,'text-anchor':'middle'},g).textContent=a.r;nd[a.id]=g});
+    BASES.forEach(function(b,i){var x=110+i*115,y=264;pos[b.id]={x:x,y:y,r:15};
+      var g=el('g',{class:'nd base',transform:'translate('+x+','+y+')'});el('circle',{r:15},g);
+      el('text',{x:22,y:5},g).textContent=b.n;el('text',{class:'c',y:4,'text-anchor':'middle'},g).textContent='';nd[b.id]=g});
     AG.forEach(function(a){link('orq',a.id);a.u.forEach(function(b){link(a.id,b)})});
-    links['orq-aud']=el('path',{class:'lk',d:'M268 40 L412 40'});links['aud-rev']=el('path',{class:'lk',d:'M430 58 C 430 130, 225 130, 225 191'});
+    link('cur','rev');link('ctl','rev');link('aud','rev');
     net.querySelectorAll('.nd').forEach(function(g){net.appendChild(g)});
   }
   function on(k,ms){var l=links[k];if(!l)return;l.classList.add('on');setTimeout(function(){l.classList.remove('on')},ms||900)}
@@ -267,7 +298,7 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
   function hit(base,n){var b=nd[base];b.classList.add('on');setTimeout(function(){b.classList.remove('on')},800);cnt[base]=(cnt[base]||0)+n;b.querySelector('.c').textContent=cnt[base]}
 
   function msg(who,text){var d=document.createElement('div');d.className='msg '+who;d.innerHTML=text;var th=$('thread');th.appendChild(d);while(th.children.length>7)th.removeChild(th.firstChild)}
-  function line(who,type,text){var d=document.createElement('div');d.className='ln '+type+(who==='orq'?' orq':'')+(who==='aud'?' aud':'');var n=who==='orq'?'Orquestrador':who==='aud'?'Auditor':AG.filter(function(a){return a.id===who})[0].n;d.innerHTML='<span class="w">'+n+'</span><span class="t">'+text+'</span>';var lg=$('log');lg.appendChild(d);while(lg.children.length>4)lg.removeChild(lg.firstChild)}
+  function line(who,type,text){var d=document.createElement('div');d.className='ln '+type+(who==='orq'?' orq':'')+(who==='aud'?' aud':'');var n=NAMES[who];d.className+=(nd[who]&&nd[who].classList.contains('fx')?' fx':'');d.innerHTML='<span class="w">'+n+'</span><span class="t">'+text+'</span>';var lg=$('log');lg.appendChild(d);while(lg.children.length>3)lg.removeChild(lg.firstChild)}
   function clock(id,m,state,label){var c=$(id);c.querySelector('.v').textContent=m+' min';c.className='clock'+(state?' '+state:'');if(label)c.querySelector('.l').textContent=label}
   function sc(id,v,cls){var e=$(id);e.innerHTML=v;if(cls)e.classList.add(cls)}
 
@@ -302,20 +333,20 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
     at(CHAT_END,function(){var r=$('res-c');r.className='res show';setTimeout(function(){$('thread').style.paddingBottom=(r.offsetHeight+16)+'px'},30);r.innerHTML='<div class="h"><h3>Resposta do chat</h3><span>61 min · 7 turnos · 2 planilhas coladas</span></div><p>"Pode ser clima, preço ou concorrência. Recomendo analisar os dados."</p><p style="margin-top:10px"><span class="tag bad">sem causa principal</span> <span class="tag bad">sem ação</span></p>';sc('s4a','nenhuma','bad');$('s4a').style.fontSize='26px'});
 
     // swarm
-    at(3.0,function(){nd.orq.classList.add('live')});
-    AG.forEach(function(a,i){at(3.9+i*0.15,function(){nd[a.id].classList.remove('hide');nd[a.id].classList.add('live');packet('orq',a.id)})});
+    function fx(id,t0,t1){at(t0,function(){nd[id].classList.add('live');var k;for(k in links)if(k.slice(-id.length-1)==='-'+id&&links[k].classList.contains('fl'))links[k].classList.add('on')});at(t1,function(){nd[id].classList.remove('live');nd[id].classList.add('done')})}
+    fx('mem',3.0,3.9);fx('cur',4.0,4.9);fx('ctl',5.0,5.9);fx('orq',6.0,15.0);fx('aud',13.8,15.0);at(15.8,function(){nd.mem.classList.remove('done');nd.mem.classList.add('live')});at(16.8,function(){nd.mem.classList.remove('live');nd.mem.classList.add('done')});fx('rel',17.4,18.4);
+    AG.forEach(function(a,i){at(6.2+i*0.12,function(){nd[a.id].classList.remove('hide');nd[a.id].classList.add('live');packet('orq',a.id)})});
     LOG.forEach(function(r){at(r[0],function(){
       line(r[1],r[2],r[3]);
       if(r[4]){on(r[1]+'-'+r[4]);packet(r[1],r[4]);setTimeout(function(){hit(r[4],r[5]||1);packet(r[1],r[4],true)},350);queries+=r[5]||1;sc('s3b',queries,'good')}
       if(r[2]==='find'&&r[1]!=='aud'){hypS[r[1]]=1;sc('s2b',Object.keys(hypS).length,'good');nd[r[1]].classList.remove('live');nd[r[1]].classList.add('done');packet('orq',r[1],true);on('orq-'+r[1])}
       if(r[2]==='dead'){hypS[r[1]]=1;sc('s2b',Object.keys(hypS).length,'good')}
-      if(r[1]==='aud'&&r[2]==='note'){nd.aud.classList.add('live');on('orq-aud');packet('orq','aud')}
-      if(r[1]==='aud'&&r[2]==='find'){nd.aud.classList.remove('live');nd.aud.classList.add('done');nd.orq.classList.remove('live');nd.orq.classList.add('done')}
+      if(r[1]==='aud'&&r[2]==='note'){packet('orq','aud')}
     })});
     at(3.2,function(){sc('s1b','1','good')});
     at(SW_END,function(){
       var r=$('res-s');r.className='res show';
-      r.innerHTML='<div class="h"><h3>Hipóteses ranqueadas</h3><span>15 min · 1 frase · '+queries+' consultas · auditado</span></div>'+
+      r.innerHTML='<div class="h"><h3>Hipóteses ranqueadas</h3><span>15 min · 1 frase · '+queries+' consultas · 38 GB lidos · auditado</span></div>'+
         '<div class="hyp"><div class="row lead"><span class="n">Promoção retirada em 2/jun</span><div class="b"><i data-w="46"></i></div><span class="p">46%</span></div>'+
         '<div class="row"><span class="n">Marca B com 25% off em farmácia</span><div class="b"><i data-w="31"></i></div><span class="p">31%</span></div>'+
         '<div class="row"><span class="n">Litoral sem sol</span><div class="b"><i data-w="15"></i></div><span class="p">15%</span></div></div>'+
