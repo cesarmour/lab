@@ -82,8 +82,8 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
 .act b{color:var(--good);font-weight:600}
 
 /* swarm */
-.net{flex:none;padding:10px 18px 0}
-.net svg{width:100%;height:auto;display:block}
+.net{flex:none;padding:10px 18px 0;overflow:hidden}
+.net svg{width:100%;height:auto;display:block;transition:transform .7s cubic-bezier(.4,0,.2,1)}
 .net text{font-family:Urbanist,system-ui,sans-serif;font-size:13px;font-weight:600;fill:var(--midnight)}
 .net text.r{font-size:11px;font-weight:400;fill:var(--steel)}
 .net text.lb{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;fill:var(--steel)}
@@ -107,6 +107,12 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
 .net .base.on circle{stroke:var(--cyan);fill:var(--soft)}
 .net .base text.c{font-family:var(--mono);font-size:12px;fill:var(--deep);font-weight:500}
 .net .pk{fill:var(--cyan)}
+.card{position:absolute;left:24px;right:24px;bottom:22px;background:var(--midnight);color:var(--off);border-radius:20px;padding:22px 28px;opacity:0;transform:translateY(14px);transition:opacity .4s,transform .4s;box-shadow:0 18px 50px rgba(28,38,47,.25)}
+.card.show{opacity:1;transform:none}
+.card .l{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}
+.card h3{margin:8px 0 8px;font-size:30px;font-weight:300;letter-spacing:-.015em;line-height:1.1}
+.card p{margin:0;font-size:17px;line-height:1.45;font-weight:300;color:rgba(252,254,254,.8)}
+.card p b{color:var(--off);font-weight:600}
 .log{flex:1;min-height:0;overflow:hidden;padding:10px 26px 10px;display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--mist);background:var(--cloud)}
 .ln{display:grid;grid-template-columns:118px 1fr;gap:12px;font-size:16px;line-height:1.3;color:var(--slate);opacity:0;transform:translateY(6px);animation:in .3s ease forwards}
 .ln .w{font-weight:600;color:var(--midnight);white-space:nowrap}
@@ -194,6 +200,7 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
       <div class="net"><svg id="net" viewBox="0 0 680 300"></svg></div>
       <div class="log" id="log"></div>
       <div class="res" id="res-s"></div>
+      <div class="card" id="card"></div>
     </div>
   </section>
 
@@ -217,25 +224,6 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
     </div>
     <div class="ft"><p><b>Swarm, by HYPR</b> · AI agents para o mundo real</p><a href="https://swarm.hyprgrid.ai/">swarm.hyprgrid.ai</a></div>
   </div>
-  <div class="end" id="end2">
-    <h1>O caso acaba. <em>O aprendizado fica.</em></h1>
-    <div class="two">
-      <div class="tile"><div class="l">memória · agente fixo</div><div class="big">Cada caso vira memória</div><p>Fatos da marca, hipóteses descartadas, consultas que funcionaram. O próximo caso começa sabendo, não do zero.</p><div class="kp"><span><b>3</b> casos lembrados</span><span><b>4</b> fatos novos gravados</span><span><b>7 de 15</b> trechos usados</span></div></div>
-      <div class="tile"><div class="l">curador · agente fixo</div><div class="big">O banco trabalha menos</div><p>Recorta só o que a pergunta precisa, na taxonomia HYPR, com validade de 7 dias. O caso seguinte reaproveita o recorte.</p><div class="kp"><span><b>1,2 TB</b> → <b>38 GB</b> no 1º caso</span><span><b>0 GB</b> no caso seguinte</span><span><b>−97%</b> de custo por consulta</span></div></div>
-    </div>
-    <div class="ft"><p><b>Swarm, by HYPR</b> · AI agents para o mundo real</p><a href="https://swarm.hyprgrid.ai/">swarm.hyprgrid.ai</a></div>
-  </div>
-  <div class="end" id="end3">
-    <h1>Só dá para fazer isso <em>em cima das bases HYPR</em></h1>
-    <div class="mid"><div class="pipes">
-      <div class="pp"><div class="l">places</div><b>Places Graph</b><span>onde cada loja está, o que vende, quem passa</span></div>
-      <div class="pp"><div class="l">transactions</div><b>Groundflow</b><span>notas fiscais reais do varejo físico, no SKU</span></div>
-      <div class="pp"><div class="l">audiences</div><b>Audiences Graph</b><span>quem comprou, quem deixou de comprar</span></div>
-      <div class="pp"><div class="l">performance</div><b>Max Attention</b><span>o que a mídia entregou de verdade</span></div>
-    </div>
-    <div class="nums"><div><b>R$ 3,16 tri</b><span>em transações observadas</span></div><div><b>+1 bi</b><span>SKUs do varejo físico</span></div><div><b>0</b><span>dado pessoal: privacy by design</span></div></div></div>
-    <div class="ft"><p>Os agentes não leem planilha colada. Leem o varejo inteiro, da grande rede ao long tail.</p><a href="https://swarm.hyprgrid.ai/">swarm.hyprgrid.ai</a></div>
-  </div>
   <div id="play"><b>▶ Rodar (45 s)</b></div>
 </div>
 
@@ -248,6 +236,19 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
 
   var QUESTION='Por que a venda de protetor solar caiu 18% em junho?';
   var timers=[];function at(t,fn){timers.push(setTimeout(fn,t*1000))}
+  // pausas com zoom (tempo original do swarm, duração)
+  var PAUSE=[['mem',3.0],['cur',4.0],['ctl',5.0],['bases',7.0],['aud',13.8]],PD=3.0;
+  function T(t){var d=0;PAUSE.forEach(function(p){if(t>p[1])d+=PD});return t+d}
+  var CK=1.45;function C(t){return 3+(t-3)*CK}
+  var CARDS={
+    mem:{l:'Memória · agente fixo',h:'Começa sabendo',p:'Antes de qualquer consulta, lê os casos anteriores da marca e entrega só os trechos que importam. No fim, grava o que aprendeu. <b>Nenhum caso começa do zero.</b>'},
+    cur:{l:'Curador · agente fixo',h:'O banco trabalha menos',p:'Recorta no BigQuery só o que a pergunta precisa, na taxonomia HYPR, com validade de 7 dias: <b>1,2 TB viram 38 GB</b>. O caso seguinte reaproveita o recorte, a custo zero.'},
+    ctl:{l:'Controle · agente fixo',h:'Sem número bruto',p:'Variação bruta mistura venda com coleta de notas. Normaliza pela base inteira e por mesmas lojas antes de qualquer hipótese: <b>a marca caiu 11 p.p. a mais que o mercado.</b>'},
+    bases:{l:'Bases HYPR · só aqui',h:'Os agentes leem o varejo inteiro',p:'Notas fiscais reais do varejo físico (<b>R$ 3,16 tri, +1 bi SKUs</b>) cruzadas com lojas, audiências e mídia, sem dado pessoal. Ninguém cola planilha: a pergunta vai direto à fonte.'},
+    aud:{l:'Auditor · agente fixo',h:'Checagem independente',p:'Refaz os números dos pilares sem ver o raciocínio dos outros agentes. Se não bate, devolve. <b>O que sai tem % de confiança, não é laudo.</b>'}
+  };
+  function zoom(id){var o=id==='bases'?{x:340,y:264}:pos[id];net.style.transformOrigin=(o.x/680*100)+'% '+(o.y/300*100)+'%';net.style.transform='scale(1.3)';var c=CARDS[id];$('card').innerHTML='<div class="l">'+c.l+'</div><h3>'+c.h+'</h3><p>'+c.p+'</p>';$('card').classList.add('show')}
+  function unzoom(){net.style.transform='';$('card').classList.remove('show')}
 
   /* chat */
   var CHAT=[ // [s, who, texto, ctx%, turno?]
@@ -355,7 +356,7 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
     clock('ck-c',0,'','tempo decorrido');clock('ck-s',0,'','tempo decorrido');
     ['s1a','s2a','s3a'].forEach(function(i){sc(i,'0')});['s1b','s2b','s3b'].forEach(function(i){sc(i,'0')});
     sc('s4a','—');sc('s4b','—');['s1a','s2a','s3a','s4a','s1b','s2b','s3b','s4b'].forEach(function(i){$(i).className=$(i).className.replace(/ (bad|good)/g,'')});
-    ['end1','end2','end3'].forEach(function(i){$(i).classList.remove('show')});
+    $('end1').classList.remove('show');$('card').classList.remove('show');net.style.transform='';
   }
 
   function run(){
@@ -364,23 +365,23 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
     var i=0;(function type(){if(i<=QUESTION.length){$('qt').textContent=QUESTION.slice(0,i);i++;timers.push(setTimeout(type,38))}else $('q').classList.add('done')})();
 
     // relógios
-    for(var m=1;m<=CHAT_MIN;m++)(function(m){at(3+(CHAT_END-3)*m/CHAT_MIN,function(){clock('ck-c',m,m===CHAT_MIN?'bad':'',m===CHAT_MIN?'sem causa principal':'tempo decorrido')})})(m);
-    for(var k=1;k<=SW_MIN;k++)(function(m){at(3+(SW_END-3)*m/SW_MIN,function(){clock('ck-s',m,m===SW_MIN?'ok':'',m===SW_MIN?'resposta pronta':'tempo decorrido')})})(k);
+    for(var m=1;m<=CHAT_MIN;m++)(function(m){at(C(3+(CHAT_END-3)*m/CHAT_MIN),function(){clock('ck-c',m,m===CHAT_MIN?'bad':'',m===CHAT_MIN?'sem causa principal':'tempo decorrido')})})(m);
+    for(var k=1;k<=SW_MIN;k++)(function(m){at(T(3+(SW_END-3)*m/SW_MIN),function(){clock('ck-s',m,m===SW_MIN?'ok':'',m===SW_MIN?'resposta pronta':'tempo decorrido')})})(k);
 
     // chat
-    CHAT.forEach(function(r){at(r[0],function(){
+    CHAT.forEach(function(r){at(C(r[0]),function(){
       msg(r[1],r[2]);$('ctxb').style.width=r[3]+'%';$('ctxp').textContent=r[3]+'%';
       if(r[3]>=100)$('ctx').classList.add('full');
       if(r[4]){turns++;sc('s1a',turns,turns>3?'bad':'')}
       if(r[1]==='bot'&&/explicar parte/.test(r[2])){hypC++;sc('s2a',hypC)}
     })});
-    at(CHAT_END,function(){var r=$('res-c');r.className='res show';setTimeout(function(){$('thread').style.paddingBottom=(r.offsetHeight+16)+'px'},30);r.innerHTML='<div class="h"><h3>Resposta do chat</h3><span>61 min · 7 turnos · 2 planilhas coladas</span></div><p>"Pode ser clima, preço ou concorrência. Recomendo analisar os dados."</p><p style="margin-top:10px"><span class="tag bad">sem causa principal</span> <span class="tag bad">sem ação</span></p>';sc('s4a','nenhuma','bad');$('s4a').style.fontSize='26px'});
+    at(C(CHAT_END),function(){var r=$('res-c');r.className='res show';setTimeout(function(){$('thread').style.paddingBottom=(r.offsetHeight+16)+'px'},30);r.innerHTML='<div class="h"><h3>Resposta do chat</h3><span>61 min · 7 turnos · 2 planilhas coladas</span></div><p>"Pode ser clima, preço ou concorrência. Recomendo analisar os dados."</p><p style="margin-top:10px"><span class="tag bad">sem causa principal</span> <span class="tag bad">sem ação</span></p>';sc('s4a','nenhuma','bad');$('s4a').style.fontSize='26px'});
 
     // swarm
-    function fx(id,t0,t1){at(t0,function(){nd[id].classList.add('live');var k;for(k in links)if(k.slice(-id.length-1)==='-'+id&&links[k].classList.contains('fl'))links[k].classList.add('on')});at(t1,function(){nd[id].classList.remove('live');nd[id].classList.add('done')})}
-    fx('mem',3.0,3.9);fx('cur',4.0,4.9);fx('ctl',5.0,5.9);fx('orq',6.0,15.0);fx('aud',13.8,15.0);at(15.8,function(){nd.mem.classList.remove('done');nd.mem.classList.add('live')});at(16.8,function(){nd.mem.classList.remove('live');nd.mem.classList.add('done')});fx('rel',17.4,18.4);
-    AG.forEach(function(a,i){at(6.2+i*0.12,function(){nd[a.id].classList.remove('hide');nd[a.id].classList.add('live');packet('orq',a.id)})});
-    LOG.forEach(function(r){at(r[0],function(){
+    function fx(id,t0,t1){t0=T(t0);t1=T(t1);at(t0,function(){nd[id].classList.add('live');var k;for(k in links)if(k.slice(-id.length-1)==='-'+id&&links[k].classList.contains('fl'))links[k].classList.add('on')});at(t1,function(){nd[id].classList.remove('live');nd[id].classList.add('done')})}
+    fx('mem',3.0,3.9);fx('cur',4.0,4.9);fx('ctl',5.0,5.9);fx('orq',6.0,15.0);fx('aud',13.8,15.0);at(T(15.8),function(){nd.mem.classList.remove('done');nd.mem.classList.add('live')});at(T(16.8),function(){nd.mem.classList.remove('live');nd.mem.classList.add('done')});fx('rel',17.4,18.4);
+    AG.forEach(function(a,i){at(T(6.2+i*0.12),function(){nd[a.id].classList.remove('hide');nd[a.id].classList.add('live');packet('orq',a.id)})});
+    LOG.forEach(function(r){at(T(r[0]),function(){
       line(r[1],r[2],r[3]);
       if(r[4]){on(r[1]+'-'+r[4]);packet(r[1],r[4]);setTimeout(function(){hit(r[4],r[5]||1);packet(r[1],r[4],true)},350);queries+=r[5]||1;sc('s3b',queries,'good')}
       if(r[2]==='find'&&r[1]!=='aud'){hypS[r[1]]=1;sc('s2b',Object.keys(hypS).length,'good');nd[r[1]].classList.remove('live');nd[r[1]].classList.add('done');packet('orq',r[1],true);on('orq-'+r[1])}
@@ -388,7 +389,8 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
       if(r[1]==='aud'&&r[2]==='note'){packet('orq','aud')}
     })});
     at(3.2,function(){sc('s1b','1','good')});
-    at(SW_END,function(){
+    PAUSE.forEach(function(p){at(T(p[1])+0.25,function(){zoom(p[0])});at(T(p[1])+PD-0.15,unzoom)});
+    at(T(SW_END),function(){
       var r=$('res-s');r.className='res show';
       r.innerHTML='<div class="h"><h3>Hipóteses ranqueadas</h3><span>15 min · 1 frase · '+queries+' consultas · 38 GB lidos · auditado</span></div>'+
         '<div class="hyp"><div class="row lead"><span class="n">Promoção retirada em 2/jun</span><div class="b"><i data-w="46"></i></div><span class="p">46%</span></div>'+
@@ -400,10 +402,8 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
     });
 
     // fecho
-    at(26.5,function(){$('end1').classList.add('show')});
-    at(33.5,function(){$('end2').classList.add('show')});
-    at(40.5,function(){$('end3').classList.add('show')});
-    at(47,function(){if(LOOP)run();else{$('play').classList.remove('off');$('play').querySelector('b').textContent='▶ Rodar de novo'}});
+    at(36.5,function(){$('end1').classList.add('show')});
+    at(46,function(){if(LOOP)run();else{$('play').classList.remove('off');$('play').querySelector('b').textContent='▶ Rodar de novo'}});
   }
   $('play').addEventListener('click',run);
   addEventListener('keydown',function(e){if(e.key===' '||e.key==='r'){e.preventDefault();run()}});
