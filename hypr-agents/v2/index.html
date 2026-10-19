@@ -110,8 +110,8 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
 .card{position:absolute;left:24px;right:24px;bottom:22px;background:var(--off);color:var(--midnight);border:1px solid var(--soft);border-left:6px solid var(--cyan);border-radius:20px;padding:22px 28px;opacity:0;transform:translateY(14px);transition:opacity .4s,transform .4s;box-shadow:0 18px 50px rgba(28,38,47,.18)}
 .card.show{opacity:1;transform:none}
 .card .l{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--deep)}
-.card h3{margin:8px 0 8px;font-size:30px;font-weight:300;letter-spacing:-.015em;line-height:1.1}
-.card p{margin:0;font-size:17px;line-height:1.45;color:var(--slate)}
+.card h3{margin:8px 0 8px;font-size:34px;font-weight:300;letter-spacing:-.015em;line-height:1.1}
+.card p{margin:0;font-size:20px;line-height:1.4;color:var(--slate)}
 .card p b{color:var(--midnight);font-weight:600}
 .log{flex:1;min-height:0;overflow:hidden;padding:10px 26px 10px;display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--mist);background:var(--cloud)}
 .ln{display:grid;grid-template-columns:118px 1fr;gap:12px;font-size:16px;line-height:1.3;color:var(--slate);opacity:0;transform:translateY(6px);animation:in .3s ease forwards}
@@ -254,7 +254,7 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
     </div></div>
     <div class="ft"><p><b>Swarm, by HYPR</b></p><a href="https://swarm.hyprgrid.ai/">swarm.hyprgrid.ai</a></div>
   </div>
-  <div id="play"><b>▶ Rodar (45 s)</b></div>
+  <div id="play"><b>▶ Rodar (50 s)</b></div>
 </div>
 
 <script>
@@ -267,16 +267,17 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
   var QUESTION='Por que a venda de protetor solar caiu 18% em junho?';
   var timers=[];function at(t,fn){timers.push(setTimeout(fn,t*1000))}
   // pausas com zoom (tempo original do swarm, duração)
-  var PAUSE=[['mem',3.0],['cur',4.0],['ctl',5.0],['bases',7.0],['aud',13.8]],PD=3.0;
+  var PAUSE=[['mem',3.0],['cur',4.0],['ctl',5.0],['bases',7.0],['aud',13.8]],PD=4.0;
   function T(t){var d=0;PAUSE.forEach(function(p){if(t>p[1])d+=PD});return t+d}
-  var CK=1.45;function C(t){return 3+(t-3)*CK}
+  var CK=1.7;function C(t){return 3+(t-3)*CK}
   var CARDS={
-    mem:{l:'Memória · agente fixo',h:'Começa sabendo',p:'Antes de qualquer consulta, lê os casos anteriores da marca e entrega só os trechos que importam. No fim, grava o que aprendeu. <b>Nenhum caso começa do zero.</b>'},
-    cur:{l:'Curador · agente fixo',h:'O banco trabalha menos',p:'Recorta no BigQuery só o que a pergunta precisa, na taxonomia HYPR, com validade de 7 dias: <b>1,2 TB viram 38 GB</b>. O caso seguinte reaproveita o recorte, a custo zero.'},
-    ctl:{l:'Controle · agente fixo',h:'Sem número bruto',p:'Variação bruta mistura venda com coleta de notas. Normaliza pela base inteira e por mesmas lojas antes de qualquer hipótese: <b>a marca caiu 11 p.p. a mais que o mercado.</b>'},
-    bases:{l:'Bases HYPR · só aqui',h:'Os agentes leem o varejo inteiro',p:'Notas fiscais reais do varejo físico (<b>R$ 3,16 tri, +1 bi SKUs</b>) cruzadas com lojas, audiências e mídia, sem dado pessoal. Ninguém cola planilha: a pergunta vai direto à fonte.'},
-    aud:{l:'Auditor · agente fixo',h:'Checagem independente',p:'Refaz os números dos pilares sem ver o raciocínio dos outros agentes. Se não bate, devolve. <b>O que sai tem % de confiança, não é laudo.</b>'}
+    mem:{l:'Memória · agente fixo',h:'Começa sabendo',p:'Lê os casos anteriores da marca antes. Grava o que aprendeu depois.'},
+    cur:{l:'Curador · agente fixo',h:'O banco trabalha menos',p:'Recorta só o que a pergunta precisa: <b>1,2 TB viram 38 GB</b>. O próximo caso reaproveita.'},
+    ctl:{l:'Controle · agente fixo',h:'Sem número bruto',p:'Normaliza pela base inteira e por mesmas lojas. <b>A marca caiu 11 p.p. a mais que o mercado.</b>'},
+    bases:{l:'Bases HYPR · só aqui',h:'Lê o varejo inteiro',p:'<b>R$ 3,16 tri</b> em notas fiscais reais, com lojas, audiências e mídia. Ninguém cola planilha.'},
+    aud:{l:'Auditor · agente fixo',h:'Checagem independente',p:'Refaz os números sem ver o raciocínio. Se não bate, devolve.'}
   };
+
   function zoom(id){var o=id==='bases'?{x:340,y:264}:pos[id];net.style.transformOrigin=(o.x/680*100)+'% '+(o.y/300*100)+'%';net.style.transform='scale(1.3)';var c=CARDS[id];$('card').innerHTML='<div class="l">'+c.l+'</div><h3>'+c.h+'</h3><p>'+c.p+'</p>';$('card').classList.add('show')}
   function unzoom(){net.style.transform='';$('card').classList.remove('show')}
 
@@ -434,8 +435,8 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
     });
 
     // fecho
-    at(36.5,function(){$('end1').classList.add('show');setTimeout(function(){$('end1').querySelectorAll('.bar i').forEach(function(b){b.style.width=b.dataset.w+'%'})},500)});
-    at(46,function(){if(LOOP)run();else{$('play').classList.remove('off');$('play').querySelector('b').textContent='▶ Rodar de novo'}});
+    at(41.5,function(){$('end1').classList.add('show');setTimeout(function(){$('end1').querySelectorAll('.bar i').forEach(function(b){b.style.width=b.dataset.w+'%'})},500)});
+    at(51,function(){if(LOOP)run();else{$('play').classList.remove('off');$('play').querySelector('b').textContent='▶ Rodar de novo'}});
   }
   $('play').addEventListener('click',run);
   addEventListener('keydown',function(e){if(e.key===' '||e.key==='r'){e.preventDefault();run()}});
