@@ -254,6 +254,7 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
     </div></div>
     <div class="ft"><p><b>Swarm, by HYPR</b></p><a href="https://swarm.hyprgrid.ai/">swarm.hyprgrid.ai</a></div>
   </div>
+  <audio id="trilha" src="/hypr-agents/v2/trilha.mp3" preload="auto"></audio>
   <div id="play"><b>▶ Rodar (50 s, com som)</b></div>
 </div>
 
@@ -469,7 +470,8 @@ html,body{margin:0;height:100%;background:var(--midnight);overflow:hidden;font-f
   }
 
   function run(){
-    reset();$('play').classList.add('off');music();
+    reset();$('play').classList.add('off');
+    if(P.get('synth')==='1')music();else if(!MUTE){var au=$('trilha');try{au.currentTime=0;au.volume=0.9;au.play()}catch(e){}}
     // pergunta digitada
     var i=0;(function type(){if(i<=QUESTION.length){$('qt').textContent=QUESTION.slice(0,i);i++;timers.push(setTimeout(type,38))}else $('q').classList.add('done')})();
 
