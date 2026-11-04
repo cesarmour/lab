@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Groundflow · Cobertura estatística</title>
+<meta name="description" content="Quanto do varejo alimentar de São Paulo o Groundflow já lê com precisão publicável, e até onde dá para descer.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{--mid:#1C262F;--cloud:#FAFAFA;--off:#FCFEFE;--mist:#E5EBF2;--steel:#78909C;--slate:#536872;--cyan:#3397B9;--deep:#246C84;--soft:#C5EAF6;--good:#018376;--bad:#B41048}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--cloud);color:var(--mid);font-family:'Urbanist',sans-serif;-webkit-font-smoothing:antialiased}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 32px}
+header{background:var(--mid);color:var(--off);padding:56px 0 64px}
+header .mono{color:#9FB3BF}
+header h1{font-weight:300;font-size:clamp(34px,5vw,58px);line-height:1.05;margin:20px 0 22px;letter-spacing:-.01em}
+header h1 span{color:var(--cyan)}
+header p{font-size:19px;font-weight:300;line-height:1.5;color:#C9D3DA;max-width:720px;margin:0}
+.brand{display:flex;justify-content:space-between;align-items:center}
+section{padding:56px 0}
+h2{font-weight:300;font-size:32px;line-height:1.15;margin:0 0 20px}
+h2 span{color:var(--cyan)}
+p.lead{font-size:18px;line-height:1.6;color:var(--slate);max-width:760px;margin:0 0 18px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:32px}
+.tile{background:var(--off);border:.5px solid var(--mist);border-radius:20px;padding:26px 26px 22px}
+.tile .mono{margin-bottom:14px;display:block}
+.tile .big{font-weight:300;font-size:40px;line-height:1;color:var(--cyan);margin-bottom:12px}
+.tile .sub{font-size:15px;line-height:1.5;color:var(--slate)}
+.card{background:var(--off);border:.5px solid var(--mist);border-radius:20px;padding:36px 40px 28px;box-shadow:0 10px 40px rgba(28,38,47,.05)}
+.legend{display:flex;flex-wrap:wrap;gap:18px;margin:22px 0 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;color:var(--slate)}
+.legend span{display:flex;align-items:center;gap:7px}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:28px}
+.step{background:var(--cloud);border-radius:14px;padding:20px}
+.step .n{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--cyan);margin-bottom:10px}
+.step h4{margin:0 0 8px;font-weight:600;font-size:16px}
+.step p{margin:0;font-size:14px;line-height:1.5;color:var(--slate)}
+input[type=range]{width:100%;accent-color:var(--cyan)}
+button.pill{border-radius:999px;border:.5px solid var(--mist);background:var(--off);color:var(--mid);padding:8px 14px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;cursor:pointer}
+button.pill.on{background:var(--mid);color:var(--off);border-color:var(--mid)}
+.ctl{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:22px}
+.ctl .mono{display:block;margin-bottom:10px;letter-spacing:.08em}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.explain{background:#F2FAFD;border-radius:14px;padding:22px 26px;margin:6px 0 30px;font-size:19px;font-weight:300;line-height:1.45}
+.cards{display:grid;gap:16px}
+.kc{background:var(--cloud);border-radius:14px;padding:20px 20px 18px;min-height:150px}
+.kc .mono{display:block;margin-bottom:14px;letter-spacing:.08em}
+.kc .big{font-weight:300;font-size:34px;line-height:1;margin-bottom:10px}
+.kc .sub{font-size:14px;line-height:1.45;color:var(--slate)}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:28px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--steel)}
+footer{background:var(--mid);color:#9FB3BF;padding:28px 0;margin-top:40px}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em}
+@media(max-width:820px){.grid3,.steps{grid-template-columns:1fr 1fr}.ctl{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr!important}.card{padding:26px 22px}}
+@media(max-width:520px){.grid3,.steps,.cards{grid-template-columns:1fr!important}}
+</style>
+</head>
+<body>
+
+<header>
+<div class="wrap">
+<div class="brand">
+<span class="mono">Groundflow · Cobertura estatística · FY26</span>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8021 1423" style="width:84px;height:auto" aria-label="HYPR"><g fill="#FCFEFE"><path d="M7948.37 511.866L7529.3 514.172C7489.28 514.364 7456.49 482.469 7456.29 443.079L7454.15 74.3597C7453.95 34.9706 7486.35 2.69085 7526.37 2.4987L7945.64 0.000863573C7985.65 -0.191278 8018.44 31.7042 8018.64 71.0933L8020.78 440.005C8020.98 479.394 7988.58 511.674 7948.56 511.866M7541.98 429.63L7934.9 427.516L7932.95 84.351L7540.03 86.4646L7541.98 429.63Z"/><path d="M1114.53 675.763L125.312 681.143L121.799 42.6566L0 43.4252L7.8076 1423L129.606 1422.23L126.093 795.083L1115.12 789.703L1118.63 1416.85L1240.43 1416.28L1232.62 36.7002L1110.83 37.2766L1114.53 675.763Z"/><path d="M4939.5 147.782C4897.53 107.048 4845.41 74.96 4784.52 52.0952C4723.81 29.4225 4653.74 18.0861 4575.86 18.4704L3832.96 22.5054L3840.77 1402.27L3962.57 1401.7L3959.84 928.453L4578.79 925.187C4737.67 924.226 4860.44 882.147 4943.99 800.103C5027.53 717.866 5069.49 606.616 5068.71 469.427C5068.32 406.404 5057.2 346.84 5035.33 292.272C5013.47 237.32 4981.07 188.9 4939.3 148.166M4946.91 469.619C4947.5 567.995 4916.66 650.232 4855.37 714.215C4794.28 777.814 4700.78 810.478 4577.22 811.055L3959.25 814.321L3955.35 135.485L4573.32 132.218C4635.2 131.834 4690.24 141.057 4736.89 159.31C4783.15 177.564 4822.19 202.542 4852.83 233.285C4883.48 264.22 4906.9 300.342 4922.71 340.884C4938.52 381.618 4946.72 425.042 4947.11 469.619"/><path d="M6637.39 898.116C6722.89 878.902 6793.35 842.395 6847.03 789.556C6930.57 707.32 6972.53 596.07 6971.75 458.88C6971.36 395.858 6960.24 336.294 6938.38 281.726C6916.51 226.773 6884.11 178.354 6842.34 137.62C6800.38 96.8856 6748.26 64.7979 6687.36 41.9331C6626.66 19.2604 6556.58 7.924 6478.7 8.30828L5735.81 12.3433L5743.62 1392.11L5865.42 1391.54L5862.68 918.291L6481.63 915.025C6489.44 915.025 6497.05 914.833 6504.66 914.64L6867.91 1386.16L7013.52 1385.39L6637.2 898.5L6637.39 898.116ZM6849.95 459.265C6850.54 557.641 6819.7 639.878 6758.41 703.861C6697.32 767.46 6603.82 800.124 6480.26 800.7L5862.29 803.967L5858.39 125.13L6476.36 121.864C6538.24 121.48 6593.28 130.703 6639.93 148.956C6686.19 167.209 6725.23 191.996 6755.87 222.931C6786.52 253.865 6809.94 289.988 6825.75 330.53C6841.56 371.264 6849.76 414.688 6850.15 459.265"/><path d="M2573.4 815.826L2081.52 40.7263L2076.06 32.0799L1937.28 32.8485L2506.26 923.425L2202.93 1411.08L2337.03 1410.31L3197.81 25.7393L3063.72 26.5078L2573.4 815.826Z"/></g></svg>
+</div>
+<h1>O varejo alimentar de São Paulo, lido <span>nota a nota</span>.</h1>
+<p>O Groundflow não estima o mercado: ele lê os cupons fiscais que o mercado emite. Esta página mostra, com números reais de leitura e critérios estatísticos explícitos, onde esse dado já é um produto publicável e até que profundidade geográfica ele desce hoje.</p>
+</div>
+</header>
+
+<section>
+<div class="wrap">
+<span class="mono">01 · Metodologia</span>
+<h2>Como medimos a <span>cobertura</span></h2>
+<p class="lead">Todo número publicado precisa responder a duas perguntas: com que frequência ele acerta e dentro de qual margem. Chamamos isso de confiança e erro. Em vez de prometer uma precisão fixa, deixamos você escolher a sua e mostramos exatamente o que o Groundflow sustenta nela.</p>
+<div class="steps">
+<div class="step"><div class="n">PASSO 1</div><h4>Universo</h4><p>Receita Federal, estabelecimentos ativos em SP nos CNAEs 4711 (super e hiper), 4712 (minimercados) e 4729-6/02 (conveniência). É o denominador de tudo.</p></div>
+<div class="step"><div class="n">PASSO 2</div><h4>Leitura real</h4><p>Cupons fiscais lidos pelo Groundflow entre agosto e outubro de 2026, agregados por mês em cada célula: estado, município, bairro e loja.</p></div>
+<div class="step"><div class="n">PASSO 3</div><h4>Critério</h4><p>Uma célula é "publicável" quando sua leitura mensal ou semanal atinge o mínimo estatístico para a confiança e o erro escolhidos, no pior caso (proporção 50%).</p></div>
+<div class="step"><div class="n">PASSO 4</div><h4>Segmento</h4><p>Grandes redes (CNPJ raiz com 20 ou mais lojas em SP) e long tail são medidos separadamente, porque se comportam como mercados diferentes.</p></div>
+</div>
+<div class="grid3">
+<div class="tile"><span class="mono">Cupons lidos por mês</span><div class="big">30 mi</div><div class="sub">Ritmo atual do Groundflow, equivalente a 360 milhões por ano. Cerca de 5% de tudo que é emitido no estado.</div></div>
+<div class="tile"><span class="mono">Emissão em SP</span><div class="big">~20 mi/dia</div><div class="sub">Estimativa a partir dos acumulados da Nota Fiscal Paulista divulgados pela Sefaz-SP. Cerca de 7 bilhões de cupons por ano.</div></div>
+<div class="tile"><span class="mono">Alimentar observado</span><div class="big">2,6 mi/mês</div><div class="sub">Cupons de super, hiper, minimercado e conveniência em SP já lidos mensalmente, de 81 mil lojas no universo.</div></div>
+</div>
+</div>
+</section>
+
+<section style="padding-top:0">
+<div class="wrap">
+<span class="mono">02 · Mercado vs capacidade</span>
+<h2>Um mercado de 7 bilhões de cupons. Uma leitura que <span>cresce</span> com ele.</h2>
+<p class="lead">A linha é a emissão de cupons fiscais no estado de São Paulo: dado declarado pela Sefaz-SP até 2020 e projeção a 2,5% ao ano daí em diante. As barras são o volume lido pelo Groundflow: real em 2025 e 2026, e a trajetória a partir de 2027 no ritmo atual.</p>
+<div class="card">
+<div class="brand"><span class="mono">Emissão de cupons fiscais no Estado de São Paulo vs capacidade de processamento Groundflow</span>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1391.01 135.32" style="width:170px;height:auto;flex:none;margin-left:16px" aria-label="Groundflow"><path fill="#1C262F" opacity=".7" d="M1133.46,35.64l-19.36,12.26c-2.93-4.69-6.85-8.66-11.5-11.66-2.77-1.8-5.73-3.25-8.9-4.29-1.6-.52-2.69-2-2.52-3.65l1.84-19.72c.2-2.16,1.76-3.85,3.73-4.33.72-.16,1.48-.16,2.28.04,6.37,1.64,12.35,4.25,17.84,7.66,6.97,4.37,13.07,10.02,17.96,16.67.48.64.72,1.32.88,2.04,0,.04.04.04,0,.08.28,1.84-.52,3.81-2.24,4.89h0Z"/><g fill="#1C262F"><path d="M115.51,112.46c-7.22,13.24-22.46,22.86-46.33,22.86C26.87,135.32,0,108.25,0,69.54,0,34.84,26.67,4.96,69.19,4.96c32.09,0,55.55,14.24,61.17,39.11l-16.44,2.41c-6.42-17.65-23.87-25.87-45.93-25.87-28.68,0-49.94,20.26-49.94,48.93s21.26,50.14,49.94,50.14c25.67,0,44.72-14.44,47.53-29.68v-6.62h-46.53v-15.24h62.17v65.18h-15.64v-20.86h-.01Z"/><path d="M144.4,133.32V6.97h50.34c26.27,0,49.33,6.82,49.33,37.7,0,20.46-8.82,35.1-30.28,39.91l35.7,48.73h-23.26l-33.7-47.73h-30.08v47.73h-18.05ZM190.73,69.94c18.65,0,35.3-2.21,35.3-24.87,0-19.05-11.83-22.46-31.89-22.46h-31.69v47.33h28.28Z"/><path d="M319.89,4.96c37.5,0,66.99,26.87,66.99,65.18s-29.48,65.18-66.99,65.18-67.38-26.87-67.38-65.18S282.39,4.96,319.89,4.96ZM368.83,70.14c0-27.88-21.06-49.14-48.94-49.14s-49.33,21.06-49.33,49.14,21.26,49.13,49.33,49.13,48.94-21.26,48.94-49.13h0Z"/><path d="M413.96,6.97v71c0,24.27,9.63,41.31,35.7,41.31s35.7-17.25,35.7-41.31V6.97h17.45v71.8c0,34.7-18.05,56.56-53.35,56.56s-53.55-22.06-53.55-56.56V6.97h18.05,0Z"/><path d="M519.06,133.32V6.97h18.05l72.4,96.67V6.97h18.05v126.35h-18.25l-72.2-96.67v96.67h-18.05Z"/><path d="M647.02,133.32V6.97h59.16c34.09,0,62.17,19.25,62.17,63.17s-28.08,63.17-62.17,63.17h-59.16ZM665.07,117.67h40.11c24.87,0,45.13-13.24,45.13-47.53s-20.26-47.53-45.13-47.53h-40.11v95.06Z"/><path d="M801.62,133.32V4.76h96.07v26.67h-64.78v25.27h59.96v24.27h-59.96v52.34h-31.29Z"/><path d="M912.11,133.32V4.76h31.29v101.88h63.77v26.67h-95.06Z"/><path d="M1181.24,4.76h33.69l4.81,103.08,49.13-103.08h34.9l8.82,102.68,44.93-102.68h33.49l-58.16,128.55h-45.72l-8.62-87.64-43.32,87.64h-45.52l-8.42-128.55h-.01Z"/><path d="M1119.61,70.11c-1.11,19.66-16.8,34.39-37.54,34.39h-.08c-20.66-.04-36.55-14.57-37.66-34.39,0-.71-.04-1.42-.04-2.17,0-20.88,16.29-36.72,37.7-36.76V2.56c-37.3.04-69.08,25.9-69.08,65.38,0,.75,0,1.46.04,2.17,1.15,38.1,32.61,63.17,69.04,63.21h.08c36.71,0,67.81-24.91,68.92-63.21h-31.38,0Z"/></g><path fill="#1C262F" opacity=".7" d="M1157.75,56.76l-11.1,1.48-23.17,3.05c-2.24.28-4.37-1.08-4.97-3.29-1-3.61-2.48-7.01-4.41-10.1-2.93-4.69-6.85-8.66-11.5-11.66l13.95-23.77.32-.52,5.61-9.58c1.44-2.45,4.73-3.13,7.01-1.44,8.74,6.13,16.23,14.07,21.92,23.29,4.97,8.02,8.58,17.04,10.5,26.7.56,2.81-1.32,5.45-4.17,5.85h.01Z"/></svg></div>
+<div class="legend">
+<span><span style="width:18px;height:2px;background:#1C262F;display:inline-block"></span>SP · DADO SEFAZ-SP 2014–2020 · EIXO ESQ.</span>
+<span><span style="width:18px;height:0;border-top:2px dashed #78909C;display:inline-block"></span>SP · ESTIMATIVA 2021–2030 · EIXO ESQ.</span>
+<span><span style="width:10px;height:10px;border-radius:2px;background:#3397B9;display:inline-block"></span>GROUNDFLOW · REAL 2025–2026 · EIXO DIR.</span>
+<span><span style="width:10px;height:10px;border-radius:2px;background:#C5EAF6;display:inline-block"></span>GROUNDFLOW · ESTIMATIVA 2027+ (360 MI, +2,5% A.A.)</span>
+</div>
+<div style="position:relative;width:100%;height:340px"><canvas id="gfChart" role="img" aria-label="SP em linha de 5,6 a 8,3 bilhões por ano; Groundflow em barras de 91 milhões em 2025 a 388 milhões em 2030"></canvas></div>
+<div class="foot"><span>FONTES: SEFAZ-SP (NOTA FISCAL PAULISTA) · GROUNDFLOW/BIGQUERY · 2026</span></div>
+</div>
+</div>
+</section>
+
+<section style="padding-top:0">
+<div class="wrap">
+<span class="mono">03 · Simulador</span>
+<h2>Escolha a precisão. Veja a <span>cobertura</span>.</h2>
+<p class="lead">Mova os controles e descubra quantos municípios, bairros e lojas já têm leitura suficiente para um número publicável, no segmento e na periodicidade que o seu caso pede. Tudo calculado sobre as distribuições reais de leitura, não sobre médias.</p>
+<div class="card">
+<div class="ctl">
+<div><span class="mono">Confiança · <b id="confOut" style="color:#1C262F;font-weight:400">95%</b></span><input type="range" id="conf" min="80" max="99.9" step="0.1" value="95"></div>
+<div><span class="mono">Erro máximo · <b id="errOut" style="color:#1C262F;font-weight:400">3%</b></span><input type="range" id="err" min="0.5" max="5" step="0.5" value="3"></div>
+</div>
+<div class="explain" id="explain"></div>
+<div class="ctl">
+<div><span class="mono">Geografia</span><div class="btns" id="geoBtns"><button class="pill" data-g="sp">ESTADO DE SP</button><button class="pill" data-g="cap">SÓ A CAPITAL</button></div></div>
+<div><span class="mono">Formato</span><div class="btns" id="fmtBtns"><button class="pill" data-f="alim">ALIMENTAR</button><button class="pill" data-f="super">SUPER/HIPER</button><button class="pill" data-f="mini">MINIMERCADO</button><button class="pill" data-f="conv">CONVENIÊNCIA</button></div></div>
+</div>
+<div class="ctl" style="margin-bottom:30px">
+<div><span class="mono">Segmento</span><div class="btns" id="segBtns"><button class="pill" data-s="todos">TODOS</button><button class="pill" data-s="rede">GRANDES REDES</button><button class="pill" data-s="longtail">LONG TAIL</button></div></div>
+<div><span class="mono">Periodicidade</span><div class="btns" id="perBtns"><button class="pill" data-p="0">MENSAL</button><button class="pill" data-p="1">SEMANAL</button></div></div>
+</div>
+<div class="cards" id="cards"></div>
+<div class="foot"><span>GRANDE REDE = CNPJ RAIZ COM 20+ LOJAS EM SP · FONTE: GROUNDFLOW/BIGQUERY · RECEITA FEDERAL</span></div>
+</div>
+</div>
+</section>
+
+<footer><div class="wrap"><span>GROUNDFLOW · BY HYPR · 2026</span><span>CONFIDENCIAL</span></div></footer>
+
+<script>
+(function(){
+const labels=['2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026','2027','2028','2029','2030'];
+const real=[5.6,5.9,5.9,6.0,6.2,6.4,6.1,null,null,null,null,null,null,null,null,null,null];
+const proj=[null,null,null,null,null,null,6.1,6.5,6.8,7.0,7.2,7.3,7.5,7.7,7.9,8.1,8.3];
+const gf=[null,null,null,null,null,null,null,null,null,null,null,91,230,360,369,378,388];
+const gcol=labels.map(l=>+l>=2027?'#C5EAF6':'#3397B9');
+Chart.defaults.font.family="'IBM Plex Mono',monospace";Chart.defaults.font.size=11;
+new Chart(document.getElementById('gfChart'),{data:{labels,datasets:[
+{type:'line',label:'SP (Sefaz-SP)',data:real,yAxisID:'y',borderColor:'#1C262F',backgroundColor:'#1C262F',borderWidth:2,pointRadius:3,tension:0.2,order:1},
+{type:'line',label:'SP (estimativa)',data:proj,yAxisID:'y',borderColor:'#78909C',backgroundColor:'#78909C',borderWidth:2,borderDash:[6,5],pointRadius:3,tension:0.2,order:1},
+{type:'bar',label:'Groundflow',data:gf,yAxisID:'y2',backgroundColor:gcol,borderRadius:4,maxBarThickness:22,order:2}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1C262F',titleColor:'#FCFEFE',bodyColor:'#E5EBF2',callbacks:{label:c=>c.dataset.label+': '+(c.dataset.yAxisID==='y2'?c.parsed.y+' mi':c.parsed.y.toFixed(1)+' bi')}}},scales:{x:{grid:{display:false},border:{color:'#E5EBF2'},ticks:{color:'#78909C',maxRotation:0}},y:{position:'left',min:0,max:9,grid:{color:'#E5EBF2'},border:{display:false},ticks:{color:'#78909C',callback:v=>v+' bi'},title:{display:true,text:'SP · BILHÕES/ANO',color:'#78909C',font:{size:10}}},y2:{position:'right',min:0,max:900,grid:{drawOnChartArea:false},border:{display:false},ticks:{color:'#78909C',callback:v=>v+' mi'},title:{display:true,text:'GROUNDFLOW · MILHÕES/ANO',color:'#78909C',font:{size:10}}}}}});
+})();
+</script>
+<script>
+const Z0=new Array(85).fill(0);
+const SP={EST:{todos:{alim:2645128,super:1804254,mini:806951,conv:33923},rede:{alim:935386,super:444060,mini:491137,conv:189},longtail:{alim:1709742,super:1360194,mini:315814,conv:33734}},
+UNI:{todos:{alim:[645,22167,81031],super:[596,5684,10499],mini:[644,19997,67605],conv:[400,1960,2927]},rede:{alim:[232,1695,3818],super:[229,1364,2167],mini:[49,518,1398],conv:[63,199,253]},longtail:{alim:[645,21849,77213],super:[596,5003,8332],mini:[644,19950,66207],conv:[398,1879,2674]}},
+C:{todos:{alim:[[226,222,219,215,215,210,209,206,203,201,200,198,197,196,194,193,189,185,180,176,175,169,166,161,160,156,153,149,145,141,140,135,131,127,122,116,112,108,103,101,97,93,88,83,79,73,68,63,59,51,46,42,40,39,39,36,34,32,31,29,28,26,25,23,19,16,16,14,13,12,12,12,9,9,7,5,5,5,5,5,3,3,2,2,1],[1205,1183,1163,1138,1122,1109,1086,1066,1048,1034,1006,989,971,953,925,900,874,842,808,783,762,742,717,678,620,569,539,512,485,451,423,400,370,334,306,274,251,217,189,160,137,121,107,90,79,67,55,42,35,28,27,22,16,13,13,9,7,5,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1474,1445,1422,1394,1365,1346,1317,1286,1262,1233,1202,1176,1153,1129,1092,1059,1016,977,936,904,873,847,810,763,703,614,586,554,529,486,451,418,378,336,300,266,236,200,165,141,104,78,57,36,26,20,13,8,6,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+super:[[211,206,202,199,197,195,195,190,188,188,187,183,182,181,180,178,174,170,166,163,159,156,152,146,143,140,137,134,129,125,125,121,119,113,108,105,102,97,92,91,88,84,78,71,69,65,59,53,49,45,40,36,34,33,31,28,27,26,24,22,21,19,16,14,13,11,8,7,6,6,4,4,4,4,4,4,4,3,3,2,2,2,2,2,1],[905,884,870,859,843,829,816,800,785,773,755,744,731,719,695,675,651,625,599,583,563,548,527,496,454,411,387,370,347,317,294,279,255,226,204,180,159,139,121,103,92,77,66,51,43,37,26,17,13,11,9,5,2,2,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[995,976,963,950,934,922,907,885,869,851,835,822,807,791,760,738,706,678,653,633,613,591,565,530,488,414,396,376,358,326,300,275,251,221,196,171,151,126,103,86,67,52,43,27,20,16,10,6,5,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+mini:[[103,102,100,100,98,97,93,90,87,87,87,86,80,79,78,77,76,73,72,68,67,65,62,62,56,54,51,48,45,45,45,42,36,35,31,28,28,26,24,23,21,21,20,18,17,16,16,15,14,14,14,14,14,12,11,11,10,10,10,10,8,7,6,6,4,4,4,4,3,2,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1],[367,356,345,334,329,326,316,310,303,295,288,279,272,266,259,255,250,243,232,223,213,210,205,195,179,169,161,150,145,140,133,125,115,104,96,90,85,71,64,55,45,40,35,28,23,21,19,16,12,10,7,7,5,4,4,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[455,446,436,421,411,404,391,382,374,364,351,338,330,322,316,306,295,284,269,259,248,244,233,222,204,190,180,170,163,153,146,138,124,112,101,92,83,72,60,54,37,26,14,9,6,4,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+conv:[[17,17,17,17,16,16,16,16,16,16,14,14,13,13,12,12,12,12,12,11,9,9,8,8,8,8,8,8,8,8,8,8,5,5,5,4,3,3,2,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[24,23,23,23,20,20,19,19,19,18,16,16,16,16,16,15,15,15,14,12,12,12,12,11,11,10,10,8,8,7,5,5,3,3,3,3,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[24,23,23,23,20,20,19,19,19,18,16,16,16,16,16,15,15,15,14,12,12,12,12,11,11,10,10,8,8,7,5,5,3,3,3,3,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]},
+rede:{alim:[[76,76,76,76,75,74,72,72,72,72,71,69,68,65,65,64,63,61,60,60,59,56,55,51,51,48,46,46,44,44,43,42,42,41,39,39,38,37,36,35,35,35,34,33,32,28,26,22,20,19,18,16,16,16,16,13,12,12,12,10,9,8,7,5,5,5,5,5,4,3,3,3,2,2,2,2,2,1,1,1,1,1,1,1,1],[395,387,381,377,373,366,357,353,348,339,329,324,319,312,304,296,286,272,264,256,249,242,230,216,205,175,164,158,151,144,140,136,131,124,112,105,102,88,76,63,59,52,48,41,38,33,29,20,19,14,10,9,8,6,6,4,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[488,480,475,466,460,450,440,433,423,415,408,398,391,382,373,358,346,330,322,309,296,289,270,254,237,195,187,181,173,165,159,153,141,134,123,113,102,92,76,64,47,36,25,17,14,10,6,3,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+super:[[76,76,76,75,74,72,71,71,71,71,70,68,67,65,65,64,63,61,60,60,59,56,55,51,51,48,46,45,43,42,41,40,40,37,35,34,33,32,31,30,30,30,29,28,27,23,19,15,12,12,11,9,9,9,8,8,7,6,6,5,4,3,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0],[279,270,264,262,257,247,241,236,229,221,216,210,204,198,190,183,174,162,158,151,144,140,128,118,108,77,69,65,59,56,54,53,51,47,41,38,36,33,28,24,23,19,18,15,13,11,7,2,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[287,281,277,271,267,260,253,246,240,233,228,221,215,210,201,192,182,172,167,158,151,145,130,120,109,72,67,64,59,57,54,53,49,46,43,40,35,32,26,20,17,15,13,10,9,7,3,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+mini:[[14,14,14,14,13,13,13,13,13,13,13,13,13,13,13,13,13,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,11,11,11,11,10,9,9,8,8,8,8,7,7,7,7,7,7,6,5,5,5,4,4,4,4,4,4,3,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1],[142,141,139,139,138,137,135,135,133,132,130,129,129,127,126,126,125,122,119,116,113,112,112,107,103,102,101,97,95,93,91,85,80,76,70,67,65,56,50,44,37,32,29,25,21,18,17,13,10,8,6,6,5,4,4,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[201,199,198,195,193,190,187,187,183,182,180,177,176,172,172,166,164,158,155,151,145,144,140,134,128,123,120,117,114,108,105,100,92,88,80,73,67,60,50,44,30,21,12,7,5,3,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+conv:[Z0,Z0,Z0]},
+longtail:{alim:[[220,216,211,207,207,202,200,197,193,191,189,188,188,186,184,182,178,174,170,166,164,158,155,151,147,144,141,139,136,132,130,125,121,115,108,102,99,91,87,86,79,76,71,65,59,55,54,49,46,40,37,34,31,29,29,28,25,22,19,17,16,14,14,12,10,9,8,7,7,5,5,5,5,4,4,4,4,4,3,2,2,2,2,2,1],[886,870,851,829,818,809,788,771,756,744,722,712,695,680,659,644,626,606,578,558,540,525,508,483,439,404,385,360,342,314,285,266,240,208,193,173,153,128,110,94,74,65,54,39,32,26,19,13,10,8,7,4,2,2,2,2,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[986,965,947,928,905,896,877,853,839,818,794,778,762,747,719,701,670,647,614,595,577,558,540,509,466,419,399,373,356,321,292,265,237,202,177,153,134,108,89,77,57,42,32,19,12,10,7,5,4,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+super:[[201,195,191,187,185,183,182,178,175,173,171,168,168,167,166,164,159,154,151,146,144,141,137,132,129,127,122,120,116,112,111,107,103,97,92,88,84,80,75,70,66,62,58,54,51,48,44,40,35,32,29,26,24,22,21,20,19,17,15,15,13,10,10,10,8,7,5,5,4,4,4,4,4,4,3,3,2,2,2,2,2,2,2,1,1],[659,644,634,624,613,605,598,585,577,571,557,550,540,532,518,505,488,473,450,441,431,419,404,383,352,327,313,299,283,256,232,220,200,175,161,142,123,104,89,77,65,52,45,32,24,22,16,11,9,8,7,4,2,2,2,2,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[708,695,686,679,667,662,654,639,629,618,607,601,592,581,559,546,524,506,486,475,462,446,435,410,379,342,329,312,299,269,246,222,202,175,153,131,116,94,77,66,50,37,30,17,11,9,7,5,4,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+mini:[[102,101,99,98,96,95,90,86,83,83,83,82,76,75,74,73,72,69,68,64,63,61,59,58,52,50,46,44,41,41,41,38,32,31,27,24,24,21,19,18,16,15,13,10,9,8,7,7,7,7,6,6,6,5,4,4,4,4,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0],[237,229,222,209,204,201,192,185,180,173,167,161,153,149,141,137,132,125,117,110,102,100,95,91,79,70,62,55,52,50,44,40,35,27,25,22,20,14,13,10,7,6,3,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[254,247,238,226,218,214,204,195,191,182,171,161,154,150,144,140,131,126,114,108,103,100,93,88,76,67,60,53,49,45,41,38,32,24,21,19,16,12,10,10,7,5,2,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+conv:[[17,17,17,17,16,16,16,16,16,16,14,14,13,13,12,12,12,12,12,11,9,9,8,8,8,8,8,8,8,8,8,8,5,5,5,4,3,3,2,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[24,23,23,23,20,20,19,19,19,18,16,16,16,16,16,15,15,15,14,12,12,12,12,11,11,10,10,8,8,7,5,5,3,3,3,3,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[24,23,23,23,20,20,19,19,19,18,16,16,16,16,16,15,15,15,14,12,12,12,12,11,11,10,10,8,8,7,5,5,3,3,3,3,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]}}};
+const CAP={EST:{todos:{alim:610128,super:289619,mini:318220,conv:2288},rede:{alim:343015,super:81925,mini:261068,conv:22},longtail:{alim:267113,super:207694,mini:57152,conv:2266}},
+UNI:{todos:{alim:[1,2099,18966],super:[1,782,2084],mini:[1,1965,16268],conv:[1,300,614]},rede:{alim:[1,421,1610],super:[1,286,591],mini:[1,259,909],conv:[1,71,110]},longtail:{alim:[1,2061,17356],super:[1,686,1493],mini:[1,1955,15359],conv:[1,278,504]}},
+C:{todos:{alim:[null,[206,198,197,191,188,184,178,178,174,169,164,160,159,156,154,151,149,146,140,137,136,134,131,121,118,115,113,112,111,106,102,96,89,82,75,67,66,57,52,43,40,35,34,28,23,21,20,17,15,14,14,11,8,7,7,5,4,2,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[322,310,302,297,293,284,277,272,264,258,252,247,244,237,233,227,220,215,205,198,191,184,177,168,165,148,145,141,137,128,119,112,95,88,77,67,58,49,44,37,27,20,13,5,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+super:[null,[137,130,126,125,122,116,114,113,110,106,104,104,103,102,98,96,95,93,88,85,79,78,73,69,69,66,64,63,60,55,51,48,42,38,35,30,29,24,22,20,20,16,13,8,7,6,5,3,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[162,156,150,147,144,138,136,132,128,125,123,122,121,119,115,112,107,104,100,97,94,88,84,80,80,69,69,67,66,60,56,51,41,37,33,27,23,16,13,10,9,8,7,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+mini:[null,[114,109,105,103,103,102,98,98,95,92,90,87,87,84,83,82,82,81,78,75,73,73,73,69,66,65,64,61,59,59,56,55,51,47,43,39,36,31,30,25,21,19,17,14,10,9,9,9,7,6,4,4,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[158,153,151,149,148,145,140,139,135,132,128,124,122,117,117,114,112,110,104,100,96,95,92,87,84,78,75,73,70,67,63,61,54,51,44,40,35,33,31,27,18,12,6,4,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+conv:[null,[2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]},
+rede:{alim:[null,[111,107,103,100,100,97,94,94,93,89,86,85,85,85,85,84,83,81,77,77,76,74,72,68,67,65,63,60,60,57,56,55,52,49,45,42,41,35,33,27,26,24,21,17,15,13,12,10,10,8,5,4,4,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[165,160,155,153,152,145,141,140,136,133,131,128,127,124,124,122,119,117,113,109,104,103,97,91,88,78,77,75,71,67,65,63,55,53,48,44,39,36,34,29,19,14,8,4,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+super:[null,[50,46,42,41,40,34,33,33,31,29,29,28,28,27,26,26,26,24,23,22,21,21,18,17,17,14,14,13,12,11,11,11,11,11,10,9,9,7,6,6,6,5,4,2,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[49,46,42,40,39,35,34,33,32,30,30,29,29,29,29,29,27,26,25,24,23,23,20,18,18,14,14,14,13,12,12,12,10,10,10,9,7,5,5,4,3,3,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+mini:[null,[79,78,76,76,76,75,73,73,71,70,69,68,68,67,66,66,65,65,63,62,60,60,60,57,54,53,53,51,49,49,48,45,42,39,36,33,31,29,28,24,20,18,15,13,9,8,7,6,5,4,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[116,114,113,113,113,110,107,107,104,103,101,99,98,95,95,93,92,91,88,85,81,80,77,73,70,64,63,61,58,55,53,51,45,43,38,35,32,31,29,25,16,11,6,4,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+conv:[null,Z0,Z0]},
+longtail:{alim:[null,[129,124,122,119,117,115,111,110,109,105,102,101,99,97,94,91,90,87,84,80,78,76,73,69,68,64,64,62,61,57,53,49,41,35,34,30,28,23,19,17,14,12,11,6,5,3,2,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[157,150,147,144,141,139,136,132,128,125,121,119,117,113,109,105,101,98,92,89,87,81,80,77,77,70,68,66,66,61,54,49,40,35,29,23,19,13,10,8,8,6,5,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+super:[null,[101,96,92,92,90,88,88,87,86,84,83,83,82,81,79,76,74,72,67,65,64,63,58,56,56,52,52,51,49,44,41,38,32,28,27,23,20,16,14,13,11,8,7,3,3,2,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[113,110,108,107,105,103,102,99,96,95,93,93,92,90,86,83,80,78,75,73,71,65,64,62,62,55,55,53,53,48,44,39,31,27,23,18,16,11,8,6,6,5,5,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+mini:[null,[42,39,38,36,34,34,32,31,30,28,27,26,25,23,22,21,21,18,17,15,14,14,14,13,13,13,12,12,12,12,10,10,9,8,7,6,5,3,3,2,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[42,39,38,36,35,35,33,32,31,29,27,25,24,22,22,21,20,19,16,15,15,15,15,14,14,14,12,12,12,12,10,10,9,8,6,5,3,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+conv:[null,[2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]}}};
+function zOf(p){const q=1-(1-p/100)/2;const a=[-39.6968302866538,220.946098424521,-275.928510446969,138.357751867269,-30.6647980661472,2.50662827745924],b=[-54.4760987982241,161.585836858041,-155.698979859887,66.8013118877197,-13.2806815528857],c=[-0.00778489400243029,-0.322396458041136,-2.40075827716184,-2.54973253934373,4.37466414146497,2.93816398269878],d=[0.00778469570904146,0.32246712907004,2.445134137143,3.75440866190742];
+ if(q>0.97575){const r=Math.sqrt(-2*Math.log(1-q));return -(((((c[0]*r+c[1])*r+c[2])*r+c[3])*r+c[4])*r+c[5])/((((d[0]*r+d[1])*r+d[2])*r+d[3])*r+1);}
+ const r=q-0.5,t=r*r;return (((((a[0]*t+a[1])*t+a[2])*t+a[3])*t+a[4])*t+a[5])*r/(((((b[0]*t+b[1])*t+b[2])*t+b[3])*t+b[4])*t+1);}
+function countAt(arr,nm){const i=Math.log(nm/200)/Math.log(1.08);if(i<=0)return arr[0];if(i>=84)return 0;const k=Math.floor(i),f=i-k;return Math.round(arr[k]+(arr[k+1]-arr[k])*f);}
+let per=0,seg='todos',fmtK='alim',geo='sp';
+const conf=document.getElementById('conf'),err=document.getElementById('err');
+const fmt=n=>n.toLocaleString('pt-BR'),dec=(n,d)=>n.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+function paint(id,attr,val){document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on',b.dataset[attr]===String(val)));}
+function card(label,big,sub,ok){return '<div class="kc"><span class="mono">'+label+'</span><div class="big" style="color:'+(ok?'#3397B9':'#B41048')+'">'+big+'</div><div class="sub">'+sub+'</div></div>';}
+function render(){const cl=+conf.value,e=+err.value,z=zOf(cl);
+ const clTxt=Number.isInteger(cl)?fmt(cl):dec(cl,1),eTxt=Number.isInteger(e)?fmt(e):dec(e,1);
+ document.getElementById('confOut').textContent=clTxt+'%';document.getElementById('errOut').textContent=eTxt+'%';
+ paint('segBtns','s',seg);paint('perBtns','p',per);paint('fmtBtns','f',fmtK);paint('geoBtns','g',geo);
+ const G=geo==='sp'?SP:CAP,geoN=geo==='sp'?'Estado de SP':'Capital';
+ const perN=per?'semana':'mês',perA=per?'semanal':'mensal';
+ const erram=Math.round(100-cl);
+ document.getElementById('explain').innerHTML='Nessa precisão, <b style="font-weight:600">de cada 100 projeções, '+(100-erram)+' acertam dentro de ±'+eTxt+' pontos</b> e '+(erram===0?'menos de 1 fica':erram+' '+(erram===1?'fica':'ficam'))+' fora. Abaixo, quantas unidades de cada nível já têm leitura suficiente por '+perN+' para publicar com essa garantia, em <b style="font-weight:600">'+geoN+'</b>.';
+ const nm=z*z*0.25/Math.pow(e/100,2)*(per?4.33:1);
+ const D=G.C[seg][fmtK],U=G.UNI[seg][fmtK],vol=G.EST[seg][fmtK]/(per?4.33:1);
+ const errEf=100*z*0.5/Math.sqrt(vol),cuts=Math.floor(vol/(z*z*0.25/Math.pow(e/100,2)));
+ const b=countAt(D[1],nm),p=countAt(D[2],nm);
+ const top=cuts>=1?card(geoN.toUpperCase()+' · '+perA.toUpperCase(),'±'+(errEf<0.1?dec(errEf,2):dec(errEf,1))+' pp','Erro real no total. A sobra sustenta até <b style="font-weight:600;color:#1C262F">'+fmt(cuts)+'</b> recortes nessa precisão.',true):card(geoN.toUpperCase()+' · '+perA.toUpperCase(),'abaixo','Leitura por '+perN+' ainda não sustenta esse total nessa precisão.',false);
+ const pct=(v,u)=>u?Math.round(100*v/u):0;
+ let html=top;
+ if(geo==='sp'){const m=countAt(D[0],nm);html+=card('MUNICÍPIOS',fmt(m),'de '+fmt(U[0])+' com lojas do tipo · <b style="font-weight:600;color:#1C262F">'+pct(m,U[0])+'%</b>',m>0);}
+ html+=card('BAIRROS',fmt(b),'de '+fmt(U[1])+' · <b style="font-weight:600;color:#1C262F">'+pct(b,U[1])+'%</b>',b>0)+card('LOJAS (PDV)',fmt(p),'de '+fmt(U[2])+' · <b style="font-weight:600;color:#1C262F">'+pct(p,U[2])+'%</b>. Em loja é censo, não amostra.',p>0);
+ const cards=document.getElementById('cards');cards.style.gridTemplateColumns='repeat('+(geo==='sp'?4:3)+',minmax(0,1fr))';cards.innerHTML=html;}
+conf.oninput=render;err.oninput=render;
+document.querySelectorAll('#segBtns button').forEach(b=>b.onclick=()=>{seg=b.dataset.s;render()});
+document.querySelectorAll('#perBtns button').forEach(b=>b.onclick=()=>{per=+b.dataset.p;render()});
+document.querySelectorAll('#fmtBtns button').forEach(b=>b.onclick=()=>{fmtK=b.dataset.f;render()});
+document.querySelectorAll('#geoBtns button').forEach(b=>b.onclick=()=>{geo=b.dataset.g;render()});
+render();
+</script>
+</body>
+</html>
