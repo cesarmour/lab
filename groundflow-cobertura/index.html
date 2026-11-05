@@ -76,8 +76,8 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 <p class="lead">Todo número publicado precisa responder a duas perguntas: com que frequência ele acerta e dentro de qual margem. Chamamos isso de confiança e erro. Em vez de prometer uma precisão fixa, deixamos você escolher a sua e mostramos exatamente o que o Groundflow sustenta nela.</p>
 <div class="steps">
 <div class="step"><div class="n">PASSO 1</div><h4>Universo</h4><p>Receita Federal, estabelecimentos ativos em SP. Alimentar = CNAEs 4711, 4712 e 4729-6/02; farmacêutico = 4771; restaurantes = 5611; padarias e laticínios = 4721; outros varejos = demais CNAE 47; todo o varejo = CNAE 47 e 56. É o denominador de tudo.</p></div>
-<div class="step"><div class="n">PASSO 2</div><h4>Leitura real</h4><p>Cupons fiscais lidos pelo Groundflow com emissão entre maio e julho de 2026, os três meses mais recentes com leitura completa, agregados por mês em cada célula: estado, município, bairro e loja.</p></div>
-<div class="step"><div class="n">PASSO 3</div><h4>Critério</h4><p>Uma célula é "publicável" quando sua leitura mensal ou semanal atinge o mínimo estatístico para a confiança e o erro escolhidos, no pior caso (proporção 50%). No nível loja aplicamos a correção de população finita: uma loja em que lemos quase toda a emissão publica com qualquer tamanho de amostra.</p></div>
+<div class="step"><div class="n">PASSO 2</div><h4>Leitura real</h4><p>Cupons fiscais lidos pelo Groundflow com emissão entre maio e julho de 2026, os três meses mais recentes com leitura completa, agregados por mês em cada célula: estado, município e bairro.</p></div>
+<div class="step"><div class="n">PASSO 3</div><h4>Critério</h4><p>Uma célula é "publicável" quando sua leitura mensal ou semanal atinge o mínimo estatístico para a confiança e o erro escolhidos, no pior caso (proporção 50%). O caso de uso define a precisão: presença pede um cupom; tendência, ticket, share e benchmark pedem amostras crescentes.</p></div>
 <div class="step"><div class="n">PASSO 4</div><h4>Segmento</h4><p>Grandes redes (CNPJ raiz com 20 ou mais lojas em SP) e long tail são medidos separadamente, porque se comportam como mercados diferentes.</p></div>
 </div>
 <div class="grid3">
@@ -112,8 +112,9 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 <div class="wrap">
 <span class="mono">03 · Simulador</span>
 <h2>Escolha a precisão. Veja a <span>cobertura</span>.</h2>
-<p class="lead">Mova os controles e descubra quantos municípios, bairros e lojas já têm leitura suficiente para um número publicável, no setor, no segmento e na periodicidade que o seu caso pede. Tudo calculado sobre as distribuições reais de leitura, não sobre médias.</p>
+<p class="lead">Escolha o caso de uso e descubra quantos municípios e bairros já têm leitura suficiente para um número publicável, no setor, no segmento e na periodicidade que o seu caso pede. Tudo calculado sobre as distribuições reais de leitura, não sobre médias.</p>
 <div class="card">
+<div class="ctl" style="grid-template-columns:1fr"><div><span class="mono">Caso de uso</span><div class="btns" id="useBtns"><button class="pill" data-u="presenca">PRESENÇA E ATIVIDADE</button><button class="pill" data-u="tendencia">TENDÊNCIA (SUBIU OU CAIU)</button><button class="pill" data-u="ticket">TICKET MÉDIO E MIX</button><button class="pill" data-u="share">SHARE DE MARCA</button><button class="pill" data-u="bench">BENCHMARK INSTITUCIONAL</button><button class="pill" data-u="custom">PERSONALIZADO</button></div></div></div>
 <div class="ctl">
 <div><span class="mono">Confiança · <b id="confOut" style="color:#1C262F;font-weight:400">95%</b></span><input type="range" id="conf" min="80" max="99.9" step="0.1" value="95"></div>
 <div><span class="mono">Erro máximo · <b id="errOut" style="color:#1C262F;font-weight:400">3%</b></span><input type="range" id="err" min="0.5" max="5" step="0.5" value="3"></div>
@@ -126,7 +127,7 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 <div class="ctl" id="fmtRow"><div><span class="mono">Formato (alimentar)</span><div class="btns" id="fmtBtns"><button class="pill" data-f="alim">AGREGADO</button><button class="pill" data-f="super">SUPER/HIPER</button><button class="pill" data-f="mini">MINIMERCADO</button><button class="pill" data-f="conv">CONVENIÊNCIA</button></div></div></div>
 <div class="ctl" style="margin-bottom:30px">
 <div><span class="mono">Segmento</span><div class="btns" id="segBtns"><button class="pill" data-s="todos">TODOS</button><button class="pill" data-s="rede">GRANDES REDES</button><button class="pill" data-s="longtail">LONG TAIL</button></div></div>
-<div><span class="mono">Periodicidade</span><div class="btns" id="perBtns"><button class="pill" data-p="0">MENSAL</button><button class="pill" data-p="1">SEMANAL</button></div></div>
+<div><span class="mono">Periodicidade</span><div class="btns" id="perBtns"><button class="pill" data-p="0">MENSAL</button><button class="pill" data-p="1">SEMANAL</button><button class="pill" data-p="2">TRIMESTRE MÓVEL</button></div></div>
 </div>
 <div class="cards" id="cards"></div>
 <div class="foot"><span>GRANDE REDE = CNPJ RAIZ COM 20+ LOJAS EM SP · FONTE: GROUNDFLOW/BIGQUERY · RECEITA FEDERAL · NOTAS DE EMISSÃO MAI–JUL/2026</span></div>
@@ -157,7 +158,10 @@ function zOf(p){const q=1-(1-p/100)/2;const a=[-39.6968302866538,220.94609842452
  if(q>0.97575){const r=Math.sqrt(-2*Math.log(1-q));return -(((((c[0]*r+c[1])*r+c[2])*r+c[3])*r+c[4])*r+c[5])/((((d[0]*r+d[1])*r+d[2])*r+d[3])*r+1);}
  const r=q-0.5,t=r*r;return (((((a[0]*t+a[1])*t+a[2])*t+a[3])*t+a[4])*t+a[5])*r/(((((b[0]*t+b[1])*t+b[2])*t+b[3])*t+b[4])*t+1);}
 function countAt(arr,nm){const i=Math.log(nm/200)/Math.log(1.08);if(i<=0)return arr[0];if(i>=84)return 0;const k=Math.floor(i),f=i-k;return Math.round(arr[k]+(arr[k+1]-arr[k])*f);}
-let per=0,seg='todos',fmtK='alim',geo='sp',setor='varejo';
+let per=0,seg='todos',fmtK='alim',geo='sp',setor='varejo',uso='tendencia';
+const USES={presenca:{n:1,t:'Presença e atividade: a célula tem pelo menos um cupom no período. Responde se está aberta, vendendo e o que vende.'},tendencia:{c:90,e:5,t:'Tendência: 90% de confiança e ±5 pontos. Suficiente para dizer se subiu ou caiu de um período para o outro.'},ticket:{c:95,e:5,t:'Ticket médio e mix de categorias: 95% de confiança e ±5 pontos sobre médias e proporções.'},share:{c:95,e:3,t:'Share de marca: 95% de confiança e ±3 pontos, o padrão de pesquisa de mercado.'},bench:{c:99,e:2,t:'Benchmark institucional: 99% de confiança e ±2 pontos, para número de imprensa e board.'},custom:{t:'Personalizado: ajuste confiança e erro nos controles acima.'}};
+const PERF=[1,4.33,1/3],PERN=['mês','semana','trimestre móvel'],PERA=['mensal','semanal','trimestre móvel'];
+function countAt2(arr,nm){const i=Math.log(Math.max(nm,1))/Math.log(1.156);if(i<=0)return arr[0];if(i>=84)return 0;const k=Math.floor(i),f=i-k;return Math.round(arr[k]+(arr[k+1]-arr[k])*f);}
 const SETN={varejo:'todo o varejo (CNAE 47 e 56)',alim:'varejo alimentar',farma:'varejo farmacêutico',rest:'restaurantes',pad:'padarias e laticínios',outros:'outros varejos'};
 const conf=document.getElementById('conf'),err=document.getElementById('err');
 const fmt=n=>n.toLocaleString('pt-BR'),dec=(n,d)=>n.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -169,28 +173,31 @@ function render(){const cl=+conf.value,e=+err.value,z=zOf(cl);
  paint('segBtns','s',seg);paint('perBtns','p',per);paint('fmtBtns','f',fmtK);paint('geoBtns','g',geo);paint('setBtns','t',setor);
  document.getElementById('fmtRow').style.display=setor==='alim'?'':'none';
  const G=setor==='alim'?(geo==='sp'?SP:CAP):(geo==='sp'?SECT_SP:SECT_CAP),geoN=geo==='sp'?'Estado de SP':'Capital',key=setor==='alim'?fmtK:setor;
- const perN=per?'semana':'mês',perA=per?'semanal':'mensal';
+ paint('useBtns','u',uso);
+ const perN=PERN[per],perA=PERA[per];
  const erram=Math.round(100-cl);
- document.getElementById('explain').innerHTML='Nessa precisão, <b style="font-weight:600">de cada 100 projeções, '+(100-erram)+' acertam dentro de ±'+eTxt+' pontos</b> e '+(erram===0?'menos de 1 fica':erram+' '+(erram===1?'fica':'ficam'))+' fora. Abaixo, quantas unidades de cada nível já têm leitura suficiente por '+perN+' para publicar com essa garantia, em <b style="font-weight:600">'+geoN+'</b>, '+SETN[setor]+'.';
- const nm=z*z*0.25/Math.pow(e/100,2)*(per?4.33:1);
- const D=G.C[seg][key],U=G.UNI[seg][key],vol=G.EST[seg][key]/(per?4.33:1);
+ const pres=uso==='presenca';
+ document.getElementById('explain').innerHTML=(pres?'<b style="font-weight:600">'+USES.presenca.t+'</b>':'Nessa precisão, <b style="font-weight:600">de cada 100 projeções, '+(100-erram)+' acertam dentro de ±'+eTxt+' pontos</b> e '+(erram===0?'menos de 1 fica':erram+' '+(erram===1?'fica':'ficam'))+' fora.')+' Abaixo, quantas unidades de cada nível já têm leitura suficiente por '+perN+' em <b style="font-weight:600">'+geoN+'</b>, '+SETN[setor]+'.';
+ const nm=pres?1:z*z*0.25/Math.pow(e/100,2)*PERF[per];
+ const D=G.C[seg][key],U=G.UNI[seg][key],vol=G.EST[seg][key]/PERF[per];
+ const H2=(HIST2[geo]&&HIST2[geo][key]&&HIST2[geo][key][seg])?HIST2[geo][key][seg]:null;
  const errEf=100*z*0.5/Math.sqrt(vol),cuts=Math.floor(vol/(z*z*0.25/Math.pow(e/100,2)));
- const PF=(PDV_FPC[geo]&&PDV_FPC[geo][key]&&PDV_FPC[geo][key][seg])?PDV_FPC[geo][key][seg]:D[2];
- const b=countAt(D[1],nm),p=countAt(PF,nm);
+ const b=H2?countAt2(H2.bai,nm):countAt(D[1],nm);
  const obs=(G.OBS&&G.OBS[seg]&&G.OBS[seg][key])?G.OBS[seg][key]:null;const base='<b style="font-weight:600;color:#1C262F">'+fmt(Math.round(vol))+'</b> cupons por '+perN+(obs?' de <b style="font-weight:600;color:#1C262F">'+fmt(obs)+'</b> lojas observadas':'')+'. ';
  const top=cuts>=1?card(geoN.toUpperCase()+' · '+perA.toUpperCase(),'±'+(errEf<0.1?dec(errEf,2):dec(errEf,1))+' pp',base+'Erro real no total; a sobra sustenta até <b style="font-weight:600;color:#1C262F">'+fmt(cuts)+'</b> recortes nessa precisão.',true):card(geoN.toUpperCase()+' · '+perA.toUpperCase(),'abaixo',base+'Ainda não sustenta esse total nessa precisão.',false);
  const pct=(v,u)=>u?Math.round(100*v/u):0;
  let html=top;
- if(geo==='sp'){const m=countAt(D[0],nm);html+=card('MUNICÍPIOS',fmt(m),'de '+fmt(U[0])+' com lojas do tipo · <b style="font-weight:600;color:#1C262F">'+pct(m,U[0])+'%</b>',m>0);}
- html+=card('BAIRROS',fmt(b),'de '+fmt(U[1])+' · <b style="font-weight:600;color:#1C262F">'+pct(b,U[1])+'%</b>',b>0)+card('LOJAS (PDV)',fmt(p),(obs?'de <b style="font-weight:600;color:#1C262F">'+fmt(obs)+'</b> observadas ('+fmt(U[2])+' no universo). ':'de '+fmt(U[2])+'. ')+'Em loja o que conta é a fração da emissão que lemos; onde lemos quase tudo, publica com qualquer n.',p>0);
- const cards=document.getElementById('cards');cards.style.gridTemplateColumns='repeat('+(geo==='sp'?4:3)+',minmax(0,1fr))';cards.innerHTML=html;}
-conf.oninput=render;err.oninput=render;
+ if(geo==='sp'){const m=H2?countAt2(H2.mun,nm):countAt(D[0],nm);html+=card('MUNICÍPIOS',fmt(m),'de '+fmt(U[0])+' com lojas do tipo · <b style="font-weight:600;color:#1C262F">'+pct(m,U[0])+'%</b>',m>0);}
+ html+=card('BAIRROS',fmt(b),'de '+fmt(U[1])+' com lojas do tipo · <b style="font-weight:600;color:#1C262F">'+pct(b,U[1])+'%</b>',b>0);
+ const cards=document.getElementById('cards');cards.style.gridTemplateColumns='repeat('+(geo==='sp'?3:2)+',minmax(0,1fr))';cards.innerHTML=html;}
+conf.oninput=()=>{uso='custom';render()};err.oninput=()=>{uso='custom';render()};
+document.querySelectorAll('#useBtns button').forEach(b=>b.onclick=()=>{uso=b.dataset.u;const u=USES[uso];if(u.c){conf.value=u.c;err.value=u.e;}render()});
 document.querySelectorAll('#segBtns button').forEach(b=>b.onclick=()=>{seg=b.dataset.s;render()});
 document.querySelectorAll('#perBtns button').forEach(b=>b.onclick=()=>{per=+b.dataset.p;render()});
 document.querySelectorAll('#fmtBtns button').forEach(b=>b.onclick=()=>{fmtK=b.dataset.f;render()});
 document.querySelectorAll('#geoBtns button').forEach(b=>b.onclick=()=>{geo=b.dataset.g;render()});
 document.querySelectorAll('#setBtns button').forEach(b=>b.onclick=()=>{setor=b.dataset.t;render()});
-render();
+conf.value=90;err.value=5;render();
 </script>
 </body>
 </html>
