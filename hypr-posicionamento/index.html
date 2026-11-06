@@ -6,13 +6,13 @@
 <title>HYPR · Processadora de transações do varejo físico</title>
 <meta name="description" content="A HYPR nasceu como software de planejamento geoespacial e hoje desponta como a principal processadora de transações do varejo físico no Brasil.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--mid:#1C262F;--cloud:#FAFAFA;--off:#FCFEFE;--mist:#E5EBF2;--steel:#78909C;--slate:#536872;--cyan:#3397B9;--deep:#246C84;--soft:#C5EAF6;--good:#018376;--bad:#B41048}
+:root{--tq:#16B39B;--tqd:#017A6E;--tqs:#C2EFE7;--mid:#1C262F;--cloud:#FAFAFA;--off:#FCFEFE;--mist:#E5EBF2;--steel:#78909C;--slate:#536872;--cyan:#3397B9;--deep:#246C84;--soft:#C5EAF6;--good:#018376;--bad:#B41048}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 html,body{margin:0;background:var(--cloud);color:var(--mid);font-family:'Urbanist',sans-serif;-webkit-font-smoothing:antialiased}
-.mono{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel)}
+.mono{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel)}
 .wrap{max-width:1080px;margin:0 auto;padding:0 32px}
 header{background:var(--mid);color:var(--off);padding:48px 0 88px;position:relative;overflow:hidden}
 header .brand{display:flex;justify-content:space-between;align-items:center;margin-bottom:84px}
@@ -21,14 +21,14 @@ header h1{font-weight:300;font-size:clamp(36px,5.6vw,66px);line-height:1.04;marg
 header h1 span{color:var(--cyan)}
 header p{font-size:21px;font-weight:300;line-height:1.5;color:#C9D3DA;max-width:720px;margin:0}
 header p b{font-weight:400;color:var(--off)}
-.evol{display:flex;align-items:center;gap:18px;margin-top:56px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#9FB3BF;flex-wrap:wrap}
+.evol{display:flex;align-items:center;gap:18px;margin-top:56px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#9FB3BF;flex-wrap:wrap}
 .evol .tag{border:.5px solid rgba(255,255,255,.22);border-radius:999px;padding:9px 16px}
 .evol .tag.now{border-color:var(--cyan);color:var(--off);background:rgba(51,151,185,.14)}
 .evol .arrow{color:var(--cyan)}
 section{padding:72px 0}
 section.press{padding:40px 0 44px;background:var(--off);border-bottom:.5px solid var(--mist)}
 .pgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:18px}
-.pq{border-left:2px solid var(--cyan);padding:4px 0 4px 18px}
+.pq{border-left:2px solid var(--mid);padding:4px 0 4px 18px}
 .pq .src{font-family:'Georgia','Times New Roman',serif;font-size:13px;letter-spacing:.02em;color:var(--mid);display:block;margin-bottom:8px}
 .pq p{margin:0;font-family:'Georgia','Times New Roman',serif;font-size:17px;line-height:1.4;color:var(--slate)}
 @media(max-width:860px){.pgrid{grid-template-columns:1fr}}
@@ -50,11 +50,11 @@ p.lead{font-size:19px;line-height:1.6;color:var(--slate);max-width:760px;margin:
 .bar .nm b{color:var(--mid);font-weight:600}
 .bar .tr{height:18px;background:var(--mist);border-radius:999px;overflow:hidden}
 .bar .fl{height:100%;border-radius:999px;background:var(--steel);width:0;transition:width 1.1s cubic-bezier(.2,.7,.2,1)}
-.bar.hy .fl{background:var(--cyan)}
-.bar.hy .nm b{color:var(--cyan)}
-.bar .v{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:var(--slate);text-align:right}
+.bar.hy .fl{background:var(--tq)}
+.bar.hy .nm b{color:var(--tqd)}
+.bar .v{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.04em;color:var(--slate);text-align:right}
 .bar.stack .fl{background:linear-gradient(90deg,var(--steel) 0 47%,#9FB3BF 47% 84%,#C9D3DA 84%)}
-.note{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--steel);margin-top:22px;line-height:1.7}
+.note{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--steel);margin-top:22px;line-height:1.7}
 /* two-column vs */
 .vs{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:40px}
 .col{border-radius:20px;padding:34px 32px 30px;border:.5px solid var(--mist);background:var(--cloud)}
@@ -62,28 +62,35 @@ p.lead{font-size:19px;line-height:1.6;color:var(--slate);max-width:760px;margin:
 .col .mono{display:block;margin-bottom:16px}
 .col.hy .mono{color:#9FB3BF}
 .col h3{font-weight:300;font-size:26px;line-height:1.15;margin:0 0 14px;letter-spacing:-.01em}
-.col.hy h3 span{color:var(--cyan)}
+.col.hy h3 span{color:var(--tq)}
 .col p{font-size:15.5px;line-height:1.6;color:var(--slate);margin:0 0 12px}
 .col.hy p{color:#C9D3DA}
-.receipt{margin-top:22px;border-radius:14px;padding:18px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.9;letter-spacing:.02em}
+.receipt{margin-top:22px;border-radius:14px;padding:18px 20px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.9;letter-spacing:.02em}
 .col .receipt{background:var(--off);border:.5px solid var(--mist);color:var(--slate)}
 .col.hy .receipt{background:rgba(255,255,255,.06);border:.5px solid rgba(255,255,255,.14);color:#C9D3DA}
 .receipt .row{display:flex;justify-content:space-between;gap:12px}
 .receipt .dim{opacity:.55}
-.receipt .hl{color:var(--cyan)}
+.receipt .hl{color:var(--tq)}
 .receipt hr{border:0;border-top:.5px dashed currentColor;opacity:.3;margin:8px 0}
 .who{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
 .who .w{border-radius:14px;padding:20px 22px;font-size:15px;line-height:1.55;color:var(--slate);background:var(--cloud);border:.5px solid var(--mist)}
 .who .w .mono{display:block;margin-bottom:8px}
 .who .w b{color:var(--mid);font-weight:600}
-.who .w.hy{background:#F2FAFD;border-color:var(--soft)}
-.who .w.hy .mono{color:var(--cyan)}
+.who .w.hy{background:#EEFAF7;border-color:var(--tqs)}
+.who .w.hy .mono{color:var(--tqd)}
+/* tiles (tabela de elementos) */
+.tile{display:inline-flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.tile .sq{position:relative;width:34px;height:34px;border-radius:9px;background:var(--mid);color:var(--off);display:flex;align-items:center;justify-content:center;font-family:'Urbanist',sans-serif;font-weight:400;font-size:15px;letter-spacing:0;text-transform:none}
+.tile .sq.gw{background:transparent;border:1.5px solid var(--tq);color:var(--tq)}
+.tile .sq::after{content:'';position:absolute;top:5px;right:5px;width:4px;height:4px;border-radius:1px;background:currentColor}
+.col.hy .tile{color:#9FB3BF}
+.kpi.tq .big{color:var(--tqd)}
 /* closing */
 .close{background:var(--mid);color:var(--off);padding:80px 0}
 .close h2{color:var(--off);max-width:900px}
 .close p{color:#C9D3DA;font-size:19px;font-weight:300;line-height:1.55;max-width:720px;margin:0}
 footer{background:var(--mid);color:#9FB3BF;padding:28px 0;border-top:.5px solid rgba(255,255,255,.1)}
-footer .wrap{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em}
 @media(max-width:860px){.kpis{grid-template-columns:1fr}.vs,.who{grid-template-columns:1fr}.bar{grid-template-columns:120px 1fr 70px;gap:10px;font-size:13px}header .brand{margin-bottom:56px}}
 @media(max-width:520px){.wrap{padding:0 20px}.col{padding:26px 22px}}
 </style>
@@ -152,7 +159,7 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 <p class="lead">As duas processam transações do mesmo varejo. A diferença está na camada da transação que cada uma vê.</p>
 <div class="vs">
 <div class="col">
-<span class="mono">Adquirente · CloudWalk</span>
+<div class="tile" style="margin-bottom:16px;color:var(--steel)"><span class="sq" style="background:var(--mist);color:var(--slate)">Aq</span><span>Adquirente · CloudWalk</span></div>
 <h3>Processa o pagamento.</h3>
 <p>A CloudWalk é adquirente: processa o pagamento no momento da compra, captura a transação do cartão na maquininha, liquida e repassa o valor ao comerciante, e ganha uma taxa sobre cada transação.</p>
 <p>A transação que ela vê é a do pagamento: valor, bandeira, parcelas, comerciante. Ela não sabe o que foi comprado.</p>
@@ -166,7 +173,7 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 </div>
 </div>
 <div class="col hy">
-<span class="mono">Processadora de transações · HYPR</span>
+<div class="tile" style="margin-bottom:16px"><span class="sq gw">Gw</span><span>GroundFlow · Transações</span></div>
 <h3>Processa o <span>conteúdo da compra</span>.</h3>
 <p>A HYPR processa a camada que a adquirente não vê: o conteúdo da compra, lido do cupom fiscal eletrônico, com loja, data, hora, cada item vendido, quantidade e preço.</p>
 <p>Enquanto a adquirente vê que alguém pagou R$ 87 num mercado, a HYPR vê que foram dois Nescau, um Omo e três Pepsi, em qual bairro e em qual rede, e consolida isso em todo o varejo, independente de quem foi o adquirente ou a forma de pagamento.</p>
@@ -194,9 +201,9 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 <h2>O que essa camada mostra: a nota fiscal <span>acompanha o índice oficial</span> e enxerga o que ele não separa.</h2>
 <p class="lead">Estudo HYPR de novembro de 2026 sobre inflação de alimentos nos distritos de São Paulo, com 41,1 milhões de notas fiscais e R$ 3,83 bilhões em compras na capital, de janeiro a outubro.</p>
 <div class="kpis">
-<div class="kpi"><span class="mono">Correlação mês a mês com o IPCA</span><div class="big">0,82</div><div class="sub">Índice de preços construído só com cupons fiscais, sobre <b>80 itens do IPCA</b> (99% do peso de alimentação no domicílio). Erro médio de 0,4 ponto por mês.</div></div>
-<div class="kpi"><span class="mono">Mesmo código de barras</span><div class="big">−10<small>%</small></div><div class="sub">O mesmo produto custa 10% menos nos distritos de menor renda: <b>718 de 788 produtos</b> comparados, mesma marca, mesma embalagem.</div></div>
-<div class="kpi"><span class="mono">Pico da diferença, maio/26</span><div class="big">1,2<small> p.p.</small></div><div class="sub">A cesta subiu 4,1% na periferia e 2,9% nos distritos de maior renda. <b>Tomate +74%</b> nas mesmas 42 lojas da periferia.</div></div>
+<div class="kpi tq"><span class="mono">Correlação mês a mês com o IPCA</span><div class="big">0,82</div><div class="sub">Índice de preços construído só com cupons fiscais, sobre <b>80 itens do IPCA</b> (99% do peso de alimentação no domicílio). Erro médio de 0,4 ponto por mês.</div></div>
+<div class="kpi tq"><span class="mono">Mesmo código de barras</span><div class="big">−10<small>%</small></div><div class="sub">O mesmo produto custa 10% menos nos distritos de menor renda: <b>718 de 788 produtos</b> comparados, mesma marca, mesma embalagem.</div></div>
+<div class="kpi tq"><span class="mono">Pico da diferença, maio/26</span><div class="big">1,2<small> p.p.</small></div><div class="sub">A cesta subiu 4,1% na periferia e 2,9% nos distritos de maior renda. <b>Tomate +74%</b> nas mesmas 42 lojas da periferia.</div></div>
 </div>
 <div class="note">FONTE · HYPR, ESTUDO INFLAÇÃO DE ALIMENTOS NOS DISTRITOS DE SÃO PAULO, NOV/2026 · GROUNDFLOW · IBGE · 3,6 MI DE COMPARAÇÕES DE PREÇO (MESMO PRODUTO, MESMA LOJA, MÊS CONTRA MÊS) · 68 DISTRITOS COM 20+ LOJAS</div>
 </div>
