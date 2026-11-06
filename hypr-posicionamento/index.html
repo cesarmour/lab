@@ -143,10 +143,12 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 <h2>R$ 30 bilhões por ano em cupons fiscais, <span>lado a lado</span> com quem você conhece.</h2>
 <div class="bars" id="bars">
 <div class="bar hy"><div class="nm"><b>HYPR</b> · cupons fiscais lidos</div><div class="tr"><div class="fl" data-w="30"></div></div><div class="v">R$ 30 bi</div></div>
-<div class="bar stack"><div class="nm"><b>Shein + AliExpress + Temu</b> · GMV Brasil</div><div class="tr"><div class="fl" data-w="35.7"></div></div><div class="v">R$ 35,7 bi</div></div>
 <div class="bar"><div class="nm"><b>Carrefour</b> · bandeira, lojas no Brasil</div><div class="tr"><div class="fl" data-w="26"></div></div><div class="v">R$ 26 bi</div></div>
 <div class="bar"><div class="nm"><b>Casas Bahia</b> · GMV digital</div><div class="tr"><div class="fl" data-w="18.7"></div></div><div class="v">R$ 18,7 bi</div></div>
+<div class="bar"><div class="nm"><b>Shein</b> · GMV Brasil</div><div class="tr"><div class="fl" data-w="17"></div></div><div class="v">R$ 17 bi</div></div>
+<div class="bar"><div class="nm"><b>AliExpress</b> · GMV Brasil</div><div class="tr"><div class="fl" data-w="13.2"></div></div><div class="v">R$ 13,2 bi</div></div>
 <div class="bar"><div class="nm"><b>RD Saúde</b> · GMV digital</div><div class="tr"><div class="fl" data-w="11.3"></div></div><div class="v">R$ 11,3 bi</div></div>
+<div class="bar"><div class="nm"><b>Temu</b> · GMV Brasil</div><div class="tr"><div class="fl" data-w="5.5"></div></div><div class="v">R$ 5,5 bi</div></div>
 </div>
 <div class="note">FONTES · GMV DIGITAL: RANKING IRTT TOP 300 DO VAREJO BRASILEIRO 2025 · BANDEIRA CARREFOUR: VENDAS BRUTAS DO SEGMENTO VAREJO DO GRUPO CARREFOUR BRASIL, 1T25 ANUALIZADO · E-COMMERCE BRASIL: ABCOMM 2025</div>
 </div>
@@ -225,7 +227,7 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 </footer>
 
 <script>
-const max=35.7;
+const max=30;
 requestAnimationFrame(()=>setTimeout(()=>document.querySelectorAll('#bars .fl').forEach(f=>f.style.width=(100*f.dataset.w/max)+'%'),150));
 </script>
 </body>
