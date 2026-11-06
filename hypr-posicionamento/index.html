@@ -14,8 +14,16 @@ html{scroll-behavior:smooth}
 html,body{margin:0;background:var(--cloud);color:var(--mid);font-family:'Urbanist',sans-serif;-webkit-font-smoothing:antialiased}
 .mono{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel)}
 .wrap{max-width:1080px;margin:0 auto;padding:0 32px}
-header{background:var(--mid);color:var(--off);padding:48px 0 88px;position:relative;overflow:hidden}
-header .brand{display:flex;justify-content:space-between;align-items:center;margin-bottom:84px}
+header{background:radial-gradient(1200px 600px at 70% 20%,#223542 0%,var(--mid) 60%);color:var(--off);padding:48px 0 120px;position:relative;overflow:hidden;min-height:92vh;display:flex;align-items:flex-end}
+header canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#grain{opacity:.07;mix-blend-mode:screen}
+.hero{position:relative;z-index:2;width:100%}
+.lens{position:absolute;z-index:1;pointer-events:none;display:flex;align-items:center;gap:14px}
+.lens .ring{width:120px;height:120px;border-radius:50%;border:.5px solid rgba(255,255,255,.35);box-shadow:0 0 0 1px rgba(22,179,155,.15) inset;display:block}
+.lens .lbl{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;color:var(--tq);white-space:nowrap}
+.mono.dot::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--tq);margin-right:10px;vertical-align:middle;box-shadow:0 0 8px rgba(22,179,155,.7)}
+@media(max-width:860px){.lens{display:none}header{min-height:0}}
+header .brand{display:flex;justify-content:space-between;align-items:center;margin-bottom:40vh}
 header .brand .mono{color:#9FB3BF}
 header h1{font-weight:300;font-size:clamp(36px,5.6vw,66px);line-height:1.04;margin:0 0 28px;letter-spacing:-.015em;max-width:900px}
 header h1 span{color:var(--cyan)}
@@ -98,7 +106,10 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 <body>
 
 <header>
-<div class="wrap">
+<canvas id="sky" aria-hidden="true"></canvas>
+<canvas id="grain" aria-hidden="true"></canvas>
+<div class="lens" id="lens"><span class="ring"></span><span class="lbl" id="lensLbl">lendo · 0 cupons</span></div>
+<div class="wrap hero">
 <div class="brand">
 <img src="hypr-wordmark-white.svg" alt="HYPR" style="width:96px;height:auto">
 <span class="mono">Posicionamento · Nov 2026</span>
@@ -115,7 +126,7 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 
 <section class="press">
 <div class="wrap">
-<span class="mono">Na imprensa</span>
+<span class="mono dot">Na imprensa</span>
 <div class="pgrid">
 <div class="pq"><span class="src">Valor Econômico</span><p>HYPR cria plataforma baseada em IA e análise de +250M de notas fiscais.</p></div>
 <div class="pq"><span class="src">Folha de S.Paulo</span><p>Cerveja de baixa caloria cresce 30% em SP e vende mais do que a sem álcool, diz HYPR.</p></div>
@@ -126,12 +137,12 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 
 <section>
 <div class="wrap">
-<span class="mono">01 · Escala</span>
+<span class="mono dot">01 · Escala</span>
 <h2>Nos últimos 12 meses, mais de <span>R$ 2 trilhões</span> em GMV processados.</h2>
 <p class="lead">Quase 9x todo o e-commerce brasileiro. Só em cupons fiscais, são R$ 30 bilhões por ano em vendas do varejo físico.</p>
 <div class="kpis">
-<div class="kpi"><span class="mono">GMV processado · 12 meses</span><div class="big">R$ 2<small> tri</small></div><div class="sub">Múltiplos setores do mundo físico, <b>quase 9x</b> o GMV de todos os e-commerces do Brasil somados.</div></div>
-<div class="kpi"><span class="mono">Cupons fiscais lidos · por ano</span><div class="big">R$ 30<small> bi</small></div><div class="sub">Vendas do varejo físico lidas item a item, o equivalente a <b>Shein, AliExpress e Temu</b> somadas no Brasil.</div></div>
+<div class="kpi"><span class="mono">GMV processado · 12 meses</span><div class="big">R$ <span class="cu" data-to="2" data-dec="0">0</span><small> tri</small></div><div class="sub">Múltiplos setores do mundo físico, <b>quase 9x</b> o GMV de todos os e-commerces do Brasil somados.</div></div>
+<div class="kpi"><span class="mono">Cupons fiscais lidos · por ano</span><div class="big">R$ <span class="cu" data-to="30" data-dec="0">0</span><small> bi</small></div><div class="sub">Vendas do varejo físico lidas item a item, o equivalente a <b>Shein, AliExpress e Temu</b> somadas no Brasil.</div></div>
 <div class="kpi"><span class="mono">Se fosse um supermercado</span><div class="big">&gt; Carrefour</div><div class="sub">A HYPR seria maior que a <b>bandeira Carrefour</b> no Brasil, com todos os hipers, supers e Express somados.</div></div>
 </div>
 </div>
@@ -139,7 +150,7 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 
 <section class="alt">
 <div class="wrap">
-<span class="mono">02 · Em perspectiva</span>
+<span class="mono dot">02 · Em perspectiva</span>
 <h2>R$ 30 bilhões por ano em cupons fiscais, <span>lado a lado</span> com quem você conhece.</h2>
 <div class="bars" id="bars">
 <div class="bar hy"><div class="nm"><b>HYPR</b> · cupons fiscais lidos</div><div class="tr"><div class="fl" data-w="30"></div></div><div class="v">R$ 30 bi</div></div>
@@ -156,7 +167,7 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 
 <section>
 <div class="wrap">
-<span class="mono">03 · A diferença</span>
+<span class="mono dot">03 · A diferença</span>
 <h2>Qual a diferença entre a HYPR e uma <span>CloudWalk</span>?</h2>
 <p class="lead">As duas processam transações do mesmo varejo. A diferença está na camada da transação que cada uma vê.</p>
 <div class="vs">
@@ -199,13 +210,13 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 
 <section class="alt">
 <div class="wrap">
-<span class="mono">04 · Prova</span>
+<span class="mono dot">04 · Prova</span>
 <h2>O que essa camada mostra: a nota fiscal <span>acompanha o índice oficial</span> e enxerga o que ele não separa.</h2>
 <p class="lead">Estudo HYPR de novembro de 2026 sobre inflação de alimentos nos distritos de São Paulo, com 41,1 milhões de notas fiscais e R$ 3,83 bilhões em compras na capital, de janeiro a outubro.</p>
 <div class="kpis">
-<div class="kpi tq"><span class="mono">Correlação mês a mês com o IPCA</span><div class="big">0,82</div><div class="sub">Índice de preços construído só com cupons fiscais, sobre <b>80 itens do IPCA</b> (99% do peso de alimentação no domicílio). Erro médio de 0,4 ponto por mês.</div></div>
-<div class="kpi tq"><span class="mono">Mesmo código de barras</span><div class="big">−10<small>%</small></div><div class="sub">O mesmo produto custa 10% menos nos distritos de menor renda: <b>718 de 788 produtos</b> comparados, mesma marca, mesma embalagem.</div></div>
-<div class="kpi tq"><span class="mono">Pico da diferença, maio/26</span><div class="big">1,2<small> p.p.</small></div><div class="sub">A cesta subiu 4,1% na periferia e 2,9% nos distritos de maior renda. <b>Tomate +74%</b> nas mesmas 42 lojas da periferia.</div></div>
+<div class="kpi tq"><span class="mono">Correlação mês a mês com o IPCA</span><div class="big"><span class="cu" data-to="0.82" data-dec="2">0</span></div><div class="sub">Índice de preços construído só com cupons fiscais, sobre <b>80 itens do IPCA</b> (99% do peso de alimentação no domicílio). Erro médio de 0,4 ponto por mês.</div></div>
+<div class="kpi tq"><span class="mono">Mesmo código de barras</span><div class="big">−<span class="cu" data-to="10" data-dec="0">0</span><small>%</small></div><div class="sub">O mesmo produto custa 10% menos nos distritos de menor renda: <b>718 de 788 produtos</b> comparados, mesma marca, mesma embalagem.</div></div>
+<div class="kpi tq"><span class="mono">Pico da diferença, maio/26</span><div class="big"><span class="cu" data-to="1.2" data-dec="1">0</span><small> p.p.</small></div><div class="sub">A cesta subiu 4,1% na periferia e 2,9% nos distritos de maior renda. <b>Tomate +74%</b> nas mesmas 42 lojas da periferia.</div></div>
 </div>
 <div class="note">FONTE · HYPR, ESTUDO INFLAÇÃO DE ALIMENTOS NOS DISTRITOS DE SÃO PAULO, NOV/2026 · GROUNDFLOW · IBGE · 3,6 MI DE COMPARAÇÕES DE PREÇO (MESMO PRODUTO, MESMA LOJA, MÊS CONTRA MÊS) · 68 DISTRITOS COM 20+ LOJAS</div>
 </div>
@@ -213,7 +224,7 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 
 <section class="close">
 <div class="wrap">
-<span class="mono" style="color:#9FB3BF">05 · Em uma frase</span>
+<span class="mono dot" style="color:#9FB3BF">05 · Em uma frase</span>
 <h2>A HYPR é a principal processadora de transações do varejo físico no Brasil.</h2>
 <p>A tecnologia que marcas usam para direcionar mídia às regiões onde precisam ganhar ou recuperar market share.</p>
 </div>
@@ -227,6 +238,27 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 </footer>
 
 <script>
+(function(){
+const c=document.getElementById('sky'),g=document.getElementById('grain'),h=c.parentElement;
+const ctx=c.getContext('2d'),gx=g.getContext('2d');let W,H,P=[];
+function size(){W=c.width=h.clientWidth;H=c.height=h.clientHeight;g.width=W;g.height=H;
+ const id=gx.createImageData(W,H);for(let i=0;i<id.data.length;i+=4){const v=Math.random()*255;id.data[i]=id.data[i+1]=id.data[i+2]=v;id.data[i+3]=255}gx.putImageData(id,0,0);
+ P=[];const n=Math.min(1400,Math.floor(W*H/900));
+ for(let i=0;i<n;i++)P.push(mk(true));}
+function mk(init){const t=Math.random();const x=init?Math.random()*W*1.2-W*.1:-20;const y=H*.36-(x-W*.5)*.2+(Math.random()-.5)*H*.16*Math.pow(Math.random(),.6);
+ return{x,y,vx:.25+Math.random()*.9,r:Math.random()<.08?1.6:.9,a:.25+Math.random()*.7,c:Math.random()<.16?'22,179,155':'220,232,240',ph:Math.random()*6.28}}
+const lens=document.getElementById('lens'),lbl=document.getElementById('lensLbl');let cnt=0,last=0;
+function frame(t){ctx.clearRect(0,0,W,H);const lx=W*.6,ly=H*.36-(lx-W*.5)*.2,lr=60;let inL=0;
+ for(const p of P){p.x+=p.vx;p.y-=p.vx*.2;p.ph+=.03;if(p.x>W+20){Object.assign(p,mk(false))}
+  const tw=.75+.25*Math.sin(p.ph);const d=Math.hypot(p.x-lx,p.y-ly);const hit=d<lr;if(hit)inL++;
+  ctx.fillStyle=`rgba(${hit?'22,179,155':p.c},${p.a*tw*(hit?1.4:1)})`;ctx.beginPath();ctx.arc(p.x,p.y,hit?p.r*1.5:p.r,0,6.28);ctx.fill()}
+ lens.style.left=(lx-lr)+'px';lens.style.top=(ly-lr)+'px';
+ if(t-last>400){cnt+=inL*37;lbl.textContent='lendo · '+cnt.toLocaleString('pt-BR')+' cupons';last=t}
+ requestAnimationFrame(frame)}
+size();addEventListener('resize',size);requestAnimationFrame(frame);
+})();
+(function(){const els=document.querySelectorAll('.cu');const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;const el=e.target;io.unobserve(el);const to=+el.dataset.to,dec=+el.dataset.dec,t0=performance.now();
+ (function st(t){const k=Math.min(1,(t-t0)/1400),v=to*(1-Math.pow(1-k,3));el.textContent=v.toLocaleString('pt-BR',{minimumFractionDigits:dec,maximumFractionDigits:dec});if(k<1)requestAnimationFrame(st)})(t0)}),{threshold:.5});els.forEach(e=>io.observe(e))})();
 const max=30;
 requestAnimationFrame(()=>setTimeout(()=>document.querySelectorAll('#bars .fl').forEach(f=>f.style.width=(100*f.dataset.w/max)+'%'),150));
 </script>
