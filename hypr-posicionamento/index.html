@@ -188,8 +188,7 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 
 <script>
 const max=35.7;
-const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){document.querySelectorAll('#bars .fl').forEach(f=>f.style.width=(100*f.dataset.w/max)+'%');io.disconnect()}})},{threshold:.3});
-io.observe(document.getElementById('bars'));
+requestAnimationFrame(()=>setTimeout(()=>document.querySelectorAll('#bars .fl').forEach(f=>f.style.width=(100*f.dataset.w/max)+'%'),150));
 </script>
 </body>
 </html>
