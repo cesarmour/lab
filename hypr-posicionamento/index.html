@@ -27,6 +27,7 @@ html,body{margin:0;background:var(--cloud);color:var(--mid);font-family:'Urbanis
 .nav .cta{background:var(--off);color:var(--mid);font-weight:600;font-size:14px;padding:11px 20px;border-radius:999px;text-decoration:none}
 header{background:#0F1A21;color:var(--off);position:relative;overflow:hidden;min-height:900px;height:100vh;display:flex;align-items:flex-end}
 header canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+header{cursor:crosshair}
 #grain{opacity:.06;mix-blend-mode:screen}
 .heroin{position:relative;z-index:2;width:100%;display:grid;grid-template-columns:1fr 408px;gap:56px;align-items:end;padding-bottom:102px;margin:0 auto}
 .kicker{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(229,235,242,.72);margin:0 0 26px}
@@ -127,7 +128,7 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 <header>
 <canvas id="sky" aria-hidden="true"></canvas>
 <canvas id="grain" aria-hidden="true"></canvas>
-<div class="lens" id="lens"><span class="ring"></span><span class="lbl" id="lensLbl">lendo · 0 cupons</span></div>
+<div class="lens" id="lens"><span class="ring"></span><span class="lbl" id="lensLbl">lendo · <b>0 compraram</b></span></div>
 <div class="wrap heroin">
 <div class="heroL">
 <p class="kicker">Posicionamento · Nov 2026</p>
@@ -256,20 +257,23 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 <script>
 (function(){
 const c=document.getElementById('sky'),g=document.getElementById('grain'),h=c.parentElement;
-const ctx=c.getContext('2d'),gx=g.getContext('2d');let W,H,P=[];
+const ctx=c.getContext('2d'),gx=g.getContext('2d');let W,H,P=[],mx=null,my=null,lx=0,ly=0;
+function base(x){return H*.40-(x-W*.5)*.17+Math.sin(x/W*4.2)*H*.03}
 function size(){W=c.width=h.clientWidth;H=c.height=h.clientHeight;g.width=W;g.height=H;
  const id=gx.createImageData(W,H);for(let i=0;i<id.data.length;i+=4){const v=Math.random()*255;id.data[i]=id.data[i+1]=id.data[i+2]=v;id.data[i+3]=255}gx.putImageData(id,0,0);
- P=[];const n=Math.min(1400,Math.floor(W*H/900));
- for(let i=0;i<n;i++)P.push(mk(true));}
-function mk(init){const t=Math.random();const x=init?Math.random()*W*1.2-W*.1:-20;const y=H*.40-(x-W*.5)*.17+(Math.random()-.5)*H*.14*Math.pow(Math.random(),.6);
- return{x,y,vx:.25+Math.random()*.9,r:Math.random()<.08?1.6:.9,a:.25+Math.random()*.7,c:Math.random()<.16?'74,222,128':'200,220,232',ph:Math.random()*6.28}}
-const lens=document.getElementById('lens'),lbl=document.getElementById('lensLbl');let cnt=0,last=0;
-function frame(t){ctx.clearRect(0,0,W,H);const lx=W*.59,ly=H*.40-(lx-W*.5)*.17,lr=77;let inL=0;
- for(const p of P){p.x+=p.vx;p.y-=p.vx*.17;p.ph+=.03;if(p.x>W+20){Object.assign(p,mk(false))}
-  const tw=.75+.25*Math.sin(p.ph);const d=Math.hypot(p.x-lx,p.y-ly);const hit=d<lr;if(hit)inL++;
-  ctx.fillStyle=`rgba(${hit?'74,222,128':p.c},${p.a*tw*(hit?1.4:1)})`;ctx.beginPath();ctx.arc(p.x,p.y,hit?p.r*1.5:p.r,0,6.28);ctx.fill()}
+ P=[];const n=Math.min(6000,Math.floor(W*H/190));for(let i=0;i<n;i++)P.push(mk(true));lx=W*.59;ly=base(lx)}
+function mk(init){const x=init?Math.random()*W*1.2-W*.1:-10;const sp=(Math.random()+Math.random()+Math.random()-1.5)/1.5;const y=base(x)+sp*H*.13;
+ return{x,y,vx:.15+Math.random()*.7,r:Math.random()<.06?1.3:.7,a:.12+Math.random()*.55,buy:Math.random()<.08,ph:Math.random()*6.28}}
+const lens=document.getElementById('lens'),lbl=document.getElementById('lensLbl');let last=0,shown=0;
+h.addEventListener('mousemove',e=>{const r=h.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top});
+h.addEventListener('mouseleave',()=>{mx=my=null});
+function frame(t){ctx.clearRect(0,0,W,H);const lr=77;
+ const tx=mx==null?W*.59:mx,ty=mx==null?base(W*.59):my;lx+=(tx-lx)*.08;ly+=(ty-ly)*.08;let inL=0;
+ for(const p of P){p.x+=p.vx;p.y-=p.vx*.17;p.ph+=.03;if(p.x>W+10){Object.assign(p,mk(false))}
+  const tw=.8+.2*Math.sin(p.ph);const hit=Math.hypot(p.x-lx,p.y-ly)<lr;const green=hit&&p.buy;if(green)inL++;
+  ctx.fillStyle=green?`rgba(74,222,128,${.9*tw})`:`rgba(200,220,232,${p.a*tw})`;ctx.beginPath();ctx.arc(p.x,p.y,green?1.6:p.r,0,6.28);ctx.fill()}
  lens.style.left=(lx-lr)+'px';lens.style.top=(ly-lr)+'px';
- if(t-last>400){cnt+=inL*37;lbl.innerHTML='lendo · <b>'+cnt.toLocaleString('pt-BR')+' cupons</b>';last=t}
+ if(t-last>350){shown=inL;lbl.innerHTML='lendo · <b>'+shown+' compraram</b>';last=t}
  requestAnimationFrame(frame)}
 size();addEventListener('resize',size);requestAnimationFrame(frame);
 })();
