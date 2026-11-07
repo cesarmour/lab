@@ -48,7 +48,10 @@ header h1{font-weight:300;font-size:clamp(40px,4.6vw,58px);line-height:1.04;marg
 section{padding:72px 0}
 section.press{padding:40px 0 44px;background:var(--off);border-bottom:.5px solid var(--mist)}
 .pgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:18px}
-.pq{border-left:2px solid var(--mid);padding:4px 0 4px 18px}
+.pq{border-left:2px solid var(--mid);padding:4px 0 4px 18px;display:block;color:inherit;text-decoration:none}
+.pq .more{display:block;margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}
+.pq:hover{border-left-color:var(--cyan)}
+.plist a{display:block}
 .pq .src{font-family:'Georgia','Times New Roman',serif;font-size:13px;letter-spacing:.02em;color:var(--mid);display:block;margin-bottom:8px}
 .pq p{margin:0;font-family:'Georgia','Times New Roman',serif;font-size:17px;line-height:1.4;color:var(--slate)}
 @media(max-width:860px){.pgrid{grid-template-columns:1fr}}
@@ -164,11 +167,11 @@ footer{background:var(--mid);color:#9FB3BF;padding:28px 0;border-top:.5px solid 
 <div class="wrap">
 <span class="mono dot">Na imprensa</span>
 <div class="pgrid">
-<div class="pq"><img class="plogo" src="img/valor.webp" alt="Valor Econômico" style="height:26px"><p>HYPR cria plataforma baseada em IA e análise de +250M de notas fiscais.</p></div>
-<div class="pq"><span class="src">Folha de S.Paulo</span><p>Cerveja de baixa caloria cresce 30% em SP e vende mais do que a sem álcool, diz HYPR.</p></div>
-<div class="pq"><img class="plogo" src="img/valor.webp" alt="Valor Econômico" style="height:26px"><p>Uma em cada cinco compras no varejo físico paulista é paga com cédulas.</p></div>
+<a class="pq" href="https://valor.globo.com/empresas/media-e-mais/noticia/2026/07/08/hypr-de-marketing-digital-cria-com-unicamp-plataforma-baseada-em-ia-e-analise-de-250-milhoes-de-notas-fiscais.ghtml" target="_blank" rel="noopener"><img class="plogo" src="img/valor.webp" alt="Valor Econômico" style="height:26px"><p>HYPR cria plataforma baseada em IA e análise de +250M de notas fiscais.</p><span class="more">Ler a matéria ↗</span></a>
+<a class="pq" href="#" data-missing="folha" target="_blank" rel="noopener"><span class="src">Folha de S.Paulo</span><p>Cerveja de baixa caloria cresce 30% em SP e vende mais do que a sem álcool, diz HYPR.</p><span class="more">Ler a matéria ↗</span></a>
+<a class="pq" href="#" data-missing="valor-cedulas" target="_blank" rel="noopener"><img class="plogo" src="img/valor.webp" alt="Valor Econômico" style="height:26px"><p>Uma em cada cinco compras no varejo físico paulista é paga com cédulas.</p><span class="more">Ler a matéria ↗</span></a>
 </div>
-<div class="plist"><img src="img/veja.webp" alt="Veja" style="height:22px"><img src="img/exame.webp" alt="Exame" style="height:16px"><span class="mono">e outros veículos</span></div>
+<div class="plist"><a href="https://veja.abril.com.br/economia/hypr-poe-2-trilhoes-de-reais-em-compras-na-ia-para-tentar-prever-o-consumo/" target="_blank" rel="noopener"><img src="img/veja.webp" alt="Veja" style="height:22px"></a><a href="https://exame.com/marketing/startup-indica-onde-as-marcas-perdem-venda-no-varejo-e-fatura-r-200-mi/" target="_blank" rel="noopener"><img src="img/exame.webp" alt="Exame" style="height:16px"></a><span class="mono">e outros veículos</span></div>
 </div>
 </section>
 
@@ -303,7 +306,7 @@ const lens=document.getElementById('lens'),lbl=document.getElementById('lensLbl'
 h.addEventListener('mousemove',e=>{const r=h.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top});
 h.addEventListener('mouseleave',()=>{mx=my=null});
 function frame(t){ctx.clearRect(0,0,W,H);const lr=77;
- const tx=mx==null?W*.59:mx,ty=mx==null?base(W*.59):my;lx+=(tx-lx)*.08;ly+=(ty-ly)*.08;let inL=0;
+ const tx=mx==null?W*.59:mx,ty=mx==null?base(W*.59):my;lx+=(tx-lx)*.28;ly+=(ty-ly)*.28;let inL=0;
  for(const p of P){p.x+=p.vx;p.y-=p.vx*.17;p.ph+=.03;if(p.x>W+10){Object.assign(p,mk(false))}
   const tw=.8+.2*Math.sin(p.ph);const hit=Math.hypot(p.x-lx,p.y-ly)<lr;const green=hit&&p.buy;if(green)inL++;
   ctx.fillStyle=green?`rgba(74,222,128,${.9*tw})`:`rgba(200,220,232,${p.a*tw})`;ctx.beginPath();ctx.arc(p.x,p.y,green?1.6:p.r,0,6.28);ctx.fill()}
