@@ -14,25 +14,35 @@ html{scroll-behavior:smooth}
 html,body{margin:0;background:var(--cloud);color:var(--mid);font-family:'Urbanist',sans-serif;-webkit-font-smoothing:antialiased}
 .mono{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel)}
 .wrap{max-width:1080px;margin:0 auto;padding:0 32px}
-header{background:radial-gradient(1200px 600px at 70% 20%,#223542 0%,var(--mid) 60%);color:var(--off);padding:48px 0 120px;position:relative;overflow:hidden;min-height:92vh;display:flex;align-items:flex-end}
+.nav{position:absolute;top:0;left:0;right:0;z-index:5;height:69px}
+.navin,.heroin{max-width:1280px;padding:0 51px}
+.navin{display:flex;align-items:center;height:69px;gap:32px}
+.nav .logo img{width:112px;height:auto;display:block}
+.nav .links{display:flex;gap:28px;font-size:15px}
+.nav .links a{color:var(--mist);text-decoration:none}
+.nav .links a:last-child{color:var(--off);border-bottom:2px solid var(--cyan);padding-bottom:3px}
+.nav .right{margin-left:auto;display:flex;align-items:center;gap:20px}
+.nav .lang{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--off)}
+.nav .lang i{color:var(--steel);font-style:normal;margin:0 4px}
+.nav .cta{background:var(--off);color:var(--mid);font-weight:600;font-size:14px;padding:11px 20px;border-radius:999px;text-decoration:none}
+header{background:#0F1A21;color:var(--off);position:relative;overflow:hidden;min-height:900px;height:100vh;display:flex;align-items:flex-end}
 header canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-#grain{opacity:.07;mix-blend-mode:screen}
-.hero{position:relative;z-index:2;width:100%}
+#grain{opacity:.06;mix-blend-mode:screen}
+.heroin{position:relative;z-index:2;width:100%;display:grid;grid-template-columns:1fr 408px;gap:56px;align-items:end;padding-bottom:102px;margin:0 auto}
+.kicker{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(229,235,242,.72);margin:0 0 26px}
+.kicker::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#4ADE80;margin-right:10px;vertical-align:middle}
+header h1{font-weight:300;font-size:clamp(40px,4.6vw,58px);line-height:1.04;margin:0;letter-spacing:-.015em;max-width:714px}
+.lede{font-size:15.5px;line-height:1.55;color:rgba(229,235,242,.78);margin:0 0 24px}
+.ctas{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:16px 26px;border-radius:999px;font-weight:600;font-size:15px;text-decoration:none;color:var(--off)}
+.btn.cyan{background:var(--cyan)}
+.btn.ghost{border:.5px solid rgba(255,255,255,.35)}
 .lens{position:absolute;z-index:1;pointer-events:none;display:flex;align-items:center;gap:14px}
-.lens .ring{width:120px;height:120px;border-radius:50%;border:.5px solid rgba(255,255,255,.35);box-shadow:0 0 0 1px rgba(22,179,155,.15) inset;display:block}
-.lens .lbl{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;color:var(--tq);white-space:nowrap}
-.mono.dot::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--tq);margin-right:10px;vertical-align:middle;box-shadow:0 0 8px rgba(22,179,155,.7)}
-@media(max-width:860px){.lens{display:none}header{min-height:0}}
-header .brand{display:flex;justify-content:space-between;align-items:center;margin-bottom:40vh}
-header .brand .mono{color:#9FB3BF}
-header h1{font-weight:300;font-size:clamp(36px,5.6vw,66px);line-height:1.04;margin:0 0 28px;letter-spacing:-.015em;max-width:900px}
-header h1 span{color:var(--cyan)}
-header p{font-size:21px;font-weight:300;line-height:1.5;color:#C9D3DA;max-width:720px;margin:0}
-header p b{font-weight:400;color:var(--off)}
-.evol{display:flex;align-items:center;gap:18px;margin-top:56px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#9FB3BF;flex-wrap:wrap}
-.evol .tag{border:.5px solid rgba(255,255,255,.22);border-radius:999px;padding:9px 16px}
-.evol .tag.now{border-color:var(--cyan);color:var(--off);background:rgba(51,151,185,.14)}
-.evol .arrow{color:var(--cyan)}
+.lens .ring{width:154px;height:154px;border-radius:50%;border:.5px solid rgba(255,255,255,.35);display:block}
+.lens .lbl{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.04em;color:#A7B4BC;white-space:nowrap}
+.lens .lbl b{color:#4ADE80;font-weight:400}
+.mono.dot::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#4ADE80;margin-right:10px;vertical-align:middle}
+@media(max-width:960px){.nav .links,.nav .lang{display:none}.heroin{grid-template-columns:1fr;gap:28px}.lens{display:none}header{min-height:0;height:auto;padding-top:120px}}
 section{padding:72px 0}
 section.press{padding:40px 0 44px;background:var(--off);border-bottom:.5px solid var(--mist)}
 .pgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:18px}
@@ -105,21 +115,27 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 </head>
 <body>
 
+<nav class="nav">
+<div class="wrap navin">
+<a href="https://hyprgrid.ai" class="logo"><img src="hypr-wordmark-white.svg" alt="HYPR"></a>
+<div class="links">
+<a href="https://hyprgrid.ai/plataforma">Plataforma</a><a href="https://hyprgrid.ai/mensuracao">Mensuração</a><a href="https://hyprgrid.ai/cases">Cases</a><a href="https://hyprgrid.ai/aplicacoes">Aplicações</a><a href="https://hyprgrid.ai/empresa">Empresa</a><a href="https://hyprgrid.ai/indice">índice</a>
+</div>
+<div class="right"><span class="lang">PT <i>/</i> EN</span><a class="cta" href="https://hyprgrid.ai/contato">Fale com a HYPR</a></div>
+</div>
+</nav>
 <header>
 <canvas id="sky" aria-hidden="true"></canvas>
 <canvas id="grain" aria-hidden="true"></canvas>
 <div class="lens" id="lens"><span class="ring"></span><span class="lbl" id="lensLbl">lendo · 0 cupons</span></div>
-<div class="wrap hero">
-<div class="brand">
-<img src="hypr-wordmark-white.svg" alt="HYPR" style="width:96px;height:auto">
-<span class="mono">Posicionamento · Nov 2026</span>
+<div class="wrap heroin">
+<div class="heroL">
+<p class="kicker">Posicionamento · Nov 2026</p>
+<h1>A principal processadora de transações do varejo físico no Brasil.</h1>
 </div>
-<h1>A principal processadora de transações do <span>varejo físico</span> no Brasil.</h1>
-<p>A HYPR nasceu como software de planejamento geoespacial e hoje desponta como a principal processadora de transações do varejo físico no Brasil. É a tecnologia que marcas como <b>L'Oréal</b> e <b>PepsiCo</b> usam para direcionar mídia às regiões onde precisam ganhar ou recuperar market share.</p>
-<div class="evol">
-<span class="tag">Planejamento geoespacial</span>
-<span class="arrow">→</span>
-<span class="tag now">Processamento de transações do varejo físico</span>
+<div class="heroR">
+<p class="lede">A HYPR nasceu como software de planejamento geoespacial e hoje desponta como a principal processadora de transações do varejo físico no Brasil. É a tecnologia que marcas como L'Oréal e PepsiCo usam para direcionar mídia às regiões onde precisam ganhar ou recuperar market share.</p>
+<div class="ctas"><a class="btn cyan" href="#escala">Ver os números <span>→</span></a><a class="btn ghost" href="https://hyprgrid.ai/contato">Fale com a HYPR</a></div>
 </div>
 </div>
 </header>
@@ -135,7 +151,7 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 </div>
 </section>
 
-<section>
+<section id="escala">
 <div class="wrap">
 <span class="mono dot">01 · Escala</span>
 <h2>Nos últimos 12 meses, mais de <span>R$ 2 trilhões</span> em GMV processados.</h2>
@@ -245,15 +261,15 @@ function size(){W=c.width=h.clientWidth;H=c.height=h.clientHeight;g.width=W;g.he
  const id=gx.createImageData(W,H);for(let i=0;i<id.data.length;i+=4){const v=Math.random()*255;id.data[i]=id.data[i+1]=id.data[i+2]=v;id.data[i+3]=255}gx.putImageData(id,0,0);
  P=[];const n=Math.min(1400,Math.floor(W*H/900));
  for(let i=0;i<n;i++)P.push(mk(true));}
-function mk(init){const t=Math.random();const x=init?Math.random()*W*1.2-W*.1:-20;const y=H*.36-(x-W*.5)*.2+(Math.random()-.5)*H*.16*Math.pow(Math.random(),.6);
- return{x,y,vx:.25+Math.random()*.9,r:Math.random()<.08?1.6:.9,a:.25+Math.random()*.7,c:Math.random()<.16?'22,179,155':'220,232,240',ph:Math.random()*6.28}}
+function mk(init){const t=Math.random();const x=init?Math.random()*W*1.2-W*.1:-20;const y=H*.40-(x-W*.5)*.17+(Math.random()-.5)*H*.14*Math.pow(Math.random(),.6);
+ return{x,y,vx:.25+Math.random()*.9,r:Math.random()<.08?1.6:.9,a:.25+Math.random()*.7,c:Math.random()<.16?'74,222,128':'200,220,232',ph:Math.random()*6.28}}
 const lens=document.getElementById('lens'),lbl=document.getElementById('lensLbl');let cnt=0,last=0;
-function frame(t){ctx.clearRect(0,0,W,H);const lx=W*.6,ly=H*.36-(lx-W*.5)*.2,lr=60;let inL=0;
- for(const p of P){p.x+=p.vx;p.y-=p.vx*.2;p.ph+=.03;if(p.x>W+20){Object.assign(p,mk(false))}
+function frame(t){ctx.clearRect(0,0,W,H);const lx=W*.59,ly=H*.40-(lx-W*.5)*.17,lr=77;let inL=0;
+ for(const p of P){p.x+=p.vx;p.y-=p.vx*.17;p.ph+=.03;if(p.x>W+20){Object.assign(p,mk(false))}
   const tw=.75+.25*Math.sin(p.ph);const d=Math.hypot(p.x-lx,p.y-ly);const hit=d<lr;if(hit)inL++;
-  ctx.fillStyle=`rgba(${hit?'22,179,155':p.c},${p.a*tw*(hit?1.4:1)})`;ctx.beginPath();ctx.arc(p.x,p.y,hit?p.r*1.5:p.r,0,6.28);ctx.fill()}
+  ctx.fillStyle=`rgba(${hit?'74,222,128':p.c},${p.a*tw*(hit?1.4:1)})`;ctx.beginPath();ctx.arc(p.x,p.y,hit?p.r*1.5:p.r,0,6.28);ctx.fill()}
  lens.style.left=(lx-lr)+'px';lens.style.top=(ly-lr)+'px';
- if(t-last>400){cnt+=inL*37;lbl.textContent='lendo · '+cnt.toLocaleString('pt-BR')+' cupons';last=t}
+ if(t-last>400){cnt+=inL*37;lbl.innerHTML='lendo · <b>'+cnt.toLocaleString('pt-BR')+' cupons</b>';last=t}
  requestAnimationFrame(frame)}
 size();addEventListener('resize',size);requestAnimationFrame(frame);
 })();
