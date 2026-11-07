@@ -105,12 +105,23 @@ p.lead{font-size:19px;line-height:1.6;color:var(--slate);max-width:760px;margin:
 .tile .sq::after{content:'';position:absolute;top:5px;right:5px;width:4px;height:4px;border-radius:1px;background:currentColor}
 .col.hy .tile{color:#9FB3BF}
 .kpi.tq .big{color:var(--mid)}
+.clients{background:var(--cloud);padding:34px 0 30px;border-bottom:.5px solid var(--mist)}
+.clients .wrap{display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap}
+.clients .mono{max-width:420px;line-height:1.7}
+.logos{display:flex;align-items:center;gap:40px}
+.logos img,.plogo,.plist img{filter:brightness(0);opacity:.58;display:block}
+.plogo{margin-bottom:10px}
+.plist{display:flex;align-items:center;gap:28px;margin-top:30px;padding-top:22px;border-top:.5px solid var(--mist)}
+footer .ftop{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;padding-bottom:22px;border-bottom:.5px solid rgba(255,255,255,.1);margin-bottom:18px}
+.badges{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.badges img{height:40px;width:auto;opacity:.85}
+footer .fbot{display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;flex-wrap:wrap;gap:10px}
 /* closing */
 .close{background:var(--mid);color:var(--off);padding:80px 0}
 .close h2{color:var(--off);max-width:900px}
 .close p{color:#C9D3DA;font-size:19px;font-weight:300;line-height:1.55;max-width:720px;margin:0}
 footer{background:var(--mid);color:#9FB3BF;padding:28px 0;border-top:.5px solid rgba(255,255,255,.1)}
-footer .wrap{display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em}
+
 @media(max-width:860px){.kpis{grid-template-columns:1fr}.vs,.who{grid-template-columns:1fr}.bar{grid-template-columns:120px 1fr 70px;gap:10px;font-size:13px}header .brand{margin-bottom:56px}}
 @media(max-width:520px){.wrap{padding:0 20px}.col{padding:26px 22px}}
 </style>
@@ -142,14 +153,22 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 </div>
 </header>
 
+<section class="clients">
+<div class="wrap">
+<span class="mono">Atendemos as 500 maiores empresas com atuação na América Latina, entre elas</span>
+<div class="logos"><img src="img/heineken.webp" alt="Heineken" style="height:20px"><img src="img/loreal.webp" alt="L'Oréal" style="height:23px"><img src="img/unilever.webp" alt="Unilever" style="height:24px"><img src="img/itau.webp" alt="Itaú" style="height:36px"></div>
+</div>
+</section>
+
 <section class="press">
 <div class="wrap">
 <span class="mono dot">Na imprensa</span>
 <div class="pgrid">
-<div class="pq"><span class="src">Valor Econômico</span><p>HYPR cria plataforma baseada em IA e análise de +250M de notas fiscais.</p></div>
+<div class="pq"><img class="plogo" src="img/valor.webp" alt="Valor Econômico" style="height:26px"><p>HYPR cria plataforma baseada em IA e análise de +250M de notas fiscais.</p></div>
 <div class="pq"><span class="src">Folha de S.Paulo</span><p>Cerveja de baixa caloria cresce 30% em SP e vende mais do que a sem álcool, diz HYPR.</p></div>
-<div class="pq"><span class="src">Valor Econômico · Índice HYPR</span><p>Uma em cada cinco compras no varejo físico paulista é paga com cédulas.</p></div>
+<div class="pq"><img class="plogo" src="img/valor.webp" alt="Valor Econômico" style="height:26px"><p>Uma em cada cinco compras no varejo físico paulista é paga com cédulas.</p></div>
 </div>
+<div class="plist"><img src="img/veja.webp" alt="Veja" style="height:22px"><img src="img/exame.webp" alt="Exame" style="height:16px"><span class="mono">e outros veículos</span></div>
 </div>
 </section>
 
@@ -226,9 +245,22 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 </div>
 </section>
 
+<section>
+<div class="wrap">
+<span class="mono dot">04 · Em campo</span>
+<h2>Quando a compra real <span>orienta a mídia</span>.</h2>
+<p class="lead">Três resultados medidos na nota fiscal. Separamos pontos de venda equivalentes em dois grupos: um recebe a campanha, o outro não. Pela nota fiscal, medimos se a campanha gerou venda na loja, e quanto.</p>
+<div class="kpis">
+<div class="kpi"><span class="mono">01 · Refrigerantes · GroundFlow Lift</span><div class="big">+19,2<small>%</small></div><div class="sub">Lift no SKU anunciado em SP, segunda onda. <b>3.651 PDVs</b> em SP e RS, exposto × controle, abr–jun 2025.</div></div>
+<div class="kpi"><span class="mono">02 · Higiene infantil</span><div class="big">+21,3<small>%</small></div><div class="sub">Em consideração de marca, medida em pesquisa com quem esteve na loja.</div></div>
+<div class="kpi"><span class="mono">03 · Fast-food</span><div class="big">+36<small> mil</small></div><div class="sub">Lembretes na agenda gerados pela campanha geolocalizada.</div></div>
+</div>
+</div>
+</section>
+
 <section class="alt">
 <div class="wrap">
-<span class="mono dot">04 · Prova</span>
+<span class="mono dot">05 · Prova</span>
 <h2>O que essa camada mostra: a nota fiscal <span>acompanha o índice oficial</span> e enxerga o que ele não separa.</h2>
 <p class="lead">Estudo HYPR de novembro de 2026 sobre inflação de alimentos nos distritos de São Paulo, com 41,1 milhões de notas fiscais e R$ 3,83 bilhões em compras na capital, de janeiro a outubro.</p>
 <div class="kpis">
@@ -242,17 +274,19 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;font-
 
 <section class="close">
 <div class="wrap">
-<span class="mono dot" style="color:#9FB3BF">05 · Em uma frase</span>
-<h2>A HYPR é a principal processadora de transações do varejo físico no Brasil.</h2>
-<p>A tecnologia que marcas usam para direcionar mídia às regiões onde precisam ganhar ou recuperar market share.</p>
+<span class="mono dot" style="color:#9FB3BF">06 · Contato</span>
+<h2>Todo mundo diz que é AI-powered. Aqui a AI é HYPR-powered.</h2>
+<p>A principal processadora de transações do varejo físico no Brasil. Leva menos de um minuto.</p>
+<div class="ctas" style="margin-top:28px"><a class="btn cyan" href="https://hyprgrid.ai/#contato">Fale com a HYPR <span>→</span></a></div>
 </div>
 </section>
 
 <footer>
-<div class="wrap">
-<span>HYPR · HYPRGRID.AI</span>
-<img src="hypr-wordmark-white.svg" alt="HYPR" style="width:64px;height:auto;opacity:.8">
+<div class="wrap ftop">
+<img src="hypr-wordmark-white.svg" alt="HYPR" style="width:96px;height:auto">
+<div class="badges"><img src="img/nvidia-inception.webp" alt="NVIDIA Inception Program"><img src="img/exame-melhores-maiores-2023.webp" alt="Exame Melhores & Maiores 2023"><img src="img/amazon-ads-verified.webp" alt="Amazon Ads Verified Partner"><img src="img/100-startups-2022.webp" alt="100 Startups to Watch 2022"></div>
 </div>
+<div class="wrap fbot"><span>HYPR · HYPRGRID.AI</span><span>Av. Andrômeda, 885 · Green Valley Alphaville · Barueri, SP</span></div>
 </footer>
 
 <script>
