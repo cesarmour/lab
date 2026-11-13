@@ -4,4 +4,3 @@ Repo pessoal do Cesar para publicar sites estáticos pelo Worker Cloudflare `lab
 
 - `hypr-agents/`: demo simulada "um chat × múltiplos agentes" (template.html + scenarios/*.js, gerada por `build.py`; casos reais por `build_real.py`). Segue o HYPR Design System (ver CLAUDE.md do repo HYPR-Projects/hypr-swarm).
 - `hypr-agents/swarm/`: só redirecionamentos. O produto Swarm vive em HYPR-Projects/hypr-swarm (`web/`) e em https://swarm.hyprgrid.ai.
-- `wf/`: HYPR Wf web, mapa de wi-fi no navegador (página única `index.html`). Mede velocidade e latência em pontos marcados sobre uma planta e abre mapas exportados pelos apps iOS e Android (2D e 3D com three.js). Segue o HYPR Design System v5.
