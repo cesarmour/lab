@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HYPR Wf · mapa de wi-fi</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Urbanist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<style>
+  /* HYPR Design System v5: neutros em 80% da peça, cyan uma ou duas vezes, teal e pink para dado. */
+  :root {
+    --midnight: #1C262F; --cloud: #FAFAFA; --offwhite: #FCFEFE; --mist: #E5EBF2; --steel: #78909C; --slate: #536872;
+    --cyan: #3397B9; --good: #16B39B; --good-deep: #017A6E; --good-soft: #C2EFE7;
+    --bad: #EA1E63; --bad-deep: #B41048; --bad-soft: #EDC5D2;
+    --r-sm: 8px; --r-md: 14px; --r-lg: 20px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { font-family: 'Urbanist', system-ui, sans-serif; font-weight: 400; color: var(--midnight); background: var(--cloud); -webkit-font-smoothing: antialiased; }
+  button, input { font-family: inherit; }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--steel); }
+  .view { display: none; min-height: 100%; }
+  .view.on { display: block; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 20px 20px 40px; }
+  h1 { font-weight: 300; font-size: clamp(34px, 8vw, 54px); line-height: 1.08; margin: 0; letter-spacing: -0.01em; }
+  h2 { font-weight: 300; font-size: clamp(28px, 6vw, 38px); line-height: 1.12; margin: 0; }
+  .hl { color: var(--cyan); }
+  p { margin: 0; }
+  .lead { font-size: 17px; color: var(--steel); line-height: 1.45; }
+  .btn { display: block; width: 100%; border: 0; border-radius: var(--r-md); padding: 16px; font-size: 17px; font-weight: 600; cursor: pointer; text-align: center; background: var(--midnight); color: var(--cloud); }
+  .btn.ghost { background: transparent; color: var(--midnight); box-shadow: inset 0 0 0 1.5px var(--midnight); }
+  .btn:disabled { opacity: 0.4; cursor: default; }
+  .dark .btn { background: var(--cloud); color: var(--midnight); }
+  .dark .btn.ghost { background: transparent; color: var(--cloud); box-shadow: inset 0 0 0 1px rgba(250,250,250,0.3); font-weight: 500; font-size: 16px; }
+  .card { background: #fff; border: 1px solid var(--mist); border-radius: var(--r-lg); padding: 18px; }
+  .stack > * + * { margin-top: 16px; }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .spacer { flex: 1; }
+  .pill { border: 0; border-radius: 999px; padding: 8px 14px; font-size: 14px; font-weight: 500; cursor: pointer; background: var(--mist); color: var(--slate); }
+  .pill.on { background: var(--midnight); color: var(--cloud); }
+  .iconbtn { width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--mist); color: var(--midnight); cursor: pointer; font-size: 18px; line-height: 1; display: grid; place-items: center; }
+  .small { font-size: 13px; color: var(--steel); line-height: 1.45; }
+  .body { font-size: 15px; line-height: 1.5; color: var(--slate); }
+
+  /* Capa */
+  #home { background: var(--midnight); color: var(--cloud); }
+  #home .wrap { min-height: 100vh; display: flex; flex-direction: column; }
+  #home .mono { color: var(--steel); }
+  .steps { background: rgba(250,250,250,0.05); border: 1px solid rgba(250,250,250,0.08); border-radius: var(--r-lg); padding: 0 16px; }
+  .step { display: flex; gap: 14px; padding: 14px 0; align-items: baseline; }
+  .step + .step { border-top: 1px solid rgba(250,250,250,0.1); }
+  .step .t { font-size: 15px; color: rgba(250,250,250,0.85); margin-top: 3px; }
+  .step .mono.l { color: var(--mist); }
+  .saved { border-top: 1px solid rgba(250,250,250,0.1); padding: 12px 0; display: flex; gap: 12px; align-items: center; cursor: pointer; }
+  .saved .n { font-size: 17px; }
+  .saved button { background: none; border: 0; color: var(--steel); cursor: pointer; font-size: 18px; }
+
+  /* Levantamento */
+  .stage { position: relative; background: #fff; border: 1px solid var(--mist); border-radius: var(--r-lg); overflow: hidden; box-shadow: 0 6px 16px rgba(28,38,47,0.06); touch-action: manipulation; }
+  .stage canvas { display: block; width: 100%; height: auto; }
+  .hero { font-weight: 300; font-size: 64px; line-height: 1; }
+  .hero small { font-size: 20px; color: var(--steel); font-weight: 300; margin-left: 4px; }
+  .chip { display: inline-block; border-radius: 999px; padding: 4px 10px; font-size: 13px; font-weight: 600; background: var(--mist); color: var(--slate); }
+  .chip.good { background: var(--good-soft); color: var(--good-deep); }
+  .chip.bad { background: var(--bad-soft); color: var(--bad-deep); }
+  input[type=number], input[type=text] { border: 1px solid var(--mist); border-radius: var(--r-sm); padding: 10px 12px; font-size: 16px; width: 110px; color: var(--midnight); background: #fff; }
+  .banner { background: var(--mist); color: var(--midnight); border-radius: 999px; padding: 8px 14px; font-size: 14px; font-weight: 500; display: inline-block; }
+
+  /* Resultado */
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .kpi { background: #fff; border: 1px solid var(--mist); border-radius: var(--r-md); padding: 14px; }
+  .kpi .v { font-weight: 300; font-size: 30px; line-height: 1.1; }
+  .kpi .v small { font-size: 13px; color: var(--steel); font-weight: 400; margin-left: 3px; }
+  .legend { display: flex; align-items: center; gap: 10px; }
+  .legend .bar { flex: 1; height: 8px; border-radius: 999px; background: linear-gradient(90deg, #EA1E63, #D3DCE6, #16B39B); }
+  .area .v { font-weight: 300; font-size: 44px; line-height: 1; }
+  .area .v small { font-size: 18px; color: var(--steel); font-weight: 400; margin-left: 4px; }
+  .zone { display: flex; gap: 12px; align-items: flex-start; }
+  .zone + .zone { border-top: 1px solid var(--mist); padding-top: 12px; margin-top: 12px; }
+  .plus { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--midnight); color: #fff; display: grid; place-items: center; font-size: 16px; line-height: 1; }
+  .node { display: flex; gap: 12px; align-items: center; margin-top: 12px; }
+  .node .b { flex: none; width: 26px; height: 26px; border-radius: 7px; color: #fff; display: grid; place-items: center; font-size: 13px; font-weight: 600; }
+  #three { width: 100%; height: 460px; display: block; }
+  canvas[hidden] { display: none !important; }
+  .wm { height: 16px; display: block; }
+  .wm.sm { height: 14px; }
+  .err { color: var(--bad-deep); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<!-- Capa: escura, uma palavra de destaque, botão primário em tinta -->
+<section id="home" class="view on dark">
+  <div class="wrap">
+    <div class="row"><img class="wm" src="hypr-wordmark-white.svg" alt="HYPR"><span class="spacer"></span><span class="mono">Wf · web</span></div>
+    <div style="flex:1; min-height: 40px"></div>
+    <div class="mono" style="margin-bottom:14px">Mapa de wi-fi · navegador</div>
+    <h1>Onde o wi-fi <span class="hl">chega</span>, cômodo a cômodo.</h1>
+    <p class="lead" style="margin-top:14px">Marque onde você está na planta e o navegador mede a rede em cada ponto. Ou abra um mapa feito no app.</p>
+    <div style="flex:1; min-height: 32px"></div>
+    <div class="steps">
+      <div class="step"><span class="mono">01</span><div><div class="mono l">Planta</div><div class="t">Envie uma imagem da planta ou use a grade em branco.</div></div></div>
+      <div class="step"><span class="mono">02</span><div><div class="mono l">Medição</div><div class="t">Ande pela casa e toque na planta onde você está.</div></div></div>
+      <div class="step"><span class="mono">03</span><div><div class="mono l">Resultado</div><div class="t">Mapa de calor, zonas fracas e onde pôr um nó extra.</div></div></div>
+    </div>
+    <button class="btn" id="go-survey" style="margin-top:20px">Mapear agora</button>
+    <button class="btn ghost" id="go-import" style="margin-top:10px">Abrir mapa do app</button>
+    <input type="file" id="file-json" accept=".json,application/json" hidden>
+    <div id="saved-list" style="margin-top:18px"></div>
+    <p class="err" id="home-err" style="margin-top:10px"></p>
+  </div>
+</section>
+
+<!-- Preparo: planta e escala -->
+<section id="setup" class="view">
+  <div class="wrap stack">
+    <div class="row"><button class="iconbtn" data-back="home" aria-label="Voltar">&#8249;</button><span class="spacer"></span><img class="wm sm" src="hypr-wordmark-midnight.svg" alt="HYPR"></div>
+    <div class="mono">Passo 1 de 2 · planta</div>
+    <h2>Qual é a <span class="hl">planta</span></h2>
+    <div class="row" style="flex-wrap:wrap">
+      <button class="pill on" id="mode-grid">Grade em branco</button>
+      <button class="pill" id="mode-image">Enviar imagem</button>
+      <input type="file" id="file-img" accept="image/*" hidden>
+    </div>
+    <div class="card stack" id="grid-opts">
+      <div class="row"><span class="body">Largura da área</span><span class="spacer"></span><input type="number" id="grid-w" value="12" min="2" max="200" step="1"><span class="body">m</span></div>
+      <div class="row"><span class="body">Profundidade</span><span class="spacer"></span><input type="number" id="grid-h" value="10" min="2" max="200" step="1"><span class="body">m</span></div>
+      <p class="small">Cada quadrado da grade vale 1 m. Use como rascunho da casa.</p>
+    </div>
+    <div class="stack" id="img-opts" hidden>
+      <p class="body" id="scale-help">Toque em dois pontos da planta cuja distância real você conhece (uma parede, por exemplo).</p>
+      <div class="stage"><canvas id="scale-canvas"></canvas></div>
+      <div class="card row"><span class="body">Distância entre os dois pontos</span><span class="spacer"></span><input type="number" id="scale-m" value="4" min="0.1" step="0.1"><span class="body">m</span></div>
+    </div>
+    <button class="btn" id="start-survey">Começar a medir</button>
+    <p class="err" id="setup-err"></p>
+  </div>
+</section>
+
+<!-- Medição -->
+<section id="survey" class="view">
+  <div class="wrap stack">
+    <div class="row"><button class="iconbtn" data-back="home" aria-label="Sair">&#215;</button><span class="spacer"></span><span class="mono" id="survey-count">Medindo · 0 pontos</span></div>
+    <div>
+      <div class="hero"><span id="live-v">0</span><small id="live-u">mbps</small></div>
+      <div class="row" style="margin-top:8px"><span class="chip" id="live-chip">toque na planta</span><span class="mono" id="live-lat">Latência · sem medição</span></div>
+    </div>
+    <div class="stage"><canvas id="survey-canvas"></canvas></div>
+    <div class="row" style="flex-wrap:wrap">
+      <button class="pill on" id="tool-point">Medir aqui</button>
+      <button class="pill" id="tool-node">Marcar roteador ou nó</button>
+      <span class="spacer"></span>
+      <button class="pill" id="undo">Desfazer</button>
+    </div>
+    <p class="small" id="survey-help">Vá até um ponto da casa, toque no lugar correspondente da planta e espere a medição terminar antes de andar.</p>
+    <button class="btn" id="finish-survey" disabled>Concluir</button>
+  </div>
+</section>
+
+<!-- Resultado: superfície clara -->
+<section id="result" class="view">
+  <div class="wrap stack">
+    <div class="row"><button class="iconbtn" data-back="home" aria-label="Voltar">&#8249;</button><span class="spacer"></span><img class="wm sm" src="hypr-wordmark-midnight.svg" alt="HYPR"></div>
+    <div class="mono" id="res-label">Resultado</div>
+    <h2 id="res-title">Mapa de <span class="hl">velocidade</span></h2>
+    <div class="row" style="flex-wrap:wrap"><span id="metric-pills" class="row"></span><span class="spacer"></span><span id="dim-pills" class="row"></span></div>
+    <div class="stage" id="res-stage"><canvas id="res-canvas"></canvas><canvas id="three" hidden></canvas></div>
+    <div class="legend"><span class="mono" id="leg-lo"></span><span class="bar"></span><span class="mono" id="leg-hi"></span></div>
+    <div class="card area row" id="area-card"><div class="v"><span id="area-v"></span><small>m²</small></div><span class="spacer"></span><span class="mono" id="area-l">Área escaneada</span></div>
+    <div class="kpis" id="kpis"></div>
+    <div class="card" id="rec-card"></div>
+    <div class="card" id="nodes-card"></div>
+    <button class="btn" id="dl-png">Baixar imagem do mapa</button>
+    <button class="btn ghost" id="dl-json">Exportar dados</button>
+  </div>
+</section>
+
+<script type="module">
+// ---------- utilidades
+const $ = (id) => document.getElementById(id);
+const fmt = (v, d = 0) => Number(v).toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d });
+const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+const median = (arr) => { const s = [...arr].sort((a, b) => a - b); return s[Math.floor(s.length / 2)]; };
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random());
+
+const METRICS = {
+  mbps: { label: 'Velocidade', unit: 'mbps', higher: true, get: (s) => s.mbps },
+  latencyMs: { label: 'Latência', unit: 'ms', higher: false, get: (s) => s.latencyMs },
+  rssi: { label: 'Sinal', unit: 'dBm', higher: true, get: (s) => s.rssi },
+};
+const NODE_COLORS = ['#3397B9', '#5F25FF', '#FF5528', '#536872'];
+
+// Escala divergente de dado: 0 ruim (pink), 0,5 neutro (mist), 1 bom (teal).
+function heat(q) {
+  const bad = [0xEA, 0x1E, 0x63], mid = [0xD3, 0xDC, 0xE6], good = [0x16, 0xB3, 0x9B];
+  const t = Math.min(Math.max(q, 0), 1);
+  const [a, b, f] = t < 0.5 ? [bad, mid, t * 2] : [mid, good, (t - 0.5) * 2];
+  return a.map((v, i) => Math.round(v + (b[i] - v) * f));
+}
+const quality = (v, lo, hi, higher) => { if (!(hi > lo)) return 1; const t = Math.min(Math.max((v - lo) / (hi - lo), 0), 1); return higher ? t : 1 - t; };
+
+function show(id) {
+  document.querySelectorAll('.view').forEach((v) => v.classList.toggle('on', v.id === id));
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('[data-back]').forEach((b) => b.addEventListener('click', () => { renderSaved(); show(b.dataset.back); }));
+
+// ---------- armazenamento local
+const KEY = 'hypr-wf-maps';
+function loadMaps() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } }
+function saveMap(map) {
+  try {
+    const maps = loadMaps().filter((m) => m.id !== map.id);
+    maps.unshift(map);
+    localStorage.setItem(KEY, JSON.stringify(maps.slice(0, 20)));
+  } catch { /* armazenamento cheio ou indisponível: o mapa segue aberto na tela */ }
+}
+function deleteMap(id) { try { localStorage.setItem(KEY, JSON.stringify(loadMaps().filter((m) => m.id !== id))); } catch {} }
+function renderSaved() {
+  const maps = loadMaps();
+  const el = $('saved-list');
+  el.innerHTML = '';
+  if (!maps.length) return;
+  const h = document.createElement('div'); h.className = 'mono'; h.textContent = `Mapas salvos · ${maps.length}`; h.style.marginBottom = '6px';
+  el.appendChild(h);
+  for (const m of maps) {
+    const row = document.createElement('div'); row.className = 'saved';
+    const info = document.createElement('div'); info.style.flex = '1';
+    const n = document.createElement('div'); n.className = 'n'; n.textContent = m.name;
+    const s = document.createElement('div'); s.className = 'mono'; s.textContent = `${m.samples.length} pontos` + (m.plan?.floorArea ? ` · ${fmt(m.plan.floorArea)} m²` : '');
+    info.append(n, s);
+    const del = document.createElement('button'); del.textContent = '×'; del.setAttribute('aria-label', 'Apagar');
+    del.addEventListener('click', (e) => { e.stopPropagation(); deleteMap(m.id); renderSaved(); });
+    row.append(info, del);
+    row.addEventListener('click', () => openResult(m));
+    el.appendChild(row);
+  }
+}
+
+// ---------- importar mapa do app (JSON do iOS ou do Android)
+function normalize(raw) {
+  if (!raw || !Array.isArray(raw.samples)) throw new Error('Arquivo sem medições');
+  const plan = raw.plan || {};
+  let date = raw.date;
+  if (typeof date === 'number') date = new Date((date + 978307200) * 1000).toISOString(); // Swift conta a partir de 2001
+  return {
+    id: raw.id || uid(), name: raw.name || 'Mapa importado', date: date || new Date().toISOString(),
+    source: raw.source || 'app', areaCount: raw.areaCount || 1,
+    plan: {
+      segments: plan.segments || [], objects: plan.objects || [], walls3D: plan.walls3D || [],
+      doors3D: plan.doors3D || [], objects3D: plan.objects3D || [], floorY: plan.floorY || 0, floorArea: plan.floorArea || 0,
+    },
+    samples: raw.samples.map((s) => ({ id: s.id || uid(), x: s.x, z: s.z, mbps: s.mbps ?? null, latencyMs: s.latencyMs ?? null, rssi: s.rssi ?? null, bssid: s.bssid ?? null })),
+    marks: raw.marks || [], image: raw.image || null,
+  };
+}
+$('go-import').addEventListener('click', () => $('file-json').click());
+$('file-json').addEventListener('change', async (e) => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  try {
+    const map = normalize(JSON.parse(await f.text()));
+    saveMap(map); openResult(map);
+  } catch (err) { $('home-err').textContent = 'Não consegui ler esse arquivo. Use o arquivo exportado pelo app em Exportar dados.'; }
+});
+
+// ---------- análise: nós da mesh e zonas fracas (mesma lógica do app)
+function nodeKey(bssid) {
+  if (!bssid) return null;
+  const p = bssid.toLowerCase().split(':').map((o) => (o.length === 1 ? '0' + o : o));
+  return p.length === 6 ? p.slice(0, 5).join(':') : null;
+}
+function analyze(map) {
+  const samples = map.samples;
+  const has = (k) => samples.filter((s) => METRICS[k].get(s) != null).length;
+  let metric = 'mbps';
+  if (has('rssi') * 2 >= samples.length && has('rssi') > 0) metric = 'rssi';
+  else if (!(has('mbps') * 2 >= samples.length && Math.max(0, ...samples.map((s) => s.mbps || 0)) > 0)) metric = 'latencyMs';
+  const M = METRICS[metric];
+  const out = { metric, nodes: [], zones: [], nodeOf: new Map(), hasBSSID: false };
+
+  const keys = [], members = [];
+  for (const s of samples) {
+    const k = nodeKey(s.bssid); if (!k) continue;
+    let i = keys.indexOf(k);
+    if (i < 0) { keys.push(k); members.push([]); i = keys.length - 1; }
+    members[i].push(s); out.nodeOf.set(s.id, i);
+  }
+  out.hasBSSID = keys.length > 0;
+  const tagged = Math.max(members.reduce((n, g) => n + g.length, 0), 1);
+  const owner = new Map();
+  for (const mark of map.marks) {
+    let best = null;
+    members.forEach((g, i) => { if (owner.has(i)) return; for (const s of g) { const d = dist(mark, [s.x, s.z]); if (!best || d < best.d) best = { i, d }; } });
+    if (best) owner.set(best.i, mark);
+  }
+  if (!keys.length) map.marks.forEach((mark, i) => out.nodes.push({ id: i, label: String.fromCharCode(65 + i % 26), count: 0, share: 0, median: null, position: mark, marked: true }));
+  members.forEach((g, i) => {
+    const vals = g.map(M.get).filter((v) => v != null);
+    let position = owner.get(i) || null; const marked = !!position;
+    if (!position) {
+      const ranked = [...g].sort((a, b) => { const va = M.get(a) ?? (M.higher ? -1e9 : 1e9), vb = M.get(b) ?? (M.higher ? -1e9 : 1e9); return M.higher ? vb - va : va - vb; }).slice(0, 3);
+      if (ranked.length) position = [ranked.reduce((n, s) => n + s.x, 0) / ranked.length, ranked.reduce((n, s) => n + s.z, 0) / ranked.length];
+    }
+    out.nodes.push({ id: i, label: String.fromCharCode(65 + i % 26), count: g.length, share: g.length / tagged, median: vals.length ? median(vals) : null, position, marked });
+  });
+
+  const valued = samples.map((s) => ({ s, v: M.get(s) })).filter((o) => o.v != null);
+  if (valued.length < 8) return out;
+  const sorted = valued.map((o) => o.v).sort((a, b) => a - b);
+  const med = sorted[Math.floor(sorted.length / 2)], p75 = sorted[Math.min(Math.floor(sorted.length * 3 / 4), sorted.length - 1)], p25 = sorted[Math.floor(sorted.length / 4)];
+  // dBm é negativo e em escala logarítmica: fraco é 12 dB abaixo do bom, ou pior que -72 dBm.
+  const isWeak = metric === 'rssi' ? (v) => v < Math.max(p75 - 12, -72) && v < p75 - 6
+    : M.higher ? (v) => v < 0.35 * p75 : (v) => v > Math.max(3 * med, 30);
+  const isStrong = metric === 'rssi' ? (v) => v >= Math.max(p75 - 6, -65)
+    : M.higher ? (v) => v >= 0.6 * p75 : (v) => v <= Math.max(1.5 * med, 10);
+  const weak = valued.filter((o) => isWeak(o.v));
+  if (!weak.length || weak.length * 10 >= valued.length * 7) return out;
+  const link = map.source === 'web' ? 2.5 : 1.5; // medições manuais são mais espaçadas
+  const cluster = new Array(weak.length).fill(-1); let n = 0;
+  for (let i = 0; i < weak.length; i++) {
+    if (cluster[i] >= 0) continue;
+    cluster[i] = n; const queue = [i];
+    while (queue.length) { const a = queue.pop(); for (let b = 0; b < weak.length; b++) if (cluster[b] < 0 && dist([weak[a].s.x, weak[a].s.z], [weak[b].s.x, weak[b].s.z]) <= link) { cluster[b] = n; queue.push(b); } }
+    n++;
+  }
+  const strong = valued.filter((o) => isStrong(o.v));
+  const minPts = map.source === 'web' ? 2 : 3;
+  for (let c = 0; c < n; c++) {
+    const g = weak.filter((_, i) => cluster[i] === c);
+    if (g.length < minPts) continue;
+    const center = [g.reduce((t, o) => t + o.s.x, 0) / g.length, g.reduce((t, o) => t + o.s.z, 0) / g.length];
+    const radius = Math.max(...g.map((o) => dist([o.s.x, o.s.z], center))) + 0.5;
+    let suggestion = null, best = Infinity;
+    for (const o of strong) { const d = dist([o.s.x, o.s.z], center); if (d > radius && d < best) { best = d; suggestion = [o.s.x, o.s.z]; } }
+    let nearest = null, nd = Infinity;
+    for (const node of out.nodes) if (node.position) { const d = dist(node.position, center); if (d < nd) { nd = d; nearest = node.label; } }
+    out.zones.push({ center, radius, count: g.length, median: median(g.map((o) => o.v)), suggestion, distance: suggestion ? best : null, nearest });
+  }
+  out.zones.sort((a, b) => b.count - a.count);
+  return out;
+}
+
+// ---------- desenho 2D
+function bounds(map, pad = 0.6) {
+  const pts = map.samples.map((s) => [s.x, s.z]);
+  for (const s of map.plan.segments) pts.push(s.a, s.b);
+  for (const m of map.marks) pts.push(m);
+  if (map.image) pts.push([0, 0], [map.image.w * map.image.mpp, map.image.h * map.image.mpp]);
+  if (map.grid) pts.push([0, 0], [map.grid.w, map.grid.h]);
+  if (!pts.length) pts.push([0, 0], [1, 1]);
+  let lo = [Infinity, Infinity], hi = [-Infinity, -Infinity];
+  for (const p of pts) { lo = [Math.min(lo[0], p[0]), Math.min(lo[1], p[1])]; hi = [Math.max(hi[0], p[0]), Math.max(hi[1], p[1])]; }
+  const fixed = map.image || map.grid; // planta manual: sem margem, casa com a imagem
+  if (!fixed) { lo = [lo[0] - pad, lo[1] - pad]; hi = [hi[0] + pad, hi[1] + pad]; }
+  return { lo, hi, span: [Math.max(hi[0] - lo[0], 0.1), Math.max(hi[1] - lo[1], 0.1)] };
+}
+// Mapa de calor por inverso da distância ao quadrado, em um canvas próprio.
+function heatCanvas(map, metricKey, b, cells = 110, reach = 2.5) {
+  const M = METRICS[metricKey];
+  const pts = map.samples.filter((s) => M.get(s) != null).map((s) => ({ x: s.x, z: s.z, v: M.get(s) }));
+  if (!pts.length) return null;
+  const vals = pts.map((p) => p.v), lo = Math.min(...vals), hi = Math.max(...vals);
+  const cell = Math.max(b.span[0], b.span[1]) / cells;
+  const cols = Math.max(Math.ceil(b.span[0] / cell), 1), rows = Math.max(Math.ceil(b.span[1] / cell), 1);
+  const c = document.createElement('canvas'); c.width = cols; c.height = rows;
+  const ctx = c.getContext('2d'); const img = ctx.createImageData(cols, rows);
+  if (map.source === 'web') reach = 4;
+  for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+    const x = b.lo[0] + (i + 0.5) * cell, z = b.lo[1] + (j + 0.5) * cell;
+    let num = 0, den = 0, near = Infinity;
+    for (const p of pts) { const d = Math.hypot(p.x - x, p.z - z); if (d < near) near = d; const w = 1 / Math.max(d * d, 0.01); num += w * p.v; den += w; }
+    if (near > reach || !den) continue;
+    const rgb = heat(quality(num / den, lo, hi, M.higher));
+    const fade = Math.min(Math.max((reach - near) / 0.8, 0), 1);
+    const k = (j * cols + i) * 4;
+    img.data[k] = rgb[0]; img.data[k + 1] = rgb[1]; img.data[k + 2] = rgb[2]; img.data[k + 3] = Math.round(215 * fade);
+  }
+  ctx.putImageData(img, 0, 0);
+  return c;
+}
+const imgCache = new Map();
+function planImage(map, redraw) {
+  if (!map.image) return null;
+  let im = imgCache.get(map.image.src);
+  if (!im) { im = new Image(); im.onload = redraw; im.src = map.image.src; imgCache.set(map.image.src, im); }
+  return im.complete && im.naturalWidth ? im : null;
+}
+function draw2D(canvas, map, opts = {}) {
+  const b = bounds(map);
+  const cssW = canvas.parentElement.clientWidth || 600;
+  const ratio = b.span[1] / b.span[0];
+  const cssH = Math.max(Math.min(cssW * ratio, 640), 240);
+  const dpr = opts.dpr || Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+  canvas.style.height = cssH + 'px';
+  const ctx = canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cssW, cssH);
+  const padPx = map.image || map.grid ? 0 : 12;
+  const scale = Math.min((cssW - padPx * 2) / b.span[0], (cssH - padPx * 2) / b.span[1]);
+  const off = [(cssW - b.span[0] * scale) / 2, (cssH - b.span[1] * scale) / 2];
+  const pt = (p) => [(p[0] - b.lo[0]) * scale + off[0], (p[1] - b.lo[1]) * scale + off[1]];
+  canvas._inv = (px, py) => [(px - off[0]) / scale + b.lo[0], (py - off[1]) / scale + b.lo[1]];
+
+  // planta de fundo
+  const im = planImage(map, () => draw2D(canvas, map, opts));
+  if (im) { const [x0, y0] = pt([0, 0]); ctx.globalAlpha = 0.9; ctx.drawImage(im, x0, y0, map.image.w * map.image.mpp * scale, map.image.h * map.image.mpp * scale); ctx.globalAlpha = 1; }
+  if (map.grid) {
+    ctx.strokeStyle = '#E5EBF2'; ctx.lineWidth = 1;
+    for (let x = 0; x <= map.grid.w; x++) { const [px] = pt([x, 0]); ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, cssH); ctx.stroke(); }
+    for (let z = 0; z <= map.grid.h; z++) { const [, py] = pt([0, z]); ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(cssW, py); ctx.stroke(); }
+  }
+  // calor
+  const metricKey = opts.metric || 'mbps';
+  const hc = heatCanvas(map, metricKey, b);
+  if (hc) { const [x0, y0] = pt(b.lo); ctx.imageSmoothingEnabled = true; ctx.drawImage(hc, x0, y0, b.span[0] * scale, b.span[1] * scale); }
+  // móveis e paredes
+  ctx.lineCap = 'round';
+  for (const o of map.plan.objects) if (o.corners?.length === 4) { ctx.strokeStyle = 'rgba(120,144,156,0.7)'; ctx.lineWidth = 1; ctx.beginPath(); o.corners.forEach((c, i) => { const [x, y] = pt(c); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.closePath(); ctx.stroke(); }
+  const segColor = { wall: '#1C262F', door: '#78909C', window: '#E5EBF2', opening: '#FCFEFE' };
+  for (const kind of ['wall', 'opening', 'door', 'window']) for (const s of map.plan.segments) if (s.kind === kind) { const [x1, y1] = pt(s.a), [x2, y2] = pt(s.b); ctx.strokeStyle = segColor[kind]; ctx.lineWidth = 3.5; ctx.lineCap = kind === 'wall' ? 'round' : 'butt'; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); }
+  const an = opts.analysis;
+  // zonas fracas
+  if (an) for (const z of an.zones) { const [x, y] = pt(z.center); ctx.strokeStyle = '#B41048'; ctx.lineWidth = 2; ctx.setLineDash([6, 4]); ctx.beginPath(); ctx.arc(x, y, z.radius * scale, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]); }
+  // pontos
+  for (const s of map.samples) {
+    const [x, y] = pt([s.x, s.z]); const r = opts.bigDots ? 5 : 2.5;
+    const ni = an?.nodeOf.get(s.id);
+    ctx.fillStyle = ni != null ? NODE_COLORS[ni % NODE_COLORS.length] : '#fff';
+    ctx.strokeStyle = 'rgba(28,38,47,0.7)'; ctx.lineWidth = 0.75;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  }
+  // nós (da análise ou marcas cruas durante a medição)
+  const nodes = an ? an.nodes.filter((n) => n.position) : map.marks.map((m, i) => ({ id: i, label: String.fromCharCode(65 + i % 26), position: m }));
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = '600 13px Urbanist, sans-serif';
+  for (const n of nodes) { const [x, y] = pt(n.position); ctx.fillStyle = NODE_COLORS[n.id % NODE_COLORS.length]; ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.roundRect(x - 11, y - 11, 22, 22, 6); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#fff'; ctx.fillText(n.label, x, y + 1); }
+  // nó extra sugerido
+  if (an) for (const z of an.zones) if (z.suggestion) { const [x, y] = pt(z.suggestion); ctx.fillStyle = '#1C262F'; ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(x, y, 13, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x - 6, y); ctx.lineTo(x + 6, y); ctx.moveTo(x, y - 6); ctx.lineTo(x, y + 6); ctx.stroke(); }
+  if (opts.pending) { const [x, y] = pt(opts.pending); ctx.strokeStyle = '#1C262F'; ctx.lineWidth = 2; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.arc(x, y, 12, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]); }
+}
+function canvasPoint(canvas, e) {
+  const r = canvas.getBoundingClientRect();
+  return canvas._inv(e.clientX - r.left, e.clientY - r.top);
+}
+
+// ---------- medição de rede no navegador
+const SPEED = 'https://speed.cloudflare.com/__down?bytes=';
+async function measureLatency() {
+  let best = null;
+  for (let i = 0; i < 3; i++) {
+    const t = performance.now();
+    try { await fetch(SPEED + '0&r=' + Math.random(), { cache: 'no-store' }); const d = performance.now() - t; best = best == null ? d : Math.min(best, d); } catch {}
+  }
+  return best;
+}
+async function measureSpeed() {
+  const t = performance.now();
+  try {
+    const ctrl = new AbortController(); const timer = setTimeout(() => ctrl.abort(), 12000);
+    const res = await fetch(SPEED + '2000000&r=' + Math.random(), { cache: 'no-store', signal: ctrl.signal });
+    if (!res.ok) { clearTimeout(timer); return null; }
+    const buf = await res.arrayBuffer(); clearTimeout(timer);
+    const secs = (performance.now() - t) / 1000;
+    return buf.byteLength >= 100000 && secs > 0 ? (buf.byteLength * 8) / secs / 1e6 : null;
+  } catch { return 0; } // sem rede ou tempo esgotado: zona morta
+}
+
+// ---------- preparo
+let setup = { mode: 'grid', img: null, p: [] };
+let current = null; // mapa em medição
+$('go-survey').addEventListener('click', () => { setup = { mode: 'grid', img: null, p: [] }; syncSetup(); show('setup'); });
+function syncSetup() {
+  $('mode-grid').classList.toggle('on', setup.mode === 'grid');
+  $('mode-image').classList.toggle('on', setup.mode === 'image');
+  $('grid-opts').hidden = setup.mode !== 'grid';
+  $('img-opts').hidden = setup.mode !== 'image';
+  $('setup-err').textContent = '';
+  if (setup.mode === 'image') drawScale();
+}
+$('mode-grid').addEventListener('click', () => { setup.mode = 'grid'; syncSetup(); });
+$('mode-image').addEventListener('click', () => $('file-img').click());
+$('file-img').addEventListener('change', (e) => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  const url = URL.createObjectURL(f);
+  const im = new Image();
+  im.onload = () => {
+    // reduz para caber no armazenamento local
+    const k = Math.min(1, 1400 / Math.max(im.naturalWidth, im.naturalHeight));
+    const c = document.createElement('canvas'); c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k);
+    const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height);
+    setup.img = { src: c.toDataURL('image/jpeg', 0.8), w: c.width, h: c.height, el: c };
+    setup.mode = 'image'; setup.p = []; syncSetup(); URL.revokeObjectURL(url);
+  };
+  im.src = url;
+});
+function drawScale() {
+  const c = $('scale-canvas'); if (!setup.img) return;
+  const cssW = c.parentElement.clientWidth || 600; const cssH = cssW * setup.img.h / setup.img.w;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  c.width = cssW * dpr; c.height = cssH * dpr; c.style.height = cssH + 'px';
+  const x = c.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0);
+  x.drawImage(setup.img.el, 0, 0, cssW, cssH);
+  const k = cssW / setup.img.w;
+  x.strokeStyle = '#1C262F'; x.fillStyle = '#1C262F'; x.lineWidth = 2;
+  if (setup.p.length === 2) { x.beginPath(); x.moveTo(setup.p[0][0] * k, setup.p[0][1] * k); x.lineTo(setup.p[1][0] * k, setup.p[1][1] * k); x.stroke(); }
+  for (const p of setup.p) { x.beginPath(); x.arc(p[0] * k, p[1] * k, 6, 0, Math.PI * 2); x.fill(); x.strokeStyle = '#fff'; x.stroke(); x.strokeStyle = '#1C262F'; }
+  $('scale-help').textContent = setup.p.length === 2 ? 'Informe abaixo a distância real entre os dois pontos. Toque de novo para remarcar.' : 'Toque em dois pontos da planta cuja distância real você conhece (uma parede, por exemplo).';
+}
+$('scale-canvas').addEventListener('click', (e) => {
+  const c = $('scale-canvas'); const r = c.getBoundingClientRect(); const k = setup.img.w / r.width;
+  if (setup.p.length >= 2) setup.p = [];
+  setup.p.push([(e.clientX - r.left) * k, (e.clientY - r.top) * k]);
+  drawScale();
+});
+$('start-survey').addEventListener('click', () => {
+  const base = { id: uid(), name: 'Mapa ' + new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }), date: new Date().toISOString(), source: 'web', areaCount: 1, plan: { segments: [], objects: [], walls3D: [], doors3D: [], objects3D: [], floorY: 0, floorArea: 0 }, samples: [], marks: [] };
+  if (setup.mode === 'grid') {
+    const w = Number($('grid-w').value), h = Number($('grid-h').value);
+    if (!(w >= 2 && h >= 2)) { $('setup-err').textContent = 'Informe largura e profundidade de pelo menos 2 m.'; return; }
+    current = { ...base, grid: { w, h }, image: null };
+    current.plan.floorArea = w * h;
+  } else {
+    const m = Number($('scale-m').value);
+    if (setup.p.length < 2 || !(m > 0)) { $('setup-err').textContent = 'Marque dois pontos na planta e informe a distância entre eles.'; return; }
+    const px = dist(setup.p[0], setup.p[1]);
+    if (px < 5) { $('setup-err').textContent = 'Os dois pontos estão muito próximos. Marque de novo.'; return; }
+    current = { ...base, grid: null, image: { src: setup.img.src, w: setup.img.w, h: setup.img.h, mpp: m / px } };
+  }
+  tool = 'point'; busy = false; syncSurvey(); show('survey'); redrawSurvey();
+});
+
+// ---------- medição na planta
+let tool = 'point', busy = false, pending = null;
+function redrawSurvey() { draw2D($('survey-canvas'), current, { metric: 'mbps', bigDots: true, pending }); }
+function syncSurvey() {
+  $('tool-point').classList.toggle('on', tool === 'point');
+  $('tool-node').classList.toggle('on', tool === 'node');
+  $('survey-count').textContent = `Medindo · ${current.samples.length} pontos`;
+  $('finish-survey').disabled = current.samples.length < 1 || busy;
+  $('survey-help').textContent = tool === 'node' ? 'Toque na planta onde fica o roteador ou um nó da mesh.' : 'Vá até um ponto da casa, toque no lugar correspondente da planta e espere a medição terminar antes de andar.';
+}
+$('tool-point').addEventListener('click', () => { tool = 'point'; syncSurvey(); });
+$('tool-node').addEventListener('click', () => { tool = 'node'; syncSurvey(); });
+$('undo').addEventListener('click', () => { if (busy) return; if (tool === 'node') current.marks.pop(); else current.samples.pop(); syncSurvey(); redrawSurvey(); });
+$('survey-canvas').addEventListener('click', async (e) => {
+  if (busy) return;
+  const p = canvasPoint($('survey-canvas'), e);
+  if (tool === 'node') { current.marks.push(p); tool = 'point'; syncSurvey(); redrawSurvey(); return; }
+  busy = true; pending = p; syncSurvey(); redrawSurvey();
+  $('live-chip').className = 'chip'; $('live-chip').textContent = 'medindo';
+  const latencyMs = await measureLatency();
+  $('live-lat').textContent = latencyMs == null ? 'Latência · sem resposta' : `Latência · ${fmt(latencyMs)} ms`;
+  const mbps = await measureSpeed();
+  current.samples.push({ id: uid(), x: p[0], z: p[1], mbps, latencyMs, rssi: null, bssid: null });
+  busy = false; pending = null;
+  $('live-v').textContent = mbps == null ? '0' : fmt(mbps);
+  const vals = current.samples.map((s) => s.mbps).filter((v) => v != null);
+  const chip = $('live-chip');
+  if (mbps == null) { chip.className = 'chip'; chip.textContent = 'medição recusada, tente de novo'; }
+  else if (vals.length > 3) { const q = quality(mbps, Math.min(...vals), Math.max(...vals), true); chip.className = 'chip ' + (q >= 0.66 ? 'good' : q <= 0.33 ? 'bad' : ''); chip.textContent = q >= 0.66 ? '▲ forte' : q <= 0.33 ? '▼ fraco' : 'médio'; }
+  else { chip.className = 'chip'; chip.textContent = 'medido'; }
+  syncSurvey(); redrawSurvey();
+});
+$('finish-survey').addEventListener('click', () => { saveMap(current); openResult(current); });
+
+// ---------- resultado
+let res = { map: null, metric: 'mbps', dim: '2d', an: null, three: null };
+function openResult(map) {
+  res.map = map; res.an = analyze(map);
+  const avail = Object.keys(METRICS).filter((k) => map.samples.some((s) => METRICS[k].get(s) != null));
+  res.metric = avail.includes(res.an.metric) ? res.an.metric : (avail[0] || 'mbps');
+  res.avail = avail; res.dim = map.plan.walls3D.length ? '3d' : '2d';
+  show('result'); renderResult();
+}
+function renderResult() {
+  const { map, an } = res; const M = METRICS[res.metric];
+  $('res-label').textContent = `${map.name} · ${map.samples.length} pontos`;
+  $('res-title').innerHTML = `Mapa de <span class="hl">${M.label.toLowerCase()}</span>`;
+  const mp = $('metric-pills'); mp.innerHTML = '';
+  if (res.avail.length > 1) for (const k of res.avail) { const b = document.createElement('button'); b.className = 'pill' + (k === res.metric ? ' on' : ''); b.textContent = METRICS[k].label; b.addEventListener('click', () => { res.metric = k; renderResult(); }); mp.appendChild(b); }
+  const dp = $('dim-pills'); dp.innerHTML = '';
+  if (map.plan.walls3D.length) for (const d of ['3d', '2d']) { const b = document.createElement('button'); b.className = 'pill' + (d === res.dim ? ' on' : ''); b.textContent = d.toUpperCase(); b.addEventListener('click', () => { res.dim = d; renderResult(); }); dp.appendChild(b); }
+
+  const c2 = $('res-canvas'), c3 = $('three');
+  c2.hidden = res.dim === '3d'; c3.hidden = res.dim !== '3d';
+  if (res.dim === '3d') render3D(); else { if (res.three) { res.three.stop(); res.three = null; } draw2D(c2, map, { metric: res.metric, analysis: an }); }
+
+  const vals = map.samples.map(M.get).filter((v) => v != null).sort((a, b) => a - b);
+  const lo = vals[0] ?? 0, hi = vals[vals.length - 1] ?? 0;
+  $('leg-lo').textContent = `Fraco · ${fmt(M.higher ? lo : hi)} ${M.unit}`;
+  $('leg-hi').textContent = `Forte · ${fmt(M.higher ? hi : lo)} ${M.unit}`;
+  const area = map.plan.floorArea;
+  $('area-card').hidden = !area;
+  if (area) { $('area-v').textContent = fmt(area, 1); $('area-l').textContent = map.grid ? 'Área da grade' : `Área escaneada · ${map.areaCount} ${map.areaCount === 1 ? 'área' : 'áreas'}`; }
+  const k = $('kpis'); k.innerHTML = '';
+  if (vals.length) for (const [label, v] of [['Mínimo', lo], ['Mediana', vals[Math.floor(vals.length / 2)]], ['Máximo', hi]]) {
+    const d = document.createElement('div'); d.className = 'kpi';
+    d.innerHTML = `<div class="v">${fmt(v)}<small>${M.unit}</small></div><div class="mono" style="margin-top:4px">${label}</div>`;
+    k.appendChild(d);
+  }
+  // recomendação
+  const A = METRICS[an.metric];
+  const rc = $('rec-card'); rc.innerHTML = '<div class="mono" style="margin-bottom:12px">Nó extra · recomendação</div>';
+  if (!an.zones.length) {
+    const p = document.createElement('p'); p.className = 'body'; p.style.color = 'var(--midnight)';
+    p.textContent = map.samples.length < 8 ? 'Meça pelo menos 8 pontos para o app apontar zonas fracas.' : 'Nenhuma zona fraca concentrada. A rede atual cobre a área medida.';
+    rc.appendChild(p);
+  } else {
+    an.zones.forEach((z, i) => {
+      const d = document.createElement('div'); d.className = 'zone';
+      const parts = [`${z.count} pontos fracos num raio de ${fmt(z.radius, 1)} m.`];
+      parts.push(z.distance != null ? `Coloque um nó a ${fmt(z.distance, 1)} m do centro dela, no último ponto com sinal bom.` : 'Sem ponto com sinal bom por perto: aproxime um nó existente ou cabeie um novo.');
+      if (z.nearest) parts.push(`Nó mais próximo hoje: ${z.nearest}.`);
+      d.innerHTML = `<span class="plus">+</span><div><div style="font-size:16px;font-weight:600">Zona fraca ${i + 1} · ${fmt(z.median)} ${A.unit}</div><div class="body" style="font-size:14px;margin-top:4px"></div></div>`;
+      d.querySelector('.body').textContent = parts.join(' ');
+      rc.appendChild(d);
+    });
+    const p = document.createElement('p'); p.className = 'small'; p.style.marginTop = '12px'; p.textContent = 'No mapa: anel tracejado é a zona fraca, marcador escuro é onde colocar o nó.'; rc.appendChild(p);
+  }
+  // nós
+  const nc = $('nodes-card'); nc.hidden = !an.nodes.length; nc.innerHTML = '';
+  if (an.nodes.length) {
+    nc.innerHTML = `<div class="mono">Roteador e nós · ${an.nodes.length}</div>`;
+    for (const n of an.nodes) {
+      const d = document.createElement('div'); d.className = 'node';
+      let title = `Nó ${n.label}`;
+      if (n.count) { title = `${fmt(n.share * 100)}% dos pontos`; if (n.median != null) title += ` · mediana ${fmt(n.median)} ${A.unit}`; }
+      d.innerHTML = `<span class="b" style="background:${NODE_COLORS[n.id % NODE_COLORS.length]}">${n.label}</span><div><div style="font-size:16px"></div><div class="mono" style="font-size:9px;margin-top:2px">${n.marked ? 'Posição marcada' : 'Posição estimada'}</div></div>`;
+      d.querySelector('div > div').textContent = title;
+      nc.appendChild(d);
+    }
+  }
+}
+window.addEventListener('resize', () => { if ($('result').classList.contains('on') && res.dim === '2d') draw2D($('res-canvas'), res.map, { metric: res.metric, analysis: res.an }); if ($('survey').classList.contains('on')) redrawSurvey(); });
+
+// ---------- 3D (só para mapas do app, que trazem as paredes)
+async function render3D() {
+  const { map, an } = res;
+  const THREE = await import('three');
+  const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
+  const canvas = $('three');
+  if (res.three) { res.three.stop(); res.three = null; }
+  const w = canvas.parentElement.clientWidth, h = 460;
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2)); renderer.setSize(w, h, false); canvas.style.width = '100%'; canvas.style.height = h + 'px'; renderer.setClearColor(0xffffff);
+  const scene = new THREE.Scene();
+  const b = bounds(map); const mid = [(b.lo[0] + b.hi[0]) / 2, (b.lo[1] + b.hi[1]) / 2]; const fy = map.plan.floorY;
+  const flat = (color, opacity = 1) => new THREE.MeshBasicMaterial({ color, transparent: opacity < 1, opacity });
+  const lit = (color, opacity = 1) => new THREE.MeshLambertMaterial({ color, transparent: opacity < 1, opacity });
+  scene.add(new THREE.AmbientLight(0xffffff, 1.6)); const sun = new THREE.DirectionalLight(0xffffff, 1.2); sun.position.set(3, 8, 5); scene.add(sun);
+  const base = new THREE.Mesh(new THREE.PlaneGeometry(b.span[0], b.span[1]), flat(0xFAFAFA)); base.rotation.x = -Math.PI / 2; base.position.set(mid[0], fy - 0.01, mid[1]); scene.add(base);
+  const hc = heatCanvas(map, res.metric, b, 160);
+  if (hc) {
+    const tex = new THREE.CanvasTexture(hc); tex.colorSpace = THREE.SRGBColorSpace; tex.magFilter = THREE.LinearFilter;
+    const m = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false });
+    // plano XY girado para XZ: topo da imagem cai no z mínimo, esquerda no x mínimo
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(b.span[0], b.span[1]), m); floor.rotation.x = -Math.PI / 2; floor.position.set(mid[0], fy, mid[1]); floor.renderOrder = 1; scene.add(floor);
+  }
+  const CUT = 1.1;
+  const place = (mesh, box, y) => { const c = box.columns; const m4 = new THREE.Matrix4().set(c[0][0], c[1][0], c[2][0], c[3][0], c[0][1], c[1][1], c[2][1], y ?? c[3][1], c[0][2], c[1][2], c[2][2], c[3][2], 0, 0, 0, 1); mesh.matrixAutoUpdate = false; mesh.matrix.copy(m4); scene.add(mesh); };
+  const wallMats = [lit(0xE5EBF2), lit(0xE5EBF2), flat(0x1C262F), lit(0xE5EBF2), lit(0xE5EBF2), lit(0xE5EBF2)]; // +x, -x, topo, base, +z, -z
+  for (const wl of map.plan.walls3D) { const hh = Math.min(wl.size[1], CUT); place(new THREE.Mesh(new THREE.BoxGeometry(wl.size[0], hh, 0.08), wallMats), wl, fy + hh / 2); }
+  for (const d of map.plan.doors3D) { const hh = Math.min(d.size[1], CUT); place(new THREE.Mesh(new THREE.BoxGeometry(d.size[0], hh + 0.002, 0.1), flat(0x78909C)), d, fy + hh / 2); }
+  for (const o of map.plan.objects3D) place(new THREE.Mesh(new THREE.BoxGeometry(o.size[0], o.size[1], o.size[2]), lit(0x78909C, 0.35)), o);
+  const dot = new THREE.SphereGeometry(0.04, 10, 8);
+  for (const s of map.samples) { const ni = an.nodeOf.get(s.id); const m = new THREE.Mesh(dot, flat(ni != null ? NODE_COLORS[ni % NODE_COLORS.length] : 0xffffff)); m.position.set(s.x, fy + 0.04, s.z); scene.add(m); }
+  const pin = (p, height, color) => { const g = new THREE.Group(); const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, height, 10), flat(color)); stem.position.y = height / 2; const head = new THREE.Mesh(new THREE.SphereGeometry(0.13, 16, 12), flat(color)); head.position.y = height; g.add(stem, head); g.position.set(p[0], fy, p[1]); scene.add(g); };
+  for (const n of an.nodes) if (n.position) pin(n.position, 0.7, NODE_COLORS[n.id % NODE_COLORS.length]);
+  for (const z of an.zones) {
+    const ring = new THREE.Mesh(new THREE.RingGeometry(Math.max(z.radius - 0.05, 0.05), z.radius, 64), flat(0xB41048)); ring.rotation.x = -Math.PI / 2; ring.position.set(z.center[0], fy + 0.03, z.center[1]); scene.add(ring);
+    if (z.suggestion) pin(z.suggestion, 1.3, 0x1C262F);
+  }
+  const size = Math.max(b.span[0], b.span[1]);
+  const cam = new THREE.PerspectiveCamera(40, w / h, 0.1, 200); const half = Math.atan(Math.tan((40 * Math.PI / 180) / 2) * Math.min(w / h, 1));
+  const d = (size / 2) / Math.tan(half) * 1.2; // distância que enquadra a maior dimensão
+  cam.position.set(mid[0], fy + d * 0.78, mid[1] + d * 0.62);
+  const controls = new OrbitControls(cam, canvas); controls.target.set(mid[0], fy, mid[1]); controls.maxPolarAngle = Math.PI / 2 - 0.05; controls.update();
+  let alive = true;
+  const loop = () => { if (!alive) return; controls.update(); renderer.render(scene, cam); requestAnimationFrame(loop); };
+  loop();
+  res.three = { stop: () => { alive = false; controls.dispose(); renderer.dispose(); }, renderer, scene, cam };
+}
+
+// ---------- exportar
+function download(name, href) { const a = document.createElement('a'); a.href = href; a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
+$('dl-png').addEventListener('click', () => {
+  const tmp = document.createElement('canvas'); const holder = document.createElement('div'); holder.style.cssText = 'position:absolute;left:-9999px;width:1200px'; holder.appendChild(tmp); document.body.appendChild(holder);
+  draw2D(tmp, res.map, { metric: res.metric, analysis: res.an, dpr: 2 });
+  download('mapa-wifi.png', tmp.toDataURL('image/png')); holder.remove();
+});
+$('dl-json').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(res.map)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob); download('mapa-wifi.json', url); setTimeout(() => URL.revokeObjectURL(url), 2000);
+});
+
+renderSaved();
+</script>
+</body>
+</html>
