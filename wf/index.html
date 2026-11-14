@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HYPR Wf · Mapa de wi-fi da sua casa com LiDAR</title>
+<meta name="description" content="O HYPR Wf escaneia a casa com o LiDAR do iPhone e mostra, cômodo a cômodo e andar por andar, onde o wi-fi chega e onde falta um nó da mesh.">
+<meta property="og:title" content="HYPR Wf · Mapa de wi-fi da sua casa com LiDAR">
+<meta property="og:description" content="Escaneie a casa com o iPhone e veja onde o wi-fi chega, cômodo a cômodo.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#1C262F">
+<link rel="icon" href="img/icone.png">
+<link rel="apple-touch-icon" href="img/icone.png">
+<style>
+@font-face { font-family: "Urbanist"; font-weight: 300; src: url("fonts/Urbanist-Light.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "Urbanist"; font-weight: 400; src: url("fonts/Urbanist-Regular.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "Urbanist"; font-weight: 500; src: url("fonts/Urbanist-Medium.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "Urbanist"; font-weight: 600; src: url("fonts/Urbanist-SemiBold.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "JetBrains Mono"; font-weight: 400; src: url("fonts/JetBrainsMono-Regular.ttf") format("truetype"); font-display: swap; }
+
+:root {
+  --midnight: #1C262F; --cloud: #FAFAFA; --offwhite: #FCFEFE; --mist: #E5EBF2;
+  --steel: #78909C; --slate: #536872; --cyan: #3397B9;
+  --good: #16B39B; --good-deep: #017A6E; --good-soft: #C2EFE7;
+  --bad: #EA1E63; --bad-soft: #EDC5D2;
+  --r1: 8px; --r2: 14px; --r3: 20px; --r4: 28px;
+  --shadow: 0 16px 40px rgba(28, 38, 47, 0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: "Urbanist", system-ui, sans-serif; font-weight: 400; color: var(--midnight); background: var(--cloud); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.label { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--steel); }
+h1, h2 { font-weight: 300; letter-spacing: -0.01em; line-height: 1.08; }
+h1 { font-size: clamp(40px, 7vw, 76px); }
+h2 { font-size: clamp(30px, 4.4vw, 48px); }
+h3 { font-weight: 600; font-size: 19px; line-height: 1.3; }
+p { color: var(--slate); font-size: 17px; }
+.cyan { color: var(--cyan); }
+
+/* Capa: escura */
+.hero { background: var(--midnight); color: var(--cloud); overflow: hidden; }
+.nav { display: flex; align-items: center; justify-content: space-between; padding: 28px 0; }
+.nav img { height: 16px; width: auto; }
+.nav a { font-size: 15px; font-weight: 500; text-decoration: none; color: var(--mist); }
+.hero-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items: center; padding: 40px 0 0; }
+.hero .label { color: var(--steel); }
+.hero h1 { margin: 18px 0 22px; }
+.hero p { color: #9FB0BA; font-size: 20px; max-width: 30em; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 34px; }
+.btn { display: inline-block; padding: 16px 26px; border-radius: var(--r2); font-size: 17px; font-weight: 600; text-decoration: none; }
+.btn-light { background: var(--cloud); color: var(--midnight); }
+.btn-ink { background: var(--midnight); color: var(--cloud); }
+.btn-ghost { border: 1.5px solid rgba(250, 250, 250, 0.25); color: var(--cloud); }
+.note { margin-top: 16px; font-size: 14px; color: var(--steel); }
+.phone { justify-self: center; align-self: end; width: min(320px, 78vw); border-radius: 44px 44px 0 0; padding: 9px 9px 0; background: #0E151B; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45); border: 1px solid rgba(250, 250, 250, 0.08); border-bottom: 0; }
+.phone img { border-radius: 36px 36px 0 0; width: 100%; height: auto; aspect-ratio: 603 / 1040; object-fit: cover; object-position: top; }
+.hero-grid > div:first-child { padding-bottom: 72px; }
+
+section { padding: 96px 0; }
+.head { max-width: 40em; margin-bottom: 48px; }
+.head h2 { margin: 14px 0 16px; }
+
+/* Passos */
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.card { background: #fff; border: 1px solid var(--mist); border-radius: var(--r3); padding: 26px; }
+.card .label { display: block; margin-bottom: 18px; }
+.card h3 { margin-bottom: 8px; }
+.card p { font-size: 16px; }
+.first { padding-top: 96px; }
+
+/* Mapa */
+.map-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 40px; align-items: center; }
+.map { background: #fff; border: 1px solid var(--mist); border-radius: var(--r4); padding: 22px; box-shadow: var(--shadow); }
+.map svg { width: 100%; height: auto; display: block; }
+.legend { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+.legend i { flex: 1; height: 8px; border-radius: 99px; background: linear-gradient(90deg, #EA1E63, #EDC5D2, #E5EBF2, #C2EFE7, #16B39B); }
+.keys { list-style: none; display: grid; gap: 18px; }
+.keys li { display: grid; grid-template-columns: 30px 1fr; gap: 14px; align-items: start; }
+.keys b { font-weight: 600; display: block; font-size: 17px; }
+.keys span { color: var(--slate); font-size: 15.5px; }
+.keys svg { width: 28px; height: 28px; margin-top: 2px; }
+
+/* Medidas */
+.alt { background: var(--offwhite); border-top: 1px solid var(--mist); border-bottom: 1px solid var(--mist); }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--mist); border-radius: var(--r3); overflow: hidden; background: #fff; }
+.cell { padding: 24px; border-right: 1px solid var(--mist); border-bottom: 1px solid var(--mist); }
+.cell:nth-child(3n) { border-right: 0; }
+.cell:nth-last-child(-n+3) { border-bottom: 0; }
+.cell .label { display: block; margin-bottom: 10px; }
+.cell h3 { margin-bottom: 6px; }
+.cell p { font-size: 15.5px; }
+
+/* Destaque escuro */
+.dark { background: var(--midnight); color: var(--cloud); }
+.dark p { color: #9FB0BA; }
+.dark .label { color: var(--steel); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+.rows { border-top: 1px solid rgba(250, 250, 250, 0.12); }
+.rows div { padding: 18px 0; border-bottom: 1px solid rgba(250, 250, 250, 0.12); display: grid; grid-template-columns: 9.5em 1fr; gap: 16px; }
+.rows .label { padding-top: 4px; }
+.rows p { font-size: 16px; }
+
+/* Perguntas */
+.faq { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.final { text-align: center; }
+.final h2 { max-width: 16em; margin: 14px auto 28px; }
+.final img.icon { width: 84px; height: 84px; border-radius: 20px; margin: 0 auto 26px; box-shadow: var(--shadow); }
+
+footer { background: var(--midnight); color: var(--steel); padding: 40px 0; font-size: 14px; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
+footer img { height: 14px; width: auto; }
+footer a { text-decoration: none; color: var(--mist); margin-left: 22px; }
+
+@media (max-width: 860px) {
+  .hero-grid, .map-grid, .two { grid-template-columns: 1fr; gap: 36px; }
+  .steps, .faq { grid-template-columns: 1fr; }
+  .grid3 { grid-template-columns: 1fr; }
+  .cell { border-right: 0 !important; border-bottom: 1px solid var(--mist) !important; }
+  .cell:last-child { border-bottom: 0 !important; }
+  section { padding: 68px 0; }
+  .hero p { font-size: 18px; }
+  .hero-grid > div:first-child { padding-bottom: 0; }
+  .rows div { grid-template-columns: 1fr; gap: 4px; }
+  footer a { margin: 0 22px 0 0; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <nav class="nav">
+      <img src="img/hypr-wordmark-white.svg" alt="HYPR">
+      <a href="#beta">Entrar no beta</a>
+    </nav>
+    <div class="hero-grid">
+      <div>
+        <span class="label">HYPR Wf · iPhone com LiDAR</span>
+        <h1>Onde o wi-fi <span class="cyan">chega</span>, cômodo a cômodo.</h1>
+        <p>Ande pela casa com o iPhone. O Wf desenha a planta com o LiDAR, mede a internet em cada ponto e mostra onde falta um nó da mesh.</p>
+        <div class="cta-row">
+          <a class="btn btn-light" href="https://testflight.apple.com/join/VUNqxPX3">Entrar no beta pelo TestFlight</a>
+          <a class="btn btn-ghost" href="#como">Como funciona</a>
+        </div>
+        <p class="note">Grátis. O beta abre assim que a Apple concluir a revisão. Android em breve.</p>
+      </div>
+      <div class="phone"><img src="img/tela-inicio.jpg" alt="Tela inicial do HYPR Wf" width="603" height="1311"></div>
+    </div>
+  </div>
+</header>
+
+<section id="como" class="first">
+  <div class="wrap">
+    <div class="head">
+      <span class="label">Como funciona</span>
+      <h2>Três passos, alguns minutos.</h2>
+      <p>Não precisa de planta, régua nem equipamento. Só do iPhone e das luzes acesas.</p>
+    </div>
+    <div class="steps">
+      <div class="card"><span class="label">01 · Escaneie</span><h3>Ande devagar apontando para as paredes</h3><p>O LiDAR lê paredes, portas, janelas e móveis e monta a planta enquanto você anda. Subiu a escada, o app troca de andar sozinho.</p></div>
+      <div class="card"><span class="label">02 · Meça</span><h3>A internet é testada a cada poucos passos</h3><p>Velocidade, upload, latência, perda de pacotes e jitter, tudo preso ao ponto exato da casa em que foi medido.</p></div>
+      <div class="card"><span class="label">03 · Corrija</span><h3>Veja a zona fraca e onde pôr o nó</h3><p>O mapa mostra as zonas fracas e indica o melhor lugar para um nó extra: o último ponto com sinal bom perto delas.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap map-grid">
+    <div class="map">
+      <span class="label">Mapa de velocidade · térreo · exemplo</span>
+      <svg viewBox="0 0 640 430" role="img" aria-label="Exemplo de mapa de calor sobre a planta de uma casa">
+        <defs>
+          <filter id="b" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="26"/></filter>
+          <clipPath id="c"><rect x="30" y="30" width="580" height="370" rx="6"/></clipPath>
+        </defs>
+        <g clip-path="url(#c)">
+          <rect x="30" y="30" width="580" height="370" fill="#EEF7F5"/>
+          <g filter="url(#b)">
+            <circle cx="150" cy="150" r="130" fill="#16B39B" opacity=".75"/>
+            <circle cx="300" cy="300" r="110" fill="#16B39B" opacity=".55"/>
+            <circle cx="330" cy="120" r="90" fill="#C2EFE7"/>
+            <circle cx="520" cy="110" r="80" fill="#EDC5D2"/>
+            <circle cx="530" cy="300" r="95" fill="#EA1E63" opacity=".7"/>
+            <circle cx="430" cy="330" r="60" fill="#EDC5D2"/>
+          </g>
+        </g>
+        <g fill="none" stroke="#1C262F" stroke-width="5" stroke-linecap="square">
+          <rect x="30" y="30" width="580" height="370"/>
+          <path d="M240 30v130M240 210v190M30 230h120M200 230h40M240 190h170M460 190h150M430 190v80M430 320v80"/>
+        </g>
+        <g fill="none" stroke="#78909C" stroke-width="5"><path d="M150 230h50M410 190h50M430 270v50M240 160v50"/></g>
+        <g fill="#1C262F" opacity=".55">
+          <circle cx="80" cy="90" r="3"/><circle cx="120" cy="130" r="3"/><circle cx="170" cy="95" r="3"/><circle cx="200" cy="170" r="3"/><circle cx="110" cy="190" r="3"/>
+          <circle cx="90" cy="290" r="3"/><circle cx="150" cy="330" r="3"/><circle cx="200" cy="290" r="3"/><circle cx="300" cy="90" r="3"/><circle cx="350" cy="140" r="3"/>
+          <circle cx="300" cy="260" r="3"/><circle cx="360" cy="320" r="3"/><circle cx="320" cy="360" r="3"/><circle cx="480" cy="90" r="3"/><circle cx="550" cy="140" r="3"/>
+          <circle cx="490" cy="250" r="3"/><circle cx="560" cy="290" r="3"/><circle cx="520" cy="350" r="3"/><circle cx="470" cy="330" r="3"/>
+        </g>
+        <circle cx="530" cy="300" r="62" fill="none" stroke="#B41048" stroke-width="2.5" stroke-dasharray="7 7"/>
+        <g><rect x="129" y="129" width="34" height="34" rx="9" fill="#3397B9" stroke="#fff" stroke-width="3"/><text x="146" y="153" text-anchor="middle" font-family="Urbanist, sans-serif" font-weight="600" font-size="19" fill="#fff">A</text></g>
+        <g><rect x="283" y="283" width="34" height="34" rx="9" fill="#5F25FF" stroke="#fff" stroke-width="3"/><text x="300" y="307" text-anchor="middle" font-family="Urbanist, sans-serif" font-weight="600" font-size="19" fill="#fff">B</text></g>
+        <g><circle cx="445" cy="295" r="19" fill="#1C262F" stroke="#fff" stroke-width="3.5"/><path d="M436 295h18M445 286v18" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
+      </svg>
+      <div class="legend"><span class="label">Fraco</span><i></i><span class="label">Forte</span></div>
+    </div>
+    <div>
+      <span class="label">O resultado</span>
+      <h2 style="margin:14px 0 26px">Um mapa que diz o que fazer.</h2>
+      <ul class="keys">
+        <li>
+          <svg viewBox="0 0 28 28"><rect x="3" y="3" width="22" height="22" rx="6" fill="#3397B9"/><text x="14" y="19.5" text-anchor="middle" font-family="Urbanist, sans-serif" font-weight="600" font-size="13" fill="#fff">A</text></svg>
+          <div><b>Nós da mesh</b><span>Cada nó em que o iPhone se conectou, e a parte da casa que ele atendeu.</span></div>
+        </li>
+        <li>
+          <svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="10.5" fill="none" stroke="#B41048" stroke-width="2" stroke-dasharray="4 4"/></svg>
+          <div><b>Zona fraca</b><span>Região onde várias medições seguidas ficaram bem abaixo do resto da casa.</span></div>
+        </li>
+        <li>
+          <svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="11" fill="#1C262F"/><path d="M8.5 14h11M14 8.5v11" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+          <div><b>Onde pôr o nó extra</b><span>O ponto mais próximo da zona fraca em que o sinal ainda é bom, para o nó novo ter de onde puxar.</span></div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="head">
+      <span class="label">O que ele mede</span>
+      <h2>Tudo o que o iPhone consegue ler, no lugar certo da planta.</h2>
+    </div>
+    <div class="grid3">
+      <div class="cell"><span class="label">Mbps</span><h3>Velocidade e upload</h3><p>Download e envio reais, não a velocidade contratada.</p></div>
+      <div class="cell"><span class="label">ms</span><h3>Latência e jitter</h3><p>Tempo de resposta até o roteador e até a internet, e o quanto ele oscila.</p></div>
+      <div class="cell"><span class="label">%</span><h3>Perda de pacotes</h3><p>O que trava chamada de vídeo e jogo, mesmo com velocidade alta.</p></div>
+      <div class="cell"><span class="label">Mesh</span><h3>Nó e troca de nó</h3><p>Em qual nó você estava em cada ponto e onde o iPhone trocou de um para outro.</p></div>
+      <div class="cell"><span class="label">Andares</span><h3>Casa de mais de um piso</h3><p>O barômetro separa os andares sozinho. Cada um ganha planta, mapa e recomendação próprios.</p></div>
+      <div class="cell"><span class="label">Rede</span><h3>Troca de rede e de linha</h3><p>Avisa quando o iPhone muda de wi-fi ou de operadora e guarda isso em cada ponto.</p></div>
+      <div class="cell"><span class="label">m²</span><h3>Planta e área</h3><p>Planta em 2D e 3D com a área de cada andar. Dá para somar cômodos ao mesmo mapa.</p></div>
+      <div class="cell"><span class="label">Campo magnético</span><h3>Obstáculos prováveis</h3><p>Marca onde há muito metal ou motor por perto, o que costuma explicar sinal fraco.</p></div>
+      <div class="cell"><span class="label">Mapa</span><h3>Salvar e compartilhar</h3><p>Os mapas ficam no aparelho e saem como imagem para mandar ao técnico ou ao provedor.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="dark" id="privacidade">
+  <div class="wrap two">
+    <div>
+      <span class="label">Privacidade</span>
+      <h2 style="margin:14px 0 18px">A planta da sua casa não sai do seu iPhone.</h2>
+      <p>O Wf não tem cadastro, conta nem servidor próprio. Os mapas ficam guardados só no aparelho, e só saem quando você toca em compartilhar. Para medir a velocidade, o app baixa e envia arquivos de teste de um serviço público de medição; nada da planta vai junto.</p>
+    </div>
+    <div class="rows">
+      <div><span class="label">Câmera e LiDAR</span><p>Para ler as paredes e montar a planta. Nenhuma foto ou vídeo é gravado.</p></div>
+      <div><span class="label">Localização</span><p>O iOS só informa o nome da rede wi-fi a apps com essa permissão. O app não registra onde você está.</p></div>
+      <div><span class="label">Movimento</span><p>O barômetro mede a altura para separar os andares.</p></div>
+      <div><span class="label">Rede local</span><p>Para medir o tempo de resposta até o seu roteador.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="head">
+      <span class="label">Antes de instalar</span>
+      <h2>O que vale saber.</h2>
+    </div>
+    <div class="faq">
+      <div class="card"><h3>Em quais iPhones funciona</h3><p>Nos modelos Pro e Pro Max a partir do iPhone 12 Pro, que têm o sensor LiDAR, com iOS 17 ou mais novo. Os outros modelos não conseguem montar a planta.</p></div>
+      <div class="card"><h3>Por que não mostra o sinal em dBm</h3><p>A Apple não deixa nenhum app ler a força do sinal do wi-fi. O Wf mede o que você sente de verdade: velocidade, resposta e estabilidade em cada ponto.</p></div>
+      <div class="card"><h3>Funciona com qualquer roteador ou mesh</h3><p>Sim. O app não conversa com o roteador: ele mede a rede do lado do iPhone, então serve para qualquer marca e qualquer provedor.</p></div>
+      <div class="card"><h3>Quanto de internet ele usa</h3><p>Cada medição baixa alguns megabytes. Um mapa completo de uma casa pode passar de 500 MB, sempre pelo wi-fi, nunca pelo plano de dados.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="alt final" id="beta">
+  <div class="wrap">
+    <img class="icon" src="img/icone.png" alt="Ícone do HYPR Wf" width="84" height="84">
+    <span class="label">Beta aberto em breve</span>
+    <h2>Descubra onde o wi-fi da sua casa falha.</h2>
+    <a class="btn btn-ink" href="https://testflight.apple.com/join/VUNqxPX3">Entrar no beta pelo TestFlight</a>
+    <p class="note" style="margin-top:18px">Instale antes o app TestFlight, da Apple, e abra o link no iPhone.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <img src="img/hypr-wordmark-white.svg" alt="HYPR">
+    <div><span>HYPR Wf</span><a href="#privacidade">Privacidade</a><a href="https://hyprgrid.ai">hyprgrid.ai</a></div>
+  </div>
+</footer>
+
+</body>
+</html>
