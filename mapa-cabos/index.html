@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>Mapa de Cabos da Casa</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: diagrama de fiação da esquerda (internet) para a direita (aparelhos); cada cabo sai da porta
+   de onde sai de verdade. Abaixo, a mesma informação em lista, para etiquetar os cabos. */
+:root {
+  --bg: #f1f4f8; --surface: #ffffff; --surface-2: #e7ecf3; --ink: #15202f; --ink-2: #56647b; --line: #d2dae6;
+  --isp: #7a2bbf; --unifi: #1f6feb; --deco: #0b8f7e; --outro: #6b7688;
+  --warn: #b45309; --bad: #c2362b; --ok: #17804a; --grade: #dfe5ee;
+  --f-titulo: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+  --f-texto: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-dado: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1219; --surface: #161d28; --surface-2: #1f2835; --ink: #e6ebf3; --ink-2: #98a6ba; --line: #2c3748;
+    --isp: #bb8ff2; --unifi: #62a0ff; --deco: #3fd0bb; --outro: #8b96a8;
+    --warn: #f0a44a; --bad: #ff7b6e; --ok: #4fd08a; --grade: #1a222e; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1219; --surface: #161d28; --surface-2: #1f2835; --ink: #e6ebf3; --ink-2: #98a6ba; --line: #2c3748;
+  --isp: #bb8ff2; --unifi: #62a0ff; --deco: #3fd0bb; --outro: #8b96a8;
+  --warn: #f0a44a; --bad: #ff7b6e; --ok: #4fd08a; --grade: #1a222e; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 var(--f-texto);
+  padding-block: 20px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--unifi); outline-offset: 2px; }
+.pagina { max-width: 1500px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+/* cabeçalho */
+.topo { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 32px; }
+h1 { font: 700 26px/1.1 var(--f-titulo); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+.sub { color: var(--ink-2); margin: 4px 0 0; }
+.numeros { display: flex; flex-wrap: wrap; gap: 6px 24px; font-variant-numeric: tabular-nums; }
+.numeros div { display: flex; align-items: baseline; gap: 6px; color: var(--ink-2); }
+.numeros b { font: 700 20px/1 var(--f-titulo); color: var(--ink); }
+
+.aviso {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 10px 14px; border-radius: 6px;
+  border: 1px solid var(--warn); color: var(--ink);
+  background: repeating-linear-gradient(135deg, transparent 0 10px, color-mix(in srgb, var(--warn) 9%, transparent) 10px 20px), var(--surface);
+}
+.aviso b { color: var(--warn); }
+
+/* fontes de dados */
+.fontes { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+.fonte { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; min-width: 0; }
+.fonte .cor { grid-row: span 2; width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; background: var(--c); }
+.fonte b { font-weight: 600; }
+.fonte .estado { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-left: 6px; }
+.fonte .estado.ok { color: var(--ok); } .fonte .estado.falta { color: var(--warn); }
+.fonte p { margin: 0; color: var(--ink-2); font-size: 13px; }
+
+/* barra de controles */
+.barra { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.abas { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface); }
+.abas button { border: 0; background: none; padding: 7px 14px; cursor: pointer; font-weight: 500; color: var(--ink-2); }
+.abas button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.chave { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+.chave input { width: 16px; height: 16px; accent-color: var(--unifi); margin: 0; }
+.busca { flex: 1 1 180px; max-width: 280px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+.botao { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 7px 12px; cursor: pointer; font-weight: 500; }
+.botao:hover { border-color: var(--ink-2); }
+.legenda { display: flex; flex-wrap: wrap; gap: 6px 16px; color: var(--ink-2); font-size: 12.5px; margin-left: auto; }
+.legenda span { display: inline-flex; align-items: center; gap: 6px; }
+.legenda i { width: 10px; height: 10px; border-radius: 2px; background: var(--c); }
+.legenda svg { width: 30px; height: 8px; }
+.legenda line { stroke: var(--ink-2); stroke-width: 2; }
+
+/* área do mapa + painel */
+.area { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (min-width: 1000px) { .area.com-painel { grid-template-columns: minmax(0, 1fr) 340px; } .painel { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; } }
+@media (max-width: 999px) { .painel { order: -1; } }
+.rolo { overflow: auto; border: 1px solid var(--line); border-radius: 8px; min-width: 0;
+  background: radial-gradient(circle, var(--grade) 1.2px, transparent 1.3px) 0 0 / 18px 18px, var(--surface-2); }
+.palco { position: relative; }
+.palco svg.cabos { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
+.cabo { fill: none; stroke: var(--c); stroke-width: 2; stroke-linecap: round; opacity: .9; }
+.cabo.m-wifi { stroke-dasharray: 1 6; stroke-width: 2.4; }
+.cabo.m-fibra { stroke-width: 3.5; }
+.cabo.m-desconhecido { stroke: var(--outro); stroke-dasharray: 1 6; stroke-width: 2.4; }
+.cabo.deduzido.m-cabo { stroke-dasharray: 9 5; }
+.cabo.hl { stroke-width: 4; opacity: 1; }
+.palco.filtrando .cabo { opacity: .25; }
+
+.no { position: absolute; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; cursor: pointer; text-align: left; padding: 0; display: block; }
+.no.infra { box-shadow: 0 1px 2px rgb(10 20 40 / .08); }
+.no:hover { border-color: var(--ink-2); }
+.no.sel { border-color: var(--c); box-shadow: 0 0 0 2px var(--c); }
+.no.off { opacity: .55; }
+.no.pend { background: repeating-linear-gradient(135deg, transparent 0 8px, color-mix(in srgb, var(--c) 10%, transparent) 8px 16px), var(--surface); border-style: dashed; border-color: var(--c); }
+.no.grupo { border-style: dashed; background: transparent; }
+.palco.filtrando .no:not(.achou) { opacity: .28; }
+.r-isp { --c: var(--isp); } .r-unifi { --c: var(--unifi); } .r-deco { --c: var(--deco); } .r-outro { --c: var(--outro); }
+.cab { display: flex; align-items: center; gap: 9px; padding: 0 10px 0 12px; height: 52px; min-width: 0; }
+.no.folha .cab { height: 44px; }
+.ic { flex: none; width: 28px; height: 28px; border-radius: 5px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 14%, transparent); color: var(--c); }
+.no.folha .ic { width: 24px; height: 24px; }
+.ic svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.tit { min-width: 0; display: flex; flex-direction: column; }
+.tit b { font: 600 13.5px/1.25 var(--f-texto); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.no.folha .tit b { font-weight: 500; font-size: 13px; }
+.tit small { font: 400 11.5px/1.3 var(--f-dado); color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.no .entra { position: absolute; left: -1px; transform: translate(-50%, -50%); top: 26px; }
+.no.folha .entra { top: 22px; }
+.saidas { border-top: 1px solid var(--line); padding-bottom: 8px; }
+.saida { height: 24px; display: flex; align-items: center; gap: 6px; padding-left: 12px; position: relative; font-size: 12px; }
+.saida .dest { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink-2); }
+.saida .vel { font: 400 11px var(--f-dado); color: var(--ink-2); white-space: nowrap; }
+.saida .vel.lento { color: var(--warn); font-weight: 600; }
+.saida .poe { color: var(--warn); font-size: 11px; }
+.saida .jack { margin-right: -1px; transform: translateX(50%); }
+.jack { /* tomada RJ45: quadrado com a trava em cima */
+  flex: none; min-width: 22px; height: 18px; padding: 0 4px; border-radius: 2px; display: inline-grid; place-items: center;
+  font: 600 10.5px/1 var(--f-dado); background: var(--surface); color: var(--ink); border: 1.5px solid var(--c, var(--ink-2)); position: relative;
+}
+.jack::before { content: ""; position: absolute; top: -4px; left: 50%; width: 8px; height: 3px; transform: translateX(-50%); background: var(--c, var(--ink-2)); border-radius: 1px 1px 0 0; }
+.jack.ar { border-radius: 9px; border-style: dotted; } .jack.ar::before { display: none; }
+.jack.nsei { color: var(--ink-2); }
+.livres { font: 400 11px/18px var(--f-dado); color: var(--ink-2); padding: 0 12px; border-top: 1px dashed var(--line); height: 18px; white-space: nowrap; overflow: hidden; }
+.tag { font: 600 10px var(--f-texto); text-transform: uppercase; letter-spacing: .06em; color: var(--c); margin-left: 6px; }
+
+/* painel de detalhe */
+.painel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.painel header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.painel h2 { font: 700 18px/1.2 var(--f-titulo); margin: 0; overflow-wrap: anywhere; }
+.painel .tipo { color: var(--c); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+.painel h3 { font: 600 12px var(--f-texto); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); margin: 0 0 6px; }
+.painel dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0; }
+.painel dt { color: var(--ink-2); } .painel dd { margin: 0; font-family: var(--f-dado); font-size: 12.5px; overflow-wrap: anywhere; }
+.painel p { margin: 0; } .nota { color: var(--ink-2); font-size: 13px; }
+.fechar { border: 0; background: none; cursor: pointer; font-size: 20px; line-height: 1; color: var(--ink-2); padding: 2px 6px; }
+.portas { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.portas td { padding: 4px 6px 4px 0; border-top: 1px solid var(--line); vertical-align: middle; }
+.portas td:first-child { width: 34px; } .portas .v { font-family: var(--f-dado); white-space: nowrap; color: var(--ink-2); }
+.portas tr.livre td { color: var(--ink-2); }
+.elo { border: 0; background: none; padding: 0; cursor: pointer; text-align: left; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.elo:hover { text-decoration-color: currentColor; }
+
+/* lista de cabos */
+.tabela-rolo { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table.cabos-t { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px; }
+.cabos-t th { text-align: left; font: 600 11.5px var(--f-texto); text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); padding: 10px 10px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.cabos-t td { padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.cabos-t tr:last-child td { border-bottom: 0; }
+.cabos-t .n { font: 400 12px var(--f-dado); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.cabos-t .v { font: 400 12px var(--f-dado); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.cabos-t .rede { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.cabos-t .rede i { width: 8px; height: 8px; border-radius: 2px; background: var(--c); }
+.cabos-t input { width: 100%; min-width: 150px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); }
+.pilula { font-size: 11.5px; font-weight: 600; padding: 1px 7px; border-radius: 10px; border: 1px solid var(--line); white-space: nowrap; }
+.pilula.ded { border-color: var(--warn); color: var(--warn); }
+.vazio { padding: 28px 16px; text-align: center; color: var(--ink-2); }
+textarea.csv { width: 100%; height: 140px; font: 12px var(--f-dado); background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px; }
+@media (prefers-reduced-motion: no-preference) { .cabo, .no { transition: opacity .15s, stroke-width .15s; } }
+</style>
+
+</head>
+<body>
+
+<div class="pagina">
+  <div class="topo">
+    <div>
+      <h1>Mapa de Cabos da Casa</h1>
+      <p class="sub" id="sub"></p>
+    </div>
+    <div class="numeros" id="numeros"></div>
+  </div>
+  <div id="aviso"></div>
+  <div class="fontes" id="fontes"></div>
+  <div class="barra">
+    <div class="abas" role="tablist">
+      <button role="tab" id="aba-mapa" aria-selected="true">Mapa</button>
+      <button role="tab" id="aba-lista" aria-selected="false">Lista de cabos</button>
+    </div>
+    <input class="busca" id="busca" type="search" placeholder="Buscar aparelho, IP ou MAC" aria-label="Buscar aparelho">
+    <label class="chave"><input type="checkbox" id="ver-wifi"> Aparelhos no Wi-Fi</label>
+    <label class="chave" id="rot-finais"><input type="checkbox" id="ver-finais" checked> Aparelhos no cabo</label>
+    <button class="botao" id="copiar" hidden>Copiar como planilha</button>
+    <div class="legenda" id="legenda"></div>
+  </div>
+  <div class="area" id="area">
+    <div id="vista"></div>
+    <aside class="painel" id="painel" hidden></aside>
+  </div>
+</div>
+<script>
+const REAL = {"gerado_em":"2026-11-15T12:31:22-03:00","fontes":{"unifi":{"ok":false,"quando":null,"modo":null,"formato":null},"deco":{"ok":false,"quando":null},"local":{"ok":true,"quando":"2026-11-15T12:15:43-03:00"}},"nodes":[{"id":"2c:3f:87:0f:25:d0","kind":"modem","network":"isp","name":"Modem Vivo Fibra","ip":"192.168.15.1","mac":"2c:3f:87:0f:25:d0","online":true},{"id":"06:2c:5a:bd:3a:68","kind":"client","network":"isp","mac":"06:2c:5a:bd:3a:68","ip":"192.168.15.2","online":true,"me":false,"name":"Cesars-iPad"},{"id":"fe:c3:ad:fa:62:ea","kind":"client","network":"isp","mac":"fe:c3:ad:fa:62:ea","ip":"192.168.15.3","online":true,"me":true,"name":"Cesars-MacBook-Pro"},{"id":"9c:05:d6:3e:4d:c0","kind":"gateway","network":"unifi","mac":"9c:05:d6:3e:4d:c0","ip":"192.168.15.10","name":"Roteador UniFi","online":true,"pending":true,"vendor":"Ubiquiti","note":"Só o lado de fora deste roteador foi visto. Falta coletar os dados dele para saber o que há atrás."},{"id":"internet","kind":"internet","network":"isp","name":"Internet"}],"links":[{"from":"2c:3f:87:0f:25:d0","to":"06:2c:5a:bd:3a:68","medium":"desconhecido","source":"varredura","certainty":"deduzido","note":"Visto na rede do modem; não dá para saber se é cabo ou Wi-Fi.","id":"2c:3f:87:0f:25:d0|>06:2c:5a:bd:3a:68"},{"from":"2c:3f:87:0f:25:d0","to":"fe:c3:ad:fa:62:ea","medium":"wifi","source":"varredura","certainty":"medido","id":"2c:3f:87:0f:25:d0|>fe:c3:ad:fa:62:ea"},{"from":"2c:3f:87:0f:25:d0","to":"9c:05:d6:3e:4d:c0","medium":"cabo","to_port":"WAN","source":"varredura","certainty":"deduzido","note":"Roteadores ficam ligados por cabo no modem. A porta do modem não é informada.","id":"2c:3f:87:0f:25:d0|>9c:05:d6:3e:4d:c0"},{"from":"internet","to":"2c:3f:87:0f:25:d0","medium":"fibra","source":"varredura","certainty":"medido","id":"internet|>2c:3f:87:0f:25:d0"}]};
+const EXEMPLO = {"gerado_em":"2026-11-15T12:31:22-03:00","fontes":{"unifi":{"ok":true,"quando":"2026-11-15T10:00:00-03:00","modo":"chave","formato":"classico"},"deco":{"ok":true,"quando":"2026-11-15T10:05:00-03:00"},"local":{"ok":true,"quando":"2026-11-15T09:55:00-03:00"}},"nodes":[{"id":"9c:05:d6:aa:10:01","kind":"gateway","network":"unifi","name":"Gateway (rack)","model":"UCG Ultra","ip":"192.168.1.1","mac":"9c:05:d6:aa:10:01","fw":"4.1.13","online":true,"ports":[{"idx":1,"name":"Port 1","up":true,"speed":1000,"poe_w":null,"wan":false,"uplink":false},{"idx":2,"name":"Port 2","up":true,"speed":1000,"poe_w":null,"wan":false,"uplink":false},{"idx":3,"name":"Port 3","up":false,"speed":null,"poe_w":null,"wan":false,"uplink":false},{"idx":4,"name":"Port 4","up":true,"speed":2500,"poe_w":null,"wan":false,"uplink":false},{"idx":5,"name":"WAN","up":true,"speed":2500,"poe_w":null,"wan":true,"uplink":true}],"aliases":["9c:05:d6:aa:10:02"],"wan_ip":"192.168.15.10"},{"id":"9c:05:d6:aa:20:01","kind":"switch","network":"unifi","name":"Switch do rack","model":"USW Lite 8 PoE","ip":"192.168.1.2","mac":"9c:05:d6:aa:20:01","fw":"7.1.26","online":true,"ports":[{"idx":1,"name":"Port 1","up":true,"speed":1000,"poe_w":null,"wan":false,"uplink":true},{"idx":2,"name":"Port 2","up":true,"speed":1000,"poe_w":9.8,"wan":false,"uplink":false},{"idx":3,"name":"Port 3","up":true,"speed":1000,"poe_w":6.1,"wan":false,"uplink":false},{"idx":4,"name":"Port 4","up":true,"speed":1000,"poe_w":null,"wan":false,"uplink":false},{"idx":5,"name":"Port 5","up":true,"speed":1000,"poe_w":null,"wan":false,"uplink":false},{"idx":6,"name":"Port 6","up":true,"speed":100,"poe_w":null,"wan":false,"uplink":false},{"idx":7,"name":"Port 7","up":true,"speed":1000,"poe_w":null,"wan":false,"uplink":false},{"idx":8,"name":"Port 8","up":false,"speed":null,"poe_w":null,"wan":false,"uplink":false}]},{"id":"9c:05:d6:aa:30:01","kind":"switch","network":"unifi","name":"Switch do escritório","model":"USW Flex Mini","ip":"192.168.1.3","mac":"9c:05:d6:aa:30:01","fw":"2.1.6","online":true,"ports":[{"idx":1,"name":"Port 1","up":true,"speed":1000,"poe_w":null,"wan":false,"uplink":true},{"idx":2,"name":"Port 2","up":true,"speed":1000,"poe_w":null,"wan":false,"uplink":false},{"idx":3,"name":"Port 3","up":true,"speed":1000,"poe_w":null,"wan":false,"uplink":false},{"idx":4,"name":"Port 4","up":false,"speed":null,"poe_w":null,"wan":false,"uplink":false},{"idx":5,"name":"Port 5","up":true,"speed":1000,"poe_w":null,"wan":false,"uplink":false}]},{"id":"9c:05:d6:aa:40:01","kind":"ap","network":"unifi","name":"AP Sala","model":"U6 Pro","ip":"192.168.1.10","mac":"9c:05:d6:aa:40:01","fw":"6.6.77","online":true,"ports":[{"idx":1,"name":"Port 1","up":true,"speed":1000,"poe_w":null,"wan":false,"uplink":true}]},{"id":"9c:05:d6:aa:50:01","kind":"ap","network":"unifi","name":"AP Suíte","model":"U6 Lite","ip":"192.168.1.11","mac":"9c:05:d6:aa:50:01","fw":"6.6.77","online":true,"ports":[{"idx":1,"name":"Port 1","up":true,"speed":1000,"poe_w":null,"wan":false,"uplink":true}]},{"id":"9c:05:d6:aa:60:01","kind":"ap","network":"unifi","name":"AP Churrasqueira","model":"U6 Mesh","ip":"192.168.1.12","mac":"9c:05:d6:aa:60:01","fw":"6.6.77","online":true,"ports":[{"idx":1,"name":"Port 1","up":false,"speed":null,"poe_w":null,"wan":false,"uplink":false}]},{"id":"00:11:32:aa:00:01","kind":"client","network":"unifi","name":"NAS Synology","ip":"192.168.1.20","mac":"00:11:32:aa:00:01","vendor":"Synology","online":true},{"id":"d0:03:4b:aa:00:02","kind":"client","network":"unifi","name":"Apple TV Sala","ip":"192.168.1.21","mac":"d0:03:4b:aa:00:02","vendor":"Apple","online":true},{"id":"00:17:88:aa:00:03","kind":"client","network":"unifi","name":"Ponte Philips Hue","ip":"192.168.1.22","mac":"00:17:88:aa:00:03","vendor":"Philips","online":true},{"id":"a8:23:fe:aa:00:04","kind":"client","network":"unifi","name":"TV LG Sala","ip":"192.168.1.23","mac":"a8:23:fe:aa:00:04","vendor":"LG","online":true},{"id":"bc:60:a7:aa:00:05","kind":"client","network":"unifi","name":"PlayStation 5","ip":"192.168.1.24","mac":"bc:60:a7:aa:00:05","vendor":"Sony","online":true},{"id":"3c:22:fb:aa:00:06","kind":"client","network":"unifi","name":"Mac mini","ip":"192.168.1.25","mac":"3c:22:fb:aa:00:06","vendor":"Apple","online":true},{"id":"00:80:92:aa:00:07","kind":"client","network":"unifi","name":"Impressora Brother","ip":"192.168.1.26","mac":"00:80:92:aa:00:07","vendor":"Brother","online":true},{"id":"64:16:66:aa:00:08","kind":"client","network":"unifi","name":"Câmera portão","ip":"192.168.1.27","mac":"64:16:66:aa:00:08","vendor":"Intelbras","online":true},{"id":"f0:18:98:aa:01:01","kind":"client","network":"unifi","name":"iPhone","ip":"192.168.1.101","mac":"f0:18:98:aa:01:01","vendor":"Apple","online":true},{"id":"f0:18:98:aa:01:02","kind":"client","network":"unifi","name":"MacBook Pro","ip":"192.168.1.102","mac":"f0:18:98:aa:01:02","vendor":"Apple","online":true},{"id":"44:65:0d:aa:01:03","kind":"client","network":"unifi","name":"Echo Dot Cozinha","ip":"192.168.1.103","mac":"44:65:0d:aa:01:03","vendor":"Amazon","online":true},{"id":"f0:18:98:aa:01:04","kind":"client","network":"unifi","name":"iPad","ip":"192.168.1.104","mac":"f0:18:98:aa:01:04","vendor":"Apple","online":true},{"id":"70:ee:50:aa:01:05","kind":"client","network":"unifi","name":"Balança Withings","ip":"192.168.1.105","mac":"70:ee:50:aa:01:05","vendor":"Withings","online":true},{"id":"b0:4a:39:aa:01:06","kind":"client","network":"unifi","name":"Caixa de som JBL","ip":"192.168.1.106","mac":"b0:4a:39:aa:01:06","vendor":"Harman","online":true},{"id":"50:c7:bf:10:00:10","kind":"deco","network":"deco","name":"Deco Edícula","model":"X50","ip":"192.168.68.1","mac":"50:c7:bf:10:00:10","fw":"1.6.1","role":"principal","online":true,"port_count":3.0,"aliases":["50:c7:bf:10:00:11"]},{"id":"50:c7:bf:10:00:20","kind":"deco","network":"deco","name":"Deco Quarto","model":"X50","ip":"192.168.68.2","mac":"50:c7:bf:10:00:20","fw":"1.6.1","role":"satélite","online":true,"port_count":3.0},{"id":"50:c7:bf:10:00:30","kind":"deco","network":"deco","name":"Deco Varanda","model":"X20","ip":"192.168.68.3","mac":"50:c7:bf:10:00:30","fw":"1.2.4","role":"satélite","online":true,"port_count":2.0},{"id":"a4:77:33:aa:02:01","kind":"client","network":"deco","mac":"a4:77:33:aa:02:01","online":true,"ip":"192.168.68.50","name":"Chromecast"},{"id":"00:0c:29:aa:02:02","kind":"client","network":"deco","mac":"00:0c:29:aa:02:02","online":true,"ip":"192.168.68.51","name":"PC Oficina"},{"id":"f4:f5:d8:aa:02:03","kind":"client","network":"deco","mac":"f4:f5:d8:aa:02:03","online":true,"ip":"192.168.68.52","name":"TV Quarto"},{"id":"f0:18:98:aa:02:04","kind":"client","network":"deco","mac":"f0:18:98:aa:02:04","online":true,"ip":"192.168.68.53","name":"iPhone visita"},{"id":"7c:a6:b0:aa:02:05","kind":"client","network":"deco","mac":"7c:a6:b0:aa:02:05","online":true,"ip":"192.168.68.54","name":"Tomada Tapo"},{"id":"e8:9f:6d:aa:02:06","kind":"client","network":"deco","mac":"e8:9f:6d:aa:02:06","online":true,"ip":"192.168.68.55","name":"Robô aspirador"},{"id":"sw?9c:05:d6:aa:20:01#5","kind":"semgerencia","network":"unifi","name":"Switch sem gerência","note":"Deduzido: o UniFi vê 2 aparelhos na mesma porta 5 de Switch do rack."},{"id":"2c:3f:87:00:00:01","kind":"modem","network":"isp","name":"Modem Vivo Fibra","ip":"192.168.15.1","mac":"2c:3f:87:00:00:01","online":true},{"id":"internet","kind":"internet","network":"isp","name":"Internet"}],"links":[{"from":"9c:05:d6:aa:10:01","to":"9c:05:d6:aa:20:01","medium":"cabo","from_port":1,"to_port":1,"speed":1000,"source":"unifi","certainty":"medido","id":"9c:05:d6:aa:10:01|1>9c:05:d6:aa:20:01"},{"from":"9c:05:d6:aa:10:01","to":"9c:05:d6:aa:30:01","medium":"cabo","from_port":2,"to_port":1,"speed":1000,"source":"unifi","certainty":"medido","id":"9c:05:d6:aa:10:01|2>9c:05:d6:aa:30:01"},{"from":"9c:05:d6:aa:20:01","to":"9c:05:d6:aa:40:01","medium":"cabo","from_port":2,"to_port":1,"speed":1000,"source":"unifi","certainty":"medido","poe_w":9.8,"id":"9c:05:d6:aa:20:01|2>9c:05:d6:aa:40:01"},{"from":"9c:05:d6:aa:20:01","to":"9c:05:d6:aa:50:01","medium":"cabo","from_port":3,"to_port":1,"speed":1000,"source":"unifi","certainty":"medido","poe_w":6.1,"id":"9c:05:d6:aa:20:01|3>9c:05:d6:aa:50:01"},{"from":"9c:05:d6:aa:40:01","to":"9c:05:d6:aa:60:01","medium":"wifi","signal":-61,"band":"5 GHz","source":"unifi","certainty":"medido","id":"9c:05:d6:aa:40:01|>9c:05:d6:aa:60:01"},{"from":"9c:05:d6:aa:10:01","to":"00:11:32:aa:00:01","medium":"cabo","from_port":4,"speed":2500,"source":"unifi","certainty":"medido","id":"9c:05:d6:aa:10:01|4>00:11:32:aa:00:01"},{"from":"9c:05:d6:aa:20:01","to":"d0:03:4b:aa:00:02","medium":"cabo","from_port":4,"speed":1000,"source":"unifi","certainty":"medido","id":"9c:05:d6:aa:20:01|4>d0:03:4b:aa:00:02"},{"from":"9c:05:d6:aa:20:01","to":"00:17:88:aa:00:03","medium":"cabo","from_port":6,"speed":100,"source":"unifi","certainty":"medido","id":"9c:05:d6:aa:20:01|6>00:17:88:aa:00:03"},{"from":"sw?9c:05:d6:aa:20:01#5","to":"a8:23:fe:aa:00:04","medium":"cabo","from_port":null,"source":"unifi","certainty":"deduzido","id":"sw?9c:05:d6:aa:20:01#5|None>a8:23:fe:aa:00:04"},{"from":"sw?9c:05:d6:aa:20:01#5","to":"bc:60:a7:aa:00:05","medium":"cabo","from_port":null,"source":"unifi","certainty":"deduzido","id":"sw?9c:05:d6:aa:20:01#5|None>bc:60:a7:aa:00:05"},{"from":"9c:05:d6:aa:30:01","to":"3c:22:fb:aa:00:06","medium":"cabo","from_port":2,"speed":1000,"source":"unifi","certainty":"medido","id":"9c:05:d6:aa:30:01|2>3c:22:fb:aa:00:06"},{"from":"9c:05:d6:aa:30:01","to":"00:80:92:aa:00:07","medium":"cabo","from_port":3,"speed":100,"source":"unifi","certainty":"medido","id":"9c:05:d6:aa:30:01|3>00:80:92:aa:00:07"},{"from":"9c:05:d6:aa:30:01","to":"64:16:66:aa:00:08","medium":"cabo","from_port":5,"speed":100,"source":"unifi","certainty":"medido","id":"9c:05:d6:aa:30:01|5>64:16:66:aa:00:08"},{"from":"9c:05:d6:aa:40:01","to":"f0:18:98:aa:01:01","medium":"wifi","signal":-52,"band":"5 GHz","essid":"Casa","source":"unifi","certainty":"medido","id":"9c:05:d6:aa:40:01|>f0:18:98:aa:01:01"},{"from":"9c:05:d6:aa:40:01","to":"f0:18:98:aa:01:02","medium":"wifi","signal":-48,"band":"6 GHz","essid":"Casa","source":"unifi","certainty":"medido","id":"9c:05:d6:aa:40:01|>f0:18:98:aa:01:02"},{"from":"9c:05:d6:aa:40:01","to":"44:65:0d:aa:01:03","medium":"wifi","signal":-66,"band":"2,4 GHz","essid":"Casa IoT","source":"unifi","certainty":"medido","id":"9c:05:d6:aa:40:01|>44:65:0d:aa:01:03"},{"from":"9c:05:d6:aa:50:01","to":"f0:18:98:aa:01:04","medium":"wifi","signal":-57,"band":"5 GHz","essid":"Casa","source":"unifi","certainty":"medido","id":"9c:05:d6:aa:50:01|>f0:18:98:aa:01:04"},{"from":"9c:05:d6:aa:50:01","to":"70:ee:50:aa:01:05","medium":"wifi","signal":-71,"band":"2,4 GHz","essid":"Casa IoT","source":"unifi","certainty":"medido","id":"9c:05:d6:aa:50:01|>70:ee:50:aa:01:05"},{"from":"9c:05:d6:aa:60:01","to":"b0:4a:39:aa:01:06","medium":"wifi","signal":-63,"band":"2,4 GHz","essid":"Casa","source":"unifi","certainty":"medido","id":"9c:05:d6:aa:60:01|>b0:4a:39:aa:01:06"},{"from":"50:c7:bf:10:00:10","to":"50:c7:bf:10:00:20","medium":"cabo","source":"deco","certainty":"medido","note":"o Deco não informa em qual porta o cabo entra","id":"50:c7:bf:10:00:10|>50:c7:bf:10:00:20"},{"from":"50:c7:bf:10:00:10","to":"50:c7:bf:10:00:30","medium":"wifi","signal":-58.0,"band":"5 GHz","source":"deco","certainty":"medido","id":"50:c7:bf:10:00:10|>50:c7:bf:10:00:30"},{"from":"9c:05:d6:aa:20:01","to":"50:c7:bf:10:00:10","medium":"cabo","from_port":7,"speed":1000,"source":"unifi","certainty":"medido","to_port":"WAN","id":"9c:05:d6:aa:20:01|7>50:c7:bf:10:00:10"},{"from":"50:c7:bf:10:00:10","to":"a4:77:33:aa:02:01","medium":"wifi","band":"5 GHz","source":"deco","certainty":"medido","id":"50:c7:bf:10:00:10|>a4:77:33:aa:02:01"},{"from":"50:c7:bf:10:00:10","to":"00:0c:29:aa:02:02","medium":"cabo","source":"deco","certainty":"medido","note":"o Deco não informa em qual porta o cabo entra","id":"50:c7:bf:10:00:10|>00:0c:29:aa:02:02"},{"from":"50:c7:bf:10:00:20","to":"f4:f5:d8:aa:02:03","medium":"cabo","source":"deco","certainty":"medido","note":"o Deco não informa em qual porta o cabo entra","id":"50:c7:bf:10:00:20|>f4:f5:d8:aa:02:03"},{"from":"50:c7:bf:10:00:20","to":"f0:18:98:aa:02:04","medium":"wifi","band":"5 GHz","essid":"convidados","source":"deco","certainty":"medido","id":"50:c7:bf:10:00:20|>f0:18:98:aa:02:04"},{"from":"50:c7:bf:10:00:30","to":"7c:a6:b0:aa:02:05","medium":"wifi","band":"2,4 GHz","source":"deco","certainty":"medido","id":"50:c7:bf:10:00:30|>7c:a6:b0:aa:02:05"},{"from":"50:c7:bf:10:00:30","to":"e8:9f:6d:aa:02:06","medium":"wifi","band":"2,4 GHz","source":"deco","certainty":"medido","id":"50:c7:bf:10:00:30|>e8:9f:6d:aa:02:06"},{"from":"9c:05:d6:aa:20:01","to":"sw?9c:05:d6:aa:20:01#5","medium":"cabo","from_port":5,"source":"unifi","certainty":"deduzido","speed":1000,"id":"9c:05:d6:aa:20:01|5>sw?9c:05:d6:aa:20:01#5"},{"from":"2c:3f:87:00:00:01","to":"9c:05:d6:aa:10:01","medium":"cabo","to_port":"WAN","source":"varredura","certainty":"deduzido","note":"O modem enxerga este roteador em 192.168.15.10. A porta do modem não é informada.","id":"2c:3f:87:00:00:01|>9c:05:d6:aa:10:01"},{"from":"internet","to":"2c:3f:87:00:00:01","medium":"fibra","source":"varredura","certainty":"medido","id":"internet|>2c:3f:87:00:00:01"}],"exemplo":true};
+</script>
+<script>
+(() => {
+  const $ = (s, el = document) => el.querySelector(s);
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const INFRA = new Set(["internet", "modem", "gateway", "switch", "ap", "deco", "semgerencia"]);
+  const TIPO = { internet: "Internet", modem: "Modem da operadora", gateway: "Roteador", switch: "Switch", ap: "Ponto de acesso Wi-Fi", deco: "Deco", semgerencia: "Switch sem gerência", client: "Aparelho" };
+  const REDE = { isp: "Operadora", unifi: "UniFi", deco: "Deco", outro: "Outros" };
+  const MEIO = { cabo: "Cabo", wifi: "Wi-Fi", fibra: "Fibra", desconhecido: "Não identificado" };
+  const W = 236, GAPX = 92, HEAD = 52, ROW = 24, PADB = 8, FOOT = 18, LEAF = 44, VGAP = 10, PAD = 28;
+  const ICONE = {
+    internet: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c3 3 3 14 0 17M12 3.5c-3 3-3 14 0 17"/>',
+    modem: '<rect x="3" y="12" width="18" height="7" rx="1.5"/><path d="M7 15.5h.01M10.5 15.5h.01M17 12V5"/>',
+    gateway: '<rect x="3" y="13" width="18" height="6" rx="1.5"/><path d="M7 16h.01M12 13V9M8.5 6.5a5 5 0 0 1 7 0"/>',
+    switch: '<rect x="2.5" y="8" width="19" height="8" rx="1.5"/><path d="M6 12h2M10 12h2M14 12h2M18 12h.01"/>',
+    ap: '<circle cx="12" cy="12" r="2"/><path d="M7.5 7.5a6.4 6.4 0 0 0 0 9M16.5 7.5a6.4 6.4 0 0 1 0 9M4.5 4.5a10.6 10.6 0 0 0 0 15M19.5 4.5a10.6 10.6 0 0 1 0 15"/>',
+    deco: '<path d="M8 20h8l1-7H7z"/><path d="M8.5 9.5a5 5 0 0 1 7 0M6 6.5a8.5 8.5 0 0 1 12 0"/>',
+    semgerencia: '<rect x="2.5" y="8" width="19" height="8" rx="1.5" stroke-dasharray="3 2.5"/><path d="M10.5 11a1.6 1.6 0 1 1 2.3 1.4c-.5.3-.8.6-.8 1.1M12 14.6h.01"/>',
+    client: '<rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M9 20h6M12 16v4"/>',
+    grupo: '<circle cx="8" cy="9" r="2.5"/><circle cx="16" cy="9" r="2.5"/><path d="M3.5 18c.6-3 2.3-4.5 4.5-4.5s3.9 1.5 4.5 4.5M12 18c.6-3 2-4.5 4-4.5s3.9 1.5 4.5 4.5"/>',
+  };
+  const WIFI = '<svg viewBox="0 0 12 10" width="12" height="10" style="fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round"><path d="M1 3.5a7.5 7.5 0 0 1 10 0M3 5.8a4.5 4.5 0 0 1 6 0"/><circle cx="6" cy="8.3" r=".8" fill="currentColor" stroke="none"/></svg>';
+  const ic = k => `<span class="ic"><svg viewBox="0 0 24 24">${ICONE[k] || ICONE.client}</svg></span>`;
+
+  let guardado = {};
+  try { guardado = JSON.parse(localStorage.getItem("mapa-cabos") || "{}"); } catch (e) {}
+  const lembrar = () => { try { localStorage.setItem("mapa-cabos", JSON.stringify(guardado)); } catch (e) {} };
+  guardado.etiquetas = guardado.etiquetas || {};
+
+  const temReal = !!(REAL && REAL.nodes && REAL.nodes.length);
+  const st = { exemplo: !temReal, vista: "mapa", wifi: false, finais: true, sel: null, busca: "" };
+  let D, nos, saidas, sobe;
+
+  const vel = v => !v ? "" : v >= 1000 ? `${String(v / 1000).replace(".", ",")} Gb` : `${v} Mb`;
+  const dataBr = s => { if (!s) return ""; const d = new Date(s); return isNaN(d) ? "" : d.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }); };
+  const nomePorta = (p, l) => p == null || p === "" ? "" : /^\d+$/.test(String(p)) ? `porta ${p}` : String(p);
+  const ordemPorta = l => (l.from_port == null ? 1e9 : Number(l.from_port) || 0);
+  const eInfra = n => INFRA.has(n.kind) || saidas.has(n.id);
+  const bate = n => { const q = st.busca.trim().toLowerCase(); return !q || [n.name, n.ip, n.mac, n.model, n.vendor].some(v => v && String(v).toLowerCase().includes(q)); };
+
+  function carregar() {
+    D = st.exemplo ? EXEMPLO : REAL;
+    D = D || { nodes: [], links: [], fontes: {} };
+    nos = new Map(D.nodes.map(n => [n.id, n]));
+    saidas = new Map(); sobe = new Map();
+    for (const l of D.links) { if (!saidas.has(l.from)) saidas.set(l.from, []); saidas.get(l.from).push(l); sobe.set(l.to, l); }
+    if (st.sel && !st.sel.startsWith("grupo:") && !nos.has(st.sel)) st.sel = null;
+  }
+
+  // ───── cabeçalho, avisos, fontes ─────
+  function desenharTopo() {
+    const cabos = D.links.filter(l => l.medium === "cabo" || l.medium === "fibra");
+    const ded = cabos.filter(l => l.certainty === "deduzido").length;
+    const ap = D.nodes.filter(n => n.kind !== "internet" && n.kind !== "semgerencia").length;
+    const semfio = D.links.filter(l => l.medium === "wifi").length;
+    const redes = ["unifi", "deco"].filter(k => D.fontes && D.fontes[k] && D.fontes[k].ok).length;
+    $("#sub").textContent = D.gerado_em ? `De onde sai e onde chega cada cabo. Montado em ${dataBr(D.gerado_em)}.` : "De onde sai e onde chega cada cabo.";
+    $("#numeros").innerHTML = `<div><b>${cabos.length}</b> ${cabos.length === 1 ? "cabo" : "cabos"}${ded ? ` (${ded} ${ded === 1 ? "deduzido" : "deduzidos"})` : ""}</div><div><b>${semfio}</b> ${semfio === 1 ? "ligação" : "ligações"} Wi-Fi</div><div><b>${ap}</b> ${ap === 1 ? "aparelho" : "aparelhos"}</div><div><b>${redes}</b> de 2 redes coletadas</div>`;
+    const f = D.fontes || {};
+    const falta = ["unifi", "deco"].filter(k => !(f[k] && f[k].ok));
+    let av = "";
+    if (st.exemplo) av = `<div class="aviso"><span><b>Exemplo.</b> Esta é uma casa inventada, só para mostrar como o mapa fica. Não é a sua rede.</span>${temReal ? '<button class="botao" id="trocar">Voltar para a minha rede</button>' : ""}</div>`;
+    else if (falta.length) av = `<div class="aviso"><span><b>Falta coletar ${falta.map(k => REDE[k]).join(" e ")}.</b> Por enquanto o mapa só mostra o que foi visto na rede do modem.</span><button class="botao" id="trocar">Ver um exemplo completo</button></div>`;
+    $("#aviso").innerHTML = av;
+    const t = $("#trocar"); if (t) t.onclick = () => { st.exemplo = !st.exemplo; st.sel = null; tudo(); };
+    const como = { unifi: "Conecte o Mac na rede UniFi (ou use a nuvem) e abra o atualizar.command.", deco: "Conecte o Mac no Wi-Fi do Deco e abra o atualizar.command.", local: "Abra o atualizar.command em qualquer rede." };
+    const oque = { unifi: "Portas de cada switch, pontos de acesso e o que está em cada porta.", deco: "Unidades Deco, como se ligam entre si e os aparelhos de cada uma.", local: "O que está ligado direto no modem da operadora." };
+    const rot = { unifi: "UniFi", deco: "Deco", local: "Modem da operadora" }, cor = { unifi: "unifi", deco: "deco", local: "isp" };
+    $("#fontes").innerHTML = ["local", "unifi", "deco"].map(k => {
+      const ok = f[k] && f[k].ok;
+      const extra = ok && k === "unifi" && f[k].formato === "oficial" ? " A API usada não informa o número da porta." : "";
+      return `<div class="fonte" style="--c:var(--${cor[k]})"><span class="cor"></span><div><b>${rot[k]}</b><span class="estado ${ok ? "ok" : "falta"}">${ok ? `coletado ${dataBr(f[k].quando)}` : "falta coletar"}</span></div><p>${ok ? oque[k] + extra : como[k]}</p></div>`;
+    }).join("");
+    $("#legenda").innerHTML = ["isp", "unifi", "deco"].map(r => `<span style="--c:var(--${r})"><i></i>${REDE[r]}</span>`).join("") +
+      `<span><svg viewBox="0 0 30 8"><line x1="1" y1="4" x2="29" y2="4"/></svg>cabo</span>` +
+      `<span><svg viewBox="0 0 30 8"><line x1="1" y1="4" x2="29" y2="4" stroke-dasharray="9 5"/></svg>cabo deduzido</span>` +
+      `<span><svg viewBox="0 0 30 8"><line x1="1" y1="4" x2="29" y2="4" stroke-dasharray="1 6" stroke-linecap="round" style="stroke-width:2.4"/></svg>Wi-Fi</span>`;
+  }
+
+  // ───── mapa ─────
+  function linhas(id) {
+    const ls = saidas.get(id) || [];
+    const nome = l => nos.get(l.to).name || "";
+    const ord = (a, b) => ordemPorta(a) - ordemPorta(b) || nome(a).localeCompare(nome(b), "pt");
+    const fio = ls.filter(l => l.medium !== "wifi").sort(ord), ar = ls.filter(l => l.medium === "wifi").sort(ord);
+    const r = [];
+    const inf = l => eInfra(nos.get(l.to));
+    if (st.finais) fio.forEach(l => r.push({ l }));
+    else { fio.filter(inf).forEach(l => r.push({ l })); const c = fio.filter(l => !inf(l)); if (c.length > 2) r.push({ grupo: "cabo", ls: c, de: id }); else c.forEach(l => r.push({ l })); }
+    ar.filter(inf).forEach(l => r.push({ l }));
+    const c = ar.filter(l => !inf(l));
+    if (st.wifi || c.length <= 2) c.forEach(l => r.push({ l })); else r.push({ grupo: "wifi", ls: c, de: id });
+    return r;
+  }
+  function medir(id, prof, vistos) {
+    const n = nos.get(id), infra = eInfra(n), rs = vistos.has(id) ? [] : linhas(id);
+    vistos.add(id);
+    const hCard = infra ? HEAD + rs.length * ROW + (rs.length ? PADB : 0) + ((n.ports || []).length ? FOOT : 0) : LEAF;
+    const filhos = rs.map(r => r.l ? medir(r.l.to, prof + 1, vistos) : { grupo: r, id: `grupo:${r.grupo}:${r.de}`, hCard: LEAF, alt: LEAF, prof: prof + 1, filhos: [], rs: [] });
+    const soma = filhos.reduce((s, f) => s + f.alt, 0) + Math.max(0, filhos.length - 1) * VGAP;
+    return { id, n, infra, rs, hCard, filhos, soma, alt: Math.max(hCard, soma), prof };
+  }
+  function posicionar(t, y, lista) {
+    t.x = PAD + t.prof * (W + GAPX); t.y = y; lista.push(t);
+    let yy = y;
+    for (const f of t.filhos) { posicionar(f, yy, lista); yy += f.alt + VGAP; }
+  }
+  function textoLinha(r) {
+    if (r.grupo) return { dest: `${r.ls.length} ${r.ls.length === 1 ? "aparelho" : "aparelhos"} ${r.grupo === "wifi" ? "no Wi-Fi" : "no cabo"}`, jack: r.grupo === "wifi" ? `<span class="jack ar" title="Wi-Fi">${WIFI}</span>` : `<span class="jack nsei">…</span>`, meta: "" };
+    const l = r.l, alvo = nos.get(l.to);
+    let jack, meta = "";
+    if (l.medium === "wifi") { jack = `<span class="jack ar" title="Wi-Fi">${WIFI}</span>`; meta = [l.band, l.signal ? `${l.signal} dBm` : ""].filter(Boolean).join(" ").replace(" GHz", "G"); }
+    else if (l.medium === "fibra") { jack = `<span class="jack" title="Fibra">FO</span>`; }
+    else {
+      const p = l.from_port;
+      jack = p != null ? `<span class="jack" title="${esc(l.from_port_name || nomePorta(p))}">${esc(p)}</span>` : `<span class="jack nsei" title="A porta de saída não é informada">?</span>`;
+      meta = vel(l.speed);
+    }
+    const lento = l.medium === "cabo" && l.speed && l.speed <= 100;
+    return { dest: alvo.name, jack, meta: (l.poe_w ? `<span class="poe" title="Alimenta por PoE: ${String(l.poe_w).replace(".", ",")} W">⚡</span>` : "") + (meta ? `<span class="vel${lento ? " lento" : ""}">${esc(meta)}</span>` : "") };
+  }
+  function cartao(t) {
+    const pos = `left:${t.x}px;top:${t.y}px;width:${W}px;height:${t.hCard}px`;
+    if (t.grupo) {
+      const g = t.grupo, pai = nos.get(g.de);
+      return `<button class="no folha grupo r-${pai.network}${st.sel === t.id ? " sel" : ""}" style="${pos}" data-id="${esc(t.id)}"><span class="cab">${ic("grupo")}<span class="tit"><b>${g.ls.length} ${g.ls.length === 1 ? "aparelho" : "aparelhos"}</b><small>${g.grupo === "wifi" ? "no Wi-Fi, toque para ver" : "no cabo, toque para ver"}</small></span></span></button>`;
+    }
+    const n = t.n, l = sobe.get(n.id);
+    const cls = ["no", t.infra ? "infra" : "folha", `r-${n.network || "outro"}`, n.online === false ? "off" : "", n.pending ? "pend" : "", st.sel === n.id ? "sel" : "", bate(n) ? "achou" : ""].filter(Boolean).join(" ");
+    let entra = "";
+    if (l && l.medium === "wifi") entra = `<span class="entra jack ar" title="Chega por Wi-Fi">${WIFI}</span>`;
+    else if (l && l.to_port != null) entra = `<span class="entra jack" title="O cabo entra na ${esc(nomePorta(l.to_port))}">${esc(l.to_port)}</span>`;
+    const subt = n.pending ? "falta coletar" : [n.model, n.ip].filter(Boolean).join(" · ") || (n.kind === "semgerencia" ? "deduzido" : n.kind === "internet" ? "operadora" : TIPO[n.kind] || "");
+    let h = `<button class="${cls}" style="${pos}" data-id="${esc(n.id)}">${entra}<span class="cab">${ic(n.kind)}<span class="tit"><b>${esc(n.name)}</b><small>${n.me ? "este Mac · " : ""}${esc(subt)}</small></span></span>`;
+    if (t.infra && t.rs.length) h += `<span class="saidas" style="display:block">${t.rs.map(r => { const x = textoLinha(r); return `<span class="saida"><span class="dest">${esc(x.dest)}</span>${x.meta}${x.jack}</span>`; }).join("")}</span>`;
+    if (t.infra && (n.ports || []).length) { const livre = n.ports.filter(p => !p.up).length; h += `<span class="livres" style="display:block">${n.ports.length} portas · ${livre ? `${livre} ${livre === 1 ? "livre" : "livres"}` : "todas em uso"}</span>`; }
+    return h + "</button>";
+  }
+  function desenharMapa() {
+    const raizes = D.nodes.filter(n => !sobe.has(n.id));
+    if (!raizes.length) { $("#vista").innerHTML = '<div class="rolo"><div class="vazio">Nenhum dado coletado ainda. Abra o atualizar.command.</div></div>'; return; }
+    const lista = [], vistos = new Set(); let y = PAD, prof = 0;
+    for (const r of raizes) { const t = medir(r.id, 0, vistos); posicionar(t, y, lista); y += t.alt + 2 * VGAP; }
+    lista.forEach(t => prof = Math.max(prof, t.prof));
+    const larg = PAD * 2 + (prof + 1) * W + prof * GAPX, alt = y - 2 * VGAP + PAD;
+    const caminho = new Set();
+    if (st.sel && nos.has(st.sel)) { let c = st.sel; while (sobe.has(c) && !caminho.has(c)) { caminho.add(c); c = sobe.get(c).from; } }
+    let svg = "";
+    for (const t of lista) t.filhos.forEach((f, i) => {
+      const r = t.rs[i], l = r.l, x1 = t.x + W, y1 = t.y + HEAD + i * ROW + ROW / 2, x2 = f.x, y2 = f.y + (f.infra ? HEAD : LEAF) / 2, c = GAPX * .55;
+      const meio = l ? l.medium : r.grupo, rede = l ? nos.get(l.to).network : nos.get(r.de).network;
+      svg += `<path class="cabo m-${meio} ${l && l.certainty === "deduzido" ? "deduzido" : ""} ${l && caminho.has(l.to) ? "hl" : ""}" style="--c:var(--${rede || "outro"})" d="M${x1} ${y1}C${x1 + c} ${y1},${x2 - c} ${y2},${x2} ${y2}"/>`;
+    });
+    $("#vista").innerHTML = `<div class="rolo" id="rolo"><div class="palco${st.busca.trim() ? " filtrando" : ""}" style="width:${larg}px;height:${alt}px"><svg class="cabos" width="${larg}" height="${alt}">${svg}</svg>${lista.map(cartao).join("")}</div></div>`;
+    $("#vista").querySelectorAll(".no").forEach(b => b.onclick = () => { st.sel = st.sel === b.dataset.id ? null : b.dataset.id; manterRolagem(desenharMapa); desenharPainel(); });
+  }
+  function manterRolagem(fn) { const r = $("#rolo"), x = r ? r.scrollLeft : 0, y = r ? r.scrollTop : 0; fn(); const n = $("#rolo"); if (n) { n.scrollLeft = x; n.scrollTop = y; } }
+
+  // ───── painel ─────
+  const eloNo = id => { const n = nos.get(id); return n ? `<button class="elo" data-ir="${esc(id)}">${esc(n.name)}</button>` : ""; };
+  function frase(l) {
+    const de = nos.get(l.from);
+    const partes = [MEIO[l.medium] || l.medium];
+    if (l.medium === "wifi") { if (l.essid) partes.push(`rede ${l.essid}`); if (l.band) partes.push(l.band); if (l.signal) partes.push(`${l.signal} dBm`); }
+    if (l.speed) partes.push(vel(l.speed)); if (l.poe_w) partes.push(`PoE ${String(l.poe_w).replace(".", ",")} W`);
+    const porta = l.from_port != null ? `, ${nomePorta(l.from_port)}${l.from_port_name ? ` (${esc(l.from_port_name)})` : ""}` : "";
+    return `${eloNo(de.id)}${porta}<br><span class="nota">${esc(partes.join(" · "))}${l.to_port != null ? ` · entra na ${esc(nomePorta(l.to_port))} deste aparelho` : ""}${l.certainty === "deduzido" ? " · deduzido" : ""}</span>`;
+  }
+  function desenharPainel() {
+    const p = $("#painel"), area = $("#area");
+    if (!st.sel) { p.hidden = true; area.classList.remove("com-painel"); return; }
+    let h = "";
+    if (st.sel.startsWith("grupo:")) {
+      const [, meio, de] = st.sel.match(/^grupo:([^:]+):(.*)$/) || [];
+      const pai = nos.get(de); if (!pai) { st.sel = null; return desenharPainel(); }
+      const ls = (saidas.get(de) || []).filter(l => (meio === "wifi") === (l.medium === "wifi") && !eInfra(nos.get(l.to)));
+      h = `<header class="r-${pai.network}"><div><div class="tipo">${meio === "wifi" ? "No Wi-Fi" : "No cabo"} de ${esc(pai.name)}</div><h2>${ls.length} ${ls.length === 1 ? "aparelho" : "aparelhos"}</h2></div><button class="fechar" aria-label="Fechar">×</button></header>
+      <table class="portas">${ls.map(l => { const n = nos.get(l.to); return `<tr><td colspan="2">${eloNo(n.id)}<br><span class="v">${esc(n.ip || "")}</span></td><td class="v">${esc([l.essid, l.band, l.signal ? l.signal + " dBm" : "", vel(l.speed)].filter(Boolean).join(" · "))}</td></tr>`; }).join("")}</table>`;
+    } else {
+      const n = nos.get(st.sel), l = sobe.get(n.id), fs = saidas.get(n.id) || [];
+      const dd = [["IP", n.ip], ["IP no modem", n.wan_ip], ["MAC", n.mac], ["Modelo", n.model], ["Fabricante", n.vendor], ["Versão", n.fw], ["Papel", n.role]].filter(x => x[1]);
+      h = `<header class="r-${n.network || "outro"}"><div><div class="tipo">${esc(TIPO[n.kind] || "")} · ${esc(REDE[n.network] || "")}</div><h2>${esc(n.name)}</h2></div><button class="fechar" aria-label="Fechar">×</button></header>`;
+      if (n.online === false) h += `<p class="nota">Estava desligado ou fora do ar na hora da coleta.</p>`;
+      if (dd.length) h += `<dl>${dd.map(x => `<dt>${x[0]}</dt><dd>${esc(x[1])}</dd>`).join("")}</dl>`;
+      if (n.note) h += `<p class="nota">${esc(n.note)}</p>`;
+      if (l && l.from !== "internet") {
+        h += `<div><h3>Chega por</h3><p>${frase(l)}</p>${l.note ? `<p class="nota">${esc(l.note)}</p>` : ""}`;
+        if (l.medium === "cabo" && l.speed && l.speed <= 100) h += `<p class="nota">Negociou 100 Mb. É normal em impressora, câmera e automação. Em TV, computador ou ponto de acesso costuma ser cabo com defeito.</p>`;
+        h += "</div>";
+      }
+      if ((n.ports || []).length) {
+        const porPorta = {}; fs.forEach(f => { if (f.from_port != null) (porPorta[f.from_port] = porPorta[f.from_port] || []).push(f); });
+        const sobeLocal = l && l.to_port != null ? String(l.to_port) : null;
+        h += `<div><h3>Portas</h3><table class="portas">${n.ports.map(pt => {
+          const em = (porPorta[pt.idx] || []).map(f => eloNo(f.to)).join(", ");
+          const eSobe = pt.uplink || sobeLocal === String(pt.idx) || (pt.wan && sobeLocal === "WAN");
+          const quem = em || (eSobe && l ? `↑ ${eloNo(l.from)}` : pt.up ? '<span class="nota">em uso, aparelho não identificado</span>' : "livre");
+          return `<tr class="${pt.up ? "" : "livre"}"><td><span class="jack">${esc(pt.idx)}</span></td><td>${quem}${pt.wan ? ' <span class="nota">(WAN)</span>' : ""}</td><td class="v">${pt.up ? vel(pt.speed) : ""}${pt.poe_w ? ` ⚡${String(pt.poe_w).replace(".", ",")}W` : ""}</td></tr>`;
+        }).join("")}</table></div>`;
+      }
+      const semPorta = fs.filter(f => f.from_port == null || !(n.ports || []).length);
+      if (semPorta.length) h += `<div><h3>${(n.ports || []).length ? "Outras ligações" : "Ligado nele"}</h3><table class="portas">${semPorta.map(f => `<tr><td><span class="jack ${f.medium === "wifi" ? "ar" : "nsei"}">${f.medium === "wifi" ? WIFI : f.from_port != null ? esc(f.from_port) : "?"}</span></td><td>${eloNo(f.to)}</td><td class="v">${esc(f.medium === "wifi" ? [f.band, f.signal ? f.signal + " dBm" : ""].filter(Boolean).join(" ") : vel(f.speed))}</td></tr>`).join("")}</table></div>`;
+      if (n.kind === "deco" && n.port_count) h += `<p class="nota">Tem ${n.port_count} portas de rede. O Deco diz o que está no cabo, mas não em qual porta.</p>`;
+    }
+    p.innerHTML = h; p.hidden = false; area.classList.add("com-painel");
+    $(".fechar", p).onclick = () => { st.sel = null; tudo(); };
+    p.querySelectorAll("[data-ir]").forEach(b => b.onclick = () => ir(b.dataset.ir));
+    if (window.matchMedia("(max-width: 999px)").matches) p.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+  function ir(id) {
+    const n = nos.get(id); if (!n) return;
+    const l = sobe.get(id);
+    if (l && !eInfra(n)) { if (l.medium === "wifi") st.wifi = true; else st.finais = true; $("#ver-wifi").checked = st.wifi; $("#ver-finais").checked = st.finais; }
+    st.sel = id; st.vista = "mapa"; tudo();
+    const el = $(`#vista .no[data-id="${CSS.escape(id)}"]`); if (el) el.scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
+  }
+
+  // ───── lista de cabos ─────
+  function ordemArvore() {
+    const out = [], vistos = new Set();
+    const anda = id => { if (vistos.has(id)) return; vistos.add(id); (saidas.get(id) || []).slice().sort((a, b) => (a.medium === "wifi") - (b.medium === "wifi") || ordemPorta(a) - ordemPorta(b)).forEach(l => { out.push(l); anda(l.to); }); };
+    D.nodes.filter(n => !sobe.has(n.id)).forEach(n => anda(n.id));
+    return out;
+  }
+  function linhasLista() {
+    return ordemArvore().filter(l => l.from !== "internet" && (st.wifi || l.medium !== "wifi") && (bate(nos.get(l.from)) || bate(nos.get(l.to))));
+  }
+  function desenharLista() {
+    const ls = linhasLista();
+    if (!ls.length) { $("#vista").innerHTML = `<div class="tabela-rolo"><div class="vazio">${st.busca.trim() ? "Nada encontrado para essa busca." : "Nenhum cabo mapeado ainda."}</div></div>`; return; }
+    const tr = ls.map((l, i) => {
+      const a = nos.get(l.from), b = nos.get(l.to);
+      return `<tr><td class="n">${i + 1}</td><td>${eloNo(a.id)}</td><td>${l.medium === "wifi" ? `<span class="jack ar">${WIFI}</span>` : l.from_port != null ? `<span class="jack" style="--c:var(--${a.network || "outro"})">${esc(l.from_port)}</span>` : '<span class="jack nsei" title="Não informada">?</span>'}</td>
+      <td>${eloNo(b.id)}</td><td>${l.to_port != null ? `<span class="jack" style="--c:var(--${b.network || "outro"})">${esc(l.to_port)}</span>` : ""}</td>
+      <td>${esc(MEIO[l.medium] || l.medium)}</td><td class="v">${esc(l.medium === "wifi" ? [l.band, l.signal ? l.signal + " dBm" : ""].filter(Boolean).join(" ") : vel(l.speed))}${l.poe_w ? ` ⚡${String(l.poe_w).replace(".", ",")} W` : ""}</td>
+      <td><span class="rede" style="--c:var(--${b.network || "outro"})"><i></i>${esc(REDE[b.network] || "")}</span></td>
+      <td><span class="pilula ${l.certainty === "deduzido" ? "ded" : ""}" title="${esc(l.note || "")}">${l.certainty === "deduzido" ? "Deduzido" : "Medido"}</span></td>
+      <td><input id="et-${i}" data-et="${esc(l.id)}" value="${esc(guardado.etiquetas[l.id] || "")}" placeholder="ex.: azul, rack → sala" aria-label="Etiqueta do cabo ${i + 1}"></td></tr>`;
+    }).join("");
+    $("#vista").innerHTML = `<div class="tabela-rolo"><table class="cabos-t"><thead><tr><th>Nº</th><th>Sai de</th><th>Porta</th><th>Chega em</th><th>Porta</th><th>Tipo</th><th>Velocidade</th><th>Rede</th><th>Certeza</th><th>Sua etiqueta</th></tr></thead><tbody>${tr}</tbody></table></div><div id="csv-area"></div>`;
+    $("#vista").querySelectorAll("[data-ir]").forEach(b => b.onclick = () => ir(b.dataset.ir));
+    $("#vista").querySelectorAll("[data-et]").forEach(i => i.oninput = () => { if (i.value.trim()) guardado.etiquetas[i.dataset.et] = i.value; else delete guardado.etiquetas[i.dataset.et]; lembrar(); });
+  }
+  function copiar() {
+    const cab = ["Nº", "Sai de", "Porta de saída", "Chega em", "Porta de chegada", "Tipo", "Velocidade", "PoE (W)", "Rede", "Certeza", "Etiqueta"];
+    const txt = [cab].concat(linhasLista().map((l, i) => [i + 1, nos.get(l.from).name, l.from_port ?? "", nos.get(l.to).name, l.to_port ?? "", MEIO[l.medium] || l.medium, vel(l.speed), l.poe_w ?? "", REDE[nos.get(l.to).network] || "", l.certainty === "deduzido" ? "Deduzido" : "Medido", guardado.etiquetas[l.id] || ""]))
+      .map(r => r.map(c => String(c).replace(/[\t\n]/g, " ")).join("\t")).join("\n");
+    const b = $("#copiar"), ok = () => { b.textContent = "Copiado. Cole no Excel ou Sheets"; setTimeout(() => b.textContent = "Copiar como planilha", 2500); };
+    const manual = () => { $("#csv-area").innerHTML = `<p class="nota">Não consegui copiar sozinho. Selecione tudo abaixo e copie:</p><textarea class="csv" id="csv-txt" readonly>${esc(txt)}</textarea>`; $("#csv-txt").select(); };
+    try { navigator.clipboard.writeText(txt).then(ok, manual); } catch (e) { manual(); }
+  }
+
+  function tudo() {
+    carregar(); desenharTopo();
+    $("#aba-mapa").setAttribute("aria-selected", st.vista === "mapa"); $("#aba-lista").setAttribute("aria-selected", st.vista === "lista");
+    $("#copiar").hidden = st.vista !== "lista"; $("#rot-finais").hidden = st.vista !== "mapa"; $("#legenda").hidden = st.vista !== "mapa";
+    if (st.vista === "mapa") desenharMapa(); else desenharLista();
+    desenharPainel();
+  }
+  $("#aba-mapa").onclick = () => { st.vista = "mapa"; tudo(); };
+  $("#aba-lista").onclick = () => { st.vista = "lista"; tudo(); };
+  $("#ver-wifi").onchange = e => { st.wifi = e.target.checked; tudo(); };
+  $("#ver-finais").onchange = e => { st.finais = e.target.checked; tudo(); };
+  $("#busca").oninput = e => { st.busca = e.target.value; if (st.vista === "mapa") manterRolagem(desenharMapa); else desenharLista(); };
+  $("#copiar").onclick = copiar;
+  tudo();
+})();
+</script>
+
+</body>
+</html>
